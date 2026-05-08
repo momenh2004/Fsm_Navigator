@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- nav_drawer.xml — Drawer partagé entre toutes les activités -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="match_parent"
+    android:layout_gravity="start"
+    android:background="#F21A1A2E"
+    android:orientation="vertical">
+
+    <!-- En-tête -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:paddingTop="52dp"
+        android:background="#1A1A2E">
+
+        <FrameLayout android:layout_width="60dp" android:layout_height="60dp"
+            android:layout_marginBottom="12dp">
+            <View android:layout_width="60dp" android:layout_height="60dp"
+                android:background="@drawable/bg_avatar"/>
+            <TextView android:id="@+id/drawerAvatarInitial"
+                android:layout_width="match_parent" android:layout_height="match_parent"
+                android:text="H" android:textColor="#1A1A2E" android:textSize="20sp"
+                android:textStyle="bold" android:gravity="center"/>
+        </FrameLayout>
+
+        <TextView android:id="@+id/drawerName"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Étudiant" android:textColor="#FFFFFF"
+            android:textSize="16sp" android:textStyle="bold"/>
+
+        <TextView android:id="@+id/drawerEmail"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="email@fsm.rnu.tn"
+            android:textColor="#607080" android:textSize="12sp"/>
+    </LinearLayout>
+
+    <View android:layout_width="match_parent" android:layout_height="1dp"
+        android:background="#0FFFFFFF"/>
+
+    <!-- Items -->
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1" android:scrollbars="none">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="12dp">
+
+            <LinearLayout android:id="@+id/drawerHome"
+                android:layout_width="match_parent" android:layout_height="52dp"
+                android:background="@drawable/bg_drawer_item_active"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingStart="16dp" android:paddingEnd="16dp"
+                android:layout_marginBottom="4dp" android:clickable="true" android:focusable="true">
+                <TextView android:layout_width="24dp" android:layout_height="24dp"
+                    android:text="⌂" android:textSize="16sp" android:textColor="#00D4FF"
+                    android:gravity="center" android:layout_marginEnd="14dp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Accueil" android:textColor="#00D4FF"
+                    android:textSize="14sp" android:textStyle="bold"/>
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/drawerMap"
+                android:layout_width="match_parent" android:layout_height="52dp"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingStart="16dp" android:paddingEnd="16dp"
+                android:layout_marginBottom="4dp" android:clickable="true" android:focusable="true">
+                <TextView android:layout_width="24dp" android:layout_height="24dp"
+                    android:text="⊙" android:textSize="16sp" android:textColor="#607080"
+                    android:gravity="center" android:layout_marginEnd="14dp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Carte du campus" android:textColor="#B0BEC5" android:textSize="14sp"/>
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/drawerSearch"
+                android:layout_width="match_parent" android:layout_height="52dp"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingStart="16dp" android:paddingEnd="16dp"
+                android:layout_marginBottom="4dp" android:clickable="true" android:focusable="true">
+                <TextView android:layout_width="24dp" android:layout_height="24dp"
+                    android:text="⌕" android:textSize="16sp" android:textColor="#607080"
+                    android:gravity="center" android:layout_marginEnd="14dp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Recherche" android:textColor="#B0BEC5" android:textSize="14sp"/>
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/drawerNav"
+                android:layout_width="match_parent" android:layout_height="52dp"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingStart="16dp" android:paddingEnd="16dp"
+                android:layout_marginBottom="4dp" android:clickable="true" android:focusable="true">
+                <TextView android:layout_width="24dp" android:layout_height="24dp"
+                    android:text="◎" android:textSize="16sp" android:textColor="#607080"
+                    android:gravity="center" android:layout_marginEnd="14dp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Navigation" android:textColor="#B0BEC5" android:textSize="14sp"/>
+            </LinearLayout>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp"
+                android:background="#0FFFFFFF" android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout android:id="@+id/drawerProfile"
+                android:layout_width="match_parent" android:layout_height="52dp"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingStart="16dp" android:paddingEnd="16dp"
+                android:layout_marginBottom="4dp" android:clickable="true" android:focusable="true">
+                <TextView android:layout_width="24dp" android:layout_height="24dp"
+                    android:text="👤" android:textSize="14sp" android:textColor="#607080"
+                    android:gravity="center" android:layout_marginEnd="14dp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Profil" android:textColor="#B0BEC5" android:textSize="14sp"/>
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/drawerAdmin"
+                android:layout_width="match_parent" android:layout_height="52dp"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingStart="16dp" android:paddingEnd="16dp"
+                android:layout_marginBottom="4dp" android:clickable="true" android:focusable="true">
+                <TextView android:layout_width="24dp" android:layout_height="24dp"
+                    android:text="⚙" android:textSize="14sp" android:textColor="#607080"
+                    android:gravity="center" android:layout_marginEnd="14dp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Administration" android:textColor="#B0BEC5" android:textSize="14sp"/>
+            </LinearLayout>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp"
+                android:background="#0FFFFFFF" android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout android:id="@+id/drawerLogout"
+                android:layout_width="match_parent" android:layout_height="52dp"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingStart="16dp" android:paddingEnd="16dp"
+                android:clickable="true" android:focusable="true">
+                <TextView android:layout_width="24dp" android:layout_height="24dp"
+                    android:text="↩" android:textSize="16sp" android:textColor="#FF4B6E"
+                    android:gravity="center" android:layout_marginEnd="14dp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Déconnexion" android:textColor="#FF4B6E" android:textSize="14sp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

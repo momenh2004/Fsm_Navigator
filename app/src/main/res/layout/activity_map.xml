@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/bg_gradient">
+
+        <!-- AppBar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="24dp">
+
+            <ImageButton
+                android:id="@+id/btnHamburger"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@android:drawable/ic_menu_sort_by_size"
+                android:tint="#00D4FF"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Menu"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="14dp"
+                android:text="Carte du campus"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"/>
+
+            <!-- Bouton reset zoom -->
+            <ImageButton
+                android:id="@+id/btnResetZoom"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@android:drawable/ic_menu_zoom"
+                android:tint="#00D4FF"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Reset zoom"/>
+        </LinearLayout>
+
+        <!-- Carte satellite -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="none">
+                <ScrollView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none">
+                    <com.fsm.navigator.map.FsmMapView
+                        android:id="@+id/mapView"
+                        android:layout_width="900dp"
+                        android:layout_height="945dp"/>
+                </ScrollView>
+            </HorizontalScrollView>
+
+            <!-- Bouton localisation -->
+            <LinearLayout
+                android:id="@+id/btnLocate"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_gravity="start|bottom"
+                android:layout_margin="16dp"
+                android:background="@drawable/bg_button_cyan"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📍"
+                    android:textSize="22sp"/>
+            </LinearLayout>
+
+            <!-- Contrôles zoom -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="16dp"
+                android:orientation="vertical"
+                android:background="@drawable/bg_glass_card"
+                android:padding="4dp">
+
+                <ImageButton
+                    android:id="@+id/btnZoomIn"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@android:drawable/btn_plus"
+                    android:tint="#00D4FF"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Zoom +"
+                    android:layout_marginBottom="4dp"/>
+
+                <View android:layout_width="24dp" android:layout_height="1dp"
+                    android:background="#1EFFFFFF" android:layout_gravity="center_horizontal"/>
+
+                <ImageButton
+                    android:id="@+id/btnZoomOut"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@android:drawable/btn_minus"
+                    android:tint="#00D4FF"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Zoom -"
+                    android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
+            <!-- Info bulle bloc sélectionné -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardBlocInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_margin="16dp"
+                app:cardBackgroundColor="#CC1A1A2E"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="8dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvBlocNom"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Bloc 3"
+                            android:textColor="#FFFFFF"
+                            android:textSize="16sp"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:id="@+id/tvBlocDesc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Salles informatiques"
+                            android:textColor="#607080"
+                            android:textSize="12sp"/>
+                    </LinearLayout>
+
+                    <!-- Bouton voir plan -->
+                    <LinearLayout
+                        android:id="@+id/btnVoirPlan"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_button_cyan"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:layout_marginEnd="8dp"
+                        android:clickable="true"
+                        android:focusable="true">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Plan" android:textColor="#1A1A2E"
+                            android:textSize="12sp" android:textStyle="bold"/>
+                    </LinearLayout>
+
+                    <!-- Bouton naviguer -->
+                    <LinearLayout
+                        android:id="@+id/btnNavigerBloc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_button_outline"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:clickable="true"
+                        android:focusable="true">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Y aller" android:textColor="#00D4FF"
+                            android:textSize="12sp" android:textStyle="bold"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </FrameLayout>
+    </LinearLayout>
+
+    <include layout="@layout/nav_drawer" android:layout_gravity="start"/>
+
+</androidx.drawerlayout.widget.DrawerLayout>

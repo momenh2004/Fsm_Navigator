@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ===== PALETTE PRINCIPALE ===== -->
+    <!-- Fond bleu nuit -->
+    <color name="bg_deep">#1A1A2E</color>
+    <color name="bg_mid">#16213E</color>
+    <color name="bg_light">#0F3460</color>
+
+    <!-- Accent cyan -->
+    <color name="accent_cyan">#00D4FF</color>
+    <color name="accent_cyan_light">#33DDFF</color>
+    <color name="accent_cyan_dim">#1A1A2E</color>
+    <color name="accent_cyan_alpha">#2600D4FF</color>
+    <color name="accent_cyan_alpha_strong">#4000D4FF</color>
+
+    <!-- Accent violet -->
+    <color name="accent_purple">#7B2FBE</color>
+    <color name="accent_purple_light">#9B4FDE</color>
+    <color name="accent_purple_alpha">#337B2FBE</color>
+
+    <!-- Accent vert (succès) -->
+    <color name="accent_green">#00D464</color>
+    <color name="accent_green_alpha">#2600D464</color>
+
+    <!-- Accent rouge (erreur) -->
+    <color name="accent_red">#FF4B6E</color>
+    <color name="accent_red_alpha">#26FF4B6E</color>
+
+    <!-- ===== TEXTE ===== -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B0BEC5</color>
+    <color name="text_hint">#607080</color>
+    <color name="text_cyan">#00D4FF</color>
+    <color name="text_disabled">#404A58</color>
+
+    <!-- ===== GLASS (surfaces) ===== -->
+    <color name="glass_bg">#12FFFFFF</color>         <!-- rgba(255,255,255,0.07) -->
+    <color name="glass_bg_strong">#1FFFFFFF</color>  <!-- rgba(255,255,255,0.12) -->
+    <color name="glass_border">#1EFFFFFF</color>     <!-- rgba(255,255,255,0.12) -->
+    <color name="glass_border_strong">#33FFFFFF</color>
+
+    <!-- ===== COMPATIBILITÉ (ancien code) ===== -->
+    <color name="fsm_green">#00D4FF</color>          <!-- remplacé par cyan -->
+    <color name="fsm_text_dark">#FFFFFF</color>
+    <color name="fsm_gray">#607080</color>
+    <color name="fsm_gray_light">#1EFFFFFF</color>
+    <color name="fsm_white">#FFFFFF</color>
+    <color name="fsm_white_soft">#1A1A2E</color>
+
+    <!-- ===== NAVIGATION DRAWER ===== -->
+    <color name="drawer_bg">#1A1A2E</color>
+    <color name="drawer_item_active">#1200D4FF</color>
+    <color name="drawer_divider">#0FFFFFFF</color>
+</resources>

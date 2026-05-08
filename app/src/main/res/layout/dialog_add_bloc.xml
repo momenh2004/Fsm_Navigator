@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- dialog_add_bloc.xml -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <EditText android:id="@+id/etDialogCode"
+        android:layout_width="match_parent" android:layout_height="48dp"
+        android:hint="Code (ex: B3)" android:inputType="text"
+        android:layout_marginBottom="10dp"/>
+
+    <EditText android:id="@+id/etDialogNom"
+        android:layout_width="match_parent" android:layout_height="48dp"
+        android:hint="Nom du bloc" android:inputType="text"
+        android:layout_marginBottom="10dp"/>
+
+    <EditText android:id="@+id/etDialogDescription"
+        android:layout_width="match_parent" android:layout_height="48dp"
+        android:hint="Description" android:inputType="text"
+        android:layout_marginBottom="10dp"/>
+
+    <CheckBox android:id="@+id/cbDialogPmr"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="Accessible PMR" android:checked="false"/>
+</LinearLayout>

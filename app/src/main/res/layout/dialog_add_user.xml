@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- dialog_add_user.xml — correspond au modèle User (email, password, role) -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <EditText
+        android:id="@+id/etDialogEmail"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        android:layout_marginBottom="10dp"/>
+
+    <EditText
+        android:id="@+id/etDialogPassword"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Mot de passe"
+        android:inputType="textPassword"
+        android:layout_marginBottom="10dp"/>
+
+    <!-- Rôle : ETUDIANT ou VISITEUR -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rôle"
+        android:textColor="#555555"
+        android:textSize="13sp"
+        android:layout_marginBottom="6dp"/>
+
+    <RadioGroup
+        android:id="@+id/rgRole"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rbEtudiant"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Étudiant"
+            android:checked="true"
+            android:layout_marginEnd="16dp"/>
+
+        <RadioButton
+            android:id="@+id/rbVisiteur"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Visiteur"/>
+    </RadioGroup>
+
+</LinearLayout>

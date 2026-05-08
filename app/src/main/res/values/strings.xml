@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FSM Navigator</string>
+    <string name="splash_tagline">Trouvez votre chemin à la FSM</string>
+    <string name="splash_university">Faculté des Sciences de Monastir</string>
+    <string name="home_welcome">Bonjour 👋</string>
+    <string name="home_subtitle">Où voulez-vous aller ?</string>
+    <string name="search_hint">Rechercher une salle, un bureau…</string>
+    <string name="btn_navigate">Naviguer</string>
+    <string name="section_quick_access">Accès rapide</string>
+    <string name="section_popular">Destinations populaires</string>
+    <string name="poi_amphitheatre">Amphithéâtres</string>
+    <string name="poi_admin">Administration</string>
+    <string name="poi_labo">Laboratoires</string>
+    <string name="poi_biblio">Bibliothèque</string>
+    <string name="poi_dept">Départements</string>
+    <string name="poi_wc">Sanitaires</string>
+</resources>
