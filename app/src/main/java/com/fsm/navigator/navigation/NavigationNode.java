@@ -56,6 +56,12 @@ public class NavigationNode {
         b.voisins.add(new Edge(a, cost, instrBA));
     }
 
+    // Ajouter un voisin UNIDIRECTIONNEL (a → b seulement)
+    public static void connectOne(NavigationNode a, NavigationNode b,
+                                  float cost, String instrAB) {
+        a.voisins.add(new Edge(b, cost, instrAB));
+    }
+
     // Distance euclidienne (heuristique A*)
     public float distanceTo(NavigationNode other) {
         float dx = this.x - other.x;

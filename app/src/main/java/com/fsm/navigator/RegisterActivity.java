@@ -13,21 +13,26 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.fsm.navigator.auth.AuthService;
 import com.fsm.navigator.auth.TokenManager;
 
+import java.util.Random;
+
 /**
- * RegisterActivity.java – Contrôleur de la page d'inscription
+ * RegisterActivity.java – Inscription avec captcha mathématique
  */
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText    etEmail, etPassword, etConfirmPassword;
+    private EditText    etEmail, etPassword, etConfirmPassword, etCaptcha;
     private Button      btnRegister;
-    private TextView    tvError, tvBackToLogin;
+    private TextView    tvError, tvBackToLogin, tvCaptchaQuestion;
     private ProgressBar progressRegister;
+
+    private int captchaAnswer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         initViews();
+        generateCaptcha();
         setupListeners();
     }
 
@@ -35,12 +40,67 @@ public class RegisterActivity extends AppCompatActivity {
         etEmail           = findViewById(R.id.etEmail);
         etPassword        = findViewById(R.id.etPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
+        etCaptcha         = findViewById(R.id.etCaptcha);
         btnRegister       = findViewById(R.id.btnRegister);
         tvError           = findViewById(R.id.tvError);
         tvBackToLogin     = findViewById(R.id.tvLogin);
+        tvCaptchaQuestion = findViewById(R.id.tvCaptchaQuestion);
         progressRegister  = findViewById(R.id.progressRegister);
     }
 
+    // =========================================================
+    // CAPTCHA MATHÉMATIQUE
+    // =========================================================
+    private void generateCaptcha() {
+        Random rand = new Random();
+        int a = rand.nextInt(10) + 1;  // 1–10
+        int b = rand.nextInt(10) + 1;  // 1–10
+        int op = rand.nextInt(3);       // 0=+, 1=-, 2=×
+
+        String question;
+        switch (op) {
+            case 0:
+                captchaAnswer = a + b;
+                question = "Combien font  " + a + " + " + b + " ?";
+                break;
+            case 1:
+                // s'assurer que la réponse est positive
+                if (a < b) { int tmp = a; a = b; b = tmp; }
+                captchaAnswer = a - b;
+                question = "Combien font  " + a + " − " + b + " ?";
+                break;
+            default:
+                captchaAnswer = a * b;
+                question = "Combien font  " + a + " × " + b + " ?";
+                break;
+        }
+
+        if (tvCaptchaQuestion != null)
+            tvCaptchaQuestion.setText(question);
+    }
+
+    private boolean verifyCaptcha() {
+        String input = etCaptcha != null ? etCaptcha.getText().toString().trim() : "";
+        if (input.isEmpty()) {
+            showError("Veuillez répondre à la question de vérification");
+            return false;
+        }
+        try {
+            int answer = Integer.parseInt(input);
+            if (answer != captchaAnswer) {
+                showError("Réponse incorrecte — veuillez réessayer");
+                generateCaptcha();
+                if (etCaptcha != null) etCaptcha.setText("");
+                return false;
+            }
+            return true;
+        } catch (NumberFormatException e) {
+            showError("Veuillez entrer un nombre");
+            return false;
+        }
+    }
+
+    // =========================================================
     private void setupListeners() {
         btnRegister.setOnClickListener(v -> attemptRegister());
         tvBackToLogin.setOnClickListener(v -> finish());
@@ -66,6 +126,9 @@ public class RegisterActivity extends AppCompatActivity {
         if (!password.equals(confirm)) {
             showError("Les mots de passe ne correspondent pas"); return;
         }
+
+        // ✅ Vérifier le captcha avant d'appeler l'API
+        if (!verifyCaptcha()) return;
 
         setLoading(true);
 

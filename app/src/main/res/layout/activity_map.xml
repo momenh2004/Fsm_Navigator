@@ -12,7 +12,6 @@
         android:orientation="vertical"
         android:background="@drawable/bg_gradient">
 
-        <!-- AppBar -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="72dp"
@@ -42,7 +41,6 @@
                 android:textStyle="bold"
                 android:fontFamily="sans-serif-medium"/>
 
-            <!-- Bouton reset zoom -->
             <ImageButton
                 android:id="@+id/btnResetZoom"
                 android:layout_width="36dp"
@@ -53,28 +51,16 @@
                 android:contentDescription="Reset zoom"/>
         </LinearLayout>
 
-        <!-- Carte satellite -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1">
 
-            <HorizontalScrollView
+            <com.fsm.navigator.map.FsmMapView
+                android:id="@+id/mapView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scrollbars="none">
-                <ScrollView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scrollbars="none">
-                    <com.fsm.navigator.map.FsmMapView
-                        android:id="@+id/mapView"
-                        android:layout_width="900dp"
-                        android:layout_height="945dp"/>
-                </ScrollView>
-            </HorizontalScrollView>
+                android:layout_height="match_parent"/>
 
-            <!-- Bouton localisation -->
             <LinearLayout
                 android:id="@+id/btnLocate"
                 android:layout_width="52dp"
@@ -92,7 +78,6 @@
                     android:textSize="22sp"/>
             </LinearLayout>
 
-            <!-- Contrôles zoom -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -112,8 +97,11 @@
                     android:contentDescription="Zoom +"
                     android:layout_marginBottom="4dp"/>
 
-                <View android:layout_width="24dp" android:layout_height="1dp"
-                    android:background="#1EFFFFFF" android:layout_gravity="center_horizontal"/>
+                <View
+                    android:layout_width="24dp"
+                    android:layout_height="1dp"
+                    android:background="#1EFFFFFF"
+                    android:layout_gravity="center_horizontal"/>
 
                 <ImageButton
                     android:id="@+id/btnZoomOut"
@@ -126,7 +114,6 @@
                     android:layout_marginTop="4dp"/>
             </LinearLayout>
 
-            <!-- Info bulle bloc sélectionné -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardBlocInfo"
                 android:layout_width="match_parent"
@@ -170,42 +157,47 @@
                             android:textSize="12sp"/>
                     </LinearLayout>
 
-                    <!-- Bouton voir plan -->
                     <LinearLayout
                         android:id="@+id/btnVoirPlan"
                         android:layout_width="wrap_content"
                         android:layout_height="40dp"
                         android:background="@drawable/bg_button_cyan"
-                        android:orientation="horizontal"
                         android:gravity="center"
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp"
                         android:layout_marginEnd="8dp"
                         android:clickable="true"
                         android:focusable="true">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="Plan" android:textColor="#1A1A2E"
-                            android:textSize="12sp" android:textStyle="bold"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Plan"
+                            android:textColor="#1A1A2E"
+                            android:textSize="12sp"
+                            android:textStyle="bold"/>
                     </LinearLayout>
 
-                    <!-- Bouton naviguer -->
                     <LinearLayout
                         android:id="@+id/btnNavigerBloc"
                         android:layout_width="wrap_content"
                         android:layout_height="40dp"
                         android:background="@drawable/bg_button_outline"
-                        android:orientation="horizontal"
                         android:gravity="center"
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp"
                         android:clickable="true"
                         android:focusable="true">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="Y aller" android:textColor="#00D4FF"
-                            android:textSize="12sp" android:textStyle="bold"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Y aller"
+                            android:textColor="#00D4FF"
+                            android:textSize="12sp"
+                            android:textStyle="bold"/>
                     </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+
         </FrameLayout>
     </LinearLayout>
 

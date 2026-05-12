@@ -119,21 +119,12 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1">
-
-            <HorizontalScrollView
+            <com.fsm.navigator.BlocDetailView
+                android:id="@+id/blocDetailView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scrollbars="none">
-                <ScrollView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scrollbars="none">
-                    <com.fsm.navigator.BlocDetailView
-                        android:id="@+id/blocDetailView"
-                        android:layout_width="900dp"
-                        android:layout_height="800dp"/>
-                </ScrollView>
-            </HorizontalScrollView>
+                android:layout_height="match_parent"/>
+
+
 
             <!-- Info salle sélectionnée -->
             <androidx.cardview.widget.CardView

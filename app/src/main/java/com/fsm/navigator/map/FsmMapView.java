@@ -7,9 +7,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 
 import com.fsm.navigator.R;
@@ -17,282 +17,214 @@ import com.fsm.navigator.R;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * FsmMapView.java – Photo satellite + marqueurs cliquables
- *
- * Coordonnées extraites par analyse de pixels sur l'image originale
- * Image de référence : 722 x 758 pixels
- * Origine : coin haut-gauche
- */
 public class FsmMapView extends View {
 
-    // ===== MODÈLE MARQUEUR =====
     public static class Bloc {
-        public String  id;
-        public String  nom;
-        public float   cx, cy;  // coordonnées en pixels sur l'image originale
-        public boolean isSelected;
-        public boolean isCurrentLocation;
-
+        public String id, nom;
+        public float cx, cy;
+        public boolean isSelected, isCurrentLocation;
         public Bloc(String id, String nom, float cx, float cy) {
-            this.id  = id;
-            this.nom = nom;
-            this.cx  = cx;
-            this.cy  = cy;
+            this.id = id; this.nom = nom; this.cx = cx; this.cy = cy;
         }
     }
 
-    // ===== INTERFACE =====
     public interface OnBlocClickListener {
         void onBlocClick(Bloc bloc);
     }
 
-    // ===== ATTRIBUTS =====
-    private List<Bloc> blocs        = new ArrayList<>();
-    private Bitmap     satelliteBmp;
-    private Paint      paintNormal, paintSelected, paintCurrent;
-    private Paint      paintBorder, paintLabel, paintLabelBg, paintShadow;
-    private OnBlocClickListener listener;
+    private List<Bloc>          blocs = new ArrayList<>();
+    private Bitmap              satelliteBmp;
+    private OnBlocClickListener clickListener;
 
-    // Zoom
+    private Paint pNormal, pSelected, pLocation, pLabel, pLabelBg;
+
     private float zoomFactor = 1.0f;
-    private float minZoom    = 0.8f;
-    private float maxZoom    = 4.0f;
-    private float panX       = 0f;
-    private float panY       = 0f;
+    private float translateX = 0f, translateY = 0f;
+    private float lastTouchX, lastTouchY;
+    private boolean isDragging = false;
+    private ScaleGestureDetector scaleDetector;
 
-    // Taille de référence = taille réelle de l'image en pixels
-    private static final float REF_W = 722f;
-    private static final float REF_H = 758f;
+    private static final float REF_W      = 1024f;
+    private static final float REF_H      = 1024f;
+    private static final float HIT_RADIUS = 50f;
 
-    private static final float MARKER_R   = 15f;
-    private static final float LABEL_SIZE = 15f;
+    public FsmMapView(Context context, AttributeSet attrs) { super(context, attrs); init(context); }
+    public FsmMapView(Context context)                     { super(context); init(context); }
 
-    // ===== CONSTRUCTEURS =====
-    public FsmMapView(Context context) {
-        super(context);
-        init(context);
-    }
-
-    public FsmMapView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(context);
-    }
-
-    // ===== INIT =====
     private void init(Context context) {
-        try {
-            satelliteBmp = BitmapFactory.decodeResource(
-                    context.getResources(), R.drawable.campus);
-        } catch (Exception e) {
-            satelliteBmp = null;
-        }
+        satelliteBmp = BitmapFactory.decodeResource(getResources(), R.drawable.campus_visible);
 
-        paintNormal = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintNormal.setColor(Color.parseColor("#003B7A"));
-        paintNormal.setStyle(Paint.Style.FILL);
-        paintNormal.setAlpha(230);
+        pNormal = new Paint(Paint.ANTI_ALIAS_FLAG);
+        pNormal.setColor(Color.parseColor("#00D4FF"));
+        pNormal.setStyle(Paint.Style.FILL);
+        pNormal.setAlpha(180);
 
-        paintSelected = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintSelected.setColor(Color.parseColor("#1565C0"));
-        paintSelected.setStyle(Paint.Style.FILL);
+        pSelected = new Paint(Paint.ANTI_ALIAS_FLAG);
+        pSelected.setColor(Color.parseColor("#FF4B6E"));
+        pSelected.setStyle(Paint.Style.FILL);
 
-        paintCurrent = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintCurrent.setColor(Color.parseColor("#E53935"));
-        paintCurrent.setStyle(Paint.Style.FILL);
+        pLocation = new Paint(Paint.ANTI_ALIAS_FLAG);
+        pLocation.setColor(Color.parseColor("#00C853"));
+        pLocation.setStyle(Paint.Style.FILL);
 
-        paintBorder = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintBorder.setColor(Color.WHITE);
-        paintBorder.setStyle(Paint.Style.STROKE);
-        paintBorder.setStrokeWidth(2.5f);
+        pLabel = new Paint(Paint.ANTI_ALIAS_FLAG);
+        pLabel.setColor(Color.WHITE);
+        pLabel.setTextAlign(Paint.Align.CENTER);
+        pLabel.setTextSize(28f);
+        pLabel.setFakeBoldText(true);
 
-        paintLabel = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintLabel.setColor(Color.WHITE);
-        paintLabel.setTextSize(LABEL_SIZE);
-        paintLabel.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-        paintLabel.setTextAlign(Paint.Align.CENTER);
+        pLabelBg = new Paint(Paint.ANTI_ALIAS_FLAG);
+        pLabelBg.setColor(Color.parseColor("#CC000000"));
+        pLabelBg.setStyle(Paint.Style.FILL);
 
-        paintLabelBg = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintLabelBg.setColor(Color.parseColor("#CC003B7A"));
-        paintLabelBg.setStyle(Paint.Style.FILL);
-
-        paintShadow = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintShadow.setColor(Color.parseColor("#55000000"));
-        paintShadow.setStyle(Paint.Style.FILL);
+        scaleDetector = new ScaleGestureDetector(context,
+                new ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                    @Override
+                    public boolean onScale(ScaleGestureDetector d) {
+                        zoomFactor *= d.getScaleFactor();
+                        zoomFactor  = Math.max(0.8f, Math.min(3.0f, zoomFactor));
+                        invalidate();
+                        return true;
+                    }
+                });
 
         initBlocs();
     }
 
-    // ===== BLOCS — coordonnées pixel exactes depuis l'image =====
     private void initBlocs() {
         blocs.clear();
-        blocs.add(new Bloc("B4",    "Bloc 4",        665f, 235f));
-        blocs.add(new Bloc("B3",    "Bloc 3",        576f, 248f));
-        blocs.add(new Bloc("BC2",   "Chimie 2",      584f, 388f));
-        blocs.add(new Bloc("BC1",   "Chimie 1",      431f, 398f));
-        blocs.add(new Bloc("AMPHIS",    "Amphis 1 à 6",        307f, 445f));
-        blocs.add(new Bloc("BP1",   "Physique 1",    440f, 458f));
-        blocs.add(new Bloc("BM",    "Math",          209f, 481f));
-        blocs.add(new Bloc("BP2",   "Physique 2",    599f, 517f));
-        blocs.add(new Bloc("COUR",  "Cour Rouge",    315f, 541f));
-        blocs.add(new Bloc("BIB",   "Bib Centrale",  216f, 548f));
-        blocs.add(new Bloc("BC",  "Bib C1 à C3",    153f, 552f));
-        blocs.add(new Bloc("DOCT",  "Salle des doctorants",        100f, 559f));
-        blocs.add(new Bloc("HORS", "D1, D2, Salle Thése",          88f, 608f));
-        blocs.add(new Bloc("B1",    "Palestine",     529f, 627f));
-        blocs.add(new Bloc("ADMIN", "Administration",   238f, 635f));
-        blocs.add(new Bloc("PCOUR","Petite Cour",    334f, 648f));
+        blocs.add(new Bloc("BP2",   "Bloc Physique 2",  943f, 231f));
+        blocs.add(new Bloc("BP1",   "Bloc Physique 1",  808f, 271f));
+        blocs.add(new Bloc("BM",    "Bloc Math",        418f, 462f));
+        blocs.add(new Bloc("B4",    "Bloc 4",           835f, 490f));
+        blocs.add(new Bloc("COUR",  "Cour Rouge",       621f, 502f));
+        blocs.add(new Bloc("B2",    "Bloc 2",           432f, 583f));
+        blocs.add(new Bloc("PCOUR", "Petite Cour",      624f, 600f));
+        blocs.add(new Bloc("BPAL",  "Bloc Palestine",   273f, 623f));
+        blocs.add(new Bloc("BC",    "Bloc C",           865f, 683f));
+        blocs.add(new Bloc("BC2",   "Bloc Chimie 2",    195f, 729f));
+        blocs.add(new Bloc("BIB",   "Bibliothèque",     449f, 729f));
+        blocs.add(new Bloc("BC1",   "Bloc Chimie 1",    271f, 731f));
+        blocs.add(new Bloc("ADM",   "Administration",    79f, 744f));
+        blocs.add(new Bloc("INF",   "Infirmerie",        96f, 814f));
+        blocs.add(new Bloc("B3",    "Bloc 3",           763f, 867f));
+        blocs.add(new Bloc("STH",   "Salle Thèse",      475f, 880f));
+        blocs.add(new Bloc("D1D2",  "D1 et D2",         332f, 886f));
+        blocs.add(new Bloc("SRV",   "Bloc Service",     159f, 906f));
     }
 
-    // ===== DESSIN =====
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
-        int w = getWidth();
-        int h = getHeight();
+        if (satelliteBmp == null) return;
 
         canvas.save();
-        canvas.translate(panX, panY);
-        canvas.scale(zoomFactor, zoomFactor);
+        canvas.translate(translateX, translateY);
+        canvas.scale(zoomFactor, zoomFactor, getWidth() / 2f, getHeight() / 2f);
 
-        // 1. Photo satellite
-        if (satelliteBmp != null) {
-            canvas.drawBitmap(satelliteBmp, null, new RectF(0, 0, w, h), null);
-        } else {
-            Paint bg = new Paint();
-            bg.setColor(Color.parseColor("#C8D8C8"));
-            canvas.drawRect(0, 0, w, h, bg);
-        }
+        canvas.drawBitmap(satelliteBmp, null, new RectF(0, 0, getWidth(), getHeight()), null);
 
-        // 2. Marqueurs — mise à l'échelle depuis pixels référence → taille écran
-        float scaleX = (float) w / REF_W;
-        float scaleY = (float) h / REF_H;
+        float scaleX = getWidth()  / REF_W;
+        float scaleY = getHeight() / REF_H;
 
         for (Bloc bloc : blocs) {
-            drawMarker(canvas, bloc, scaleX, scaleY);
+            float dx = bloc.cx * scaleX;
+            float dy = bloc.cy * scaleY;
+            float r  = 22f;
+
+            Paint p = bloc.isCurrentLocation ? pLocation
+                    : bloc.isSelected        ? pSelected
+                    : pNormal;
+
+            // Anneau extérieur
+            Paint ring = new Paint(Paint.ANTI_ALIAS_FLAG);
+            ring.setColor(p.getColor());
+            ring.setAlpha(80);
+            ring.setStyle(Paint.Style.STROKE);
+            ring.setStrokeWidth(6f);
+            canvas.drawCircle(dx, dy, r + 8f, ring);
+
+            // Cercle principal
+            canvas.drawCircle(dx, dy, r, p);
+
+            // Label avec fond
+            float lw = pLabel.measureText(bloc.nom) + 16f;
+            float lh = 36f;
+            float lx = dx - lw / 2f;
+            float ly = dy + r + 8f;
+            canvas.drawRoundRect(new RectF(lx, ly, lx + lw, ly + lh), 8f, 8f, pLabelBg);
+            canvas.drawText(bloc.nom, dx, ly + lh - 8f, pLabel);
         }
 
         canvas.restore();
     }
 
-    private void drawMarker(Canvas canvas, Bloc bloc, float sx, float sy) {
-        float x = bloc.cx * sx;
-        float y = bloc.cy * sy;
-
-        Paint fill = bloc.isCurrentLocation ? paintCurrent
-                : bloc.isSelected        ? paintSelected
-                : paintNormal;
-
-        // Ombre
-        canvas.drawCircle(x + 2f, y + 2f, MARKER_R + 1f, paintShadow);
-
-        // Cercle principal
-        canvas.drawCircle(x, y, MARKER_R, fill);
-        canvas.drawCircle(x, y, MARKER_R, paintBorder);
-
-        // Anneau position actuelle
-        if (bloc.isCurrentLocation) {
-            Paint ring = new Paint(Paint.ANTI_ALIAS_FLAG);
-            ring.setColor(Color.parseColor("#88E53935"));
-            ring.setStyle(Paint.Style.STROKE);
-            ring.setStrokeWidth(3f);
-            canvas.drawCircle(x, y, MARKER_R + 6f, ring);
-        }
-
-        // Label
-        String label = (bloc.isSelected || bloc.isCurrentLocation)
-                ? bloc.nom
-                : bloc.nom.split(" ")[0];
-
-        Paint lp = new Paint(paintLabel);
-        lp.setTextSize(LABEL_SIZE);
-
-        float lw = lp.measureText(label) + 8f;
-        float lh = lp.getTextSize() + 6f;
-        float ly = y - MARKER_R - 4f;
-
-        RectF lRect = new RectF(x - lw/2f, ly - lh, x + lw/2f, ly);
-        canvas.drawRoundRect(lRect, 4f, 4f, paintLabelBg);
-        canvas.drawText(label, x, ly - 3f, lp);
-    }
-
-    // ===== ZOOM =====
-    public void zoomIn() {
-        zoomFactor = Math.min(zoomFactor + 0.3f, maxZoom);
-        invalidate();
-    }
-
-    public void zoomOut() {
-        zoomFactor = Math.max(zoomFactor - 0.3f, minZoom);
-        clampPan();
-        invalidate();
-    }
-
-    public void resetZoom() {
-        zoomFactor = 1.0f;
-        panX = 0f;
-        panY = 0f;
-        invalidate();
-    }
-
-    private void clampPan() {
-        int w = getWidth(), h = getHeight();
-        float maxPanX = w * (zoomFactor - 1);
-        float maxPanY = h * (zoomFactor - 1);
-        panX = Math.max(-maxPanX, Math.min(0, panX));
-        panY = Math.max(-maxPanY, Math.min(0, panY));
-    }
-
-    // ===== TOUCH =====
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_UP) {
-            float tx = (event.getX() - panX) / zoomFactor;
-            float ty = (event.getY() - panY) / zoomFactor;
+        scaleDetector.onTouchEvent(event);
 
-            int w = getWidth(), h = getHeight();
-            float scaleX = (float) w / REF_W;
-            float scaleY = (float) h / REF_H;
-            float touchR = 35f;
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+                lastTouchX = event.getX();
+                lastTouchY = event.getY();
+                isDragging = false;
+                return true;
 
-            for (Bloc bloc : blocs) {
-                float mx = bloc.cx * scaleX;
-                float my = bloc.cy * scaleY;
-                double dist = Math.sqrt(Math.pow(tx-mx, 2) + Math.pow(ty-my, 2));
-                if (dist <= touchR) {
-                    for (Bloc b : blocs) b.isSelected = false;
-                    bloc.isSelected = true;
+            case MotionEvent.ACTION_MOVE:
+                float dx = event.getX() - lastTouchX;
+                float dy = event.getY() - lastTouchY;
+                if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+                    isDragging  = true;
+                    translateX += dx;
+                    translateY += dy;
+                    lastTouchX  = event.getX();
+                    lastTouchY  = event.getY();
                     invalidate();
-                    if (listener != null) listener.onBlocClick(bloc);
-                    return true;
                 }
-            }
-            for (Bloc b : blocs) b.isSelected = false;
-            invalidate();
+                return true;
+
+            case MotionEvent.ACTION_UP:
+                if (!isDragging && !scaleDetector.isInProgress())
+                    handleClick(event.getX(), event.getY());
+                return true;
         }
-        return true;
+        return super.onTouchEvent(event);
     }
 
-    // ===== API =====
-    public void setOnBlocClickListener(OnBlocClickListener l) { this.listener = l; }
+    private void handleClick(float touchX, float touchY) {
+        float scaleX = getWidth()  / REF_W;
+        float scaleY = getHeight() / REF_H;
 
-    public void setCurrentLocation(String blocId) {
-        for (Bloc b : blocs) b.isCurrentLocation = b.id.equals(blocId);
+        float imgX = (touchX - translateX - (1 - zoomFactor) * getWidth()  / 2f) / zoomFactor;
+        float imgY = (touchY - translateY - (1 - zoomFactor) * getHeight() / 2f) / zoomFactor;
+
+        Bloc  closest = null;
+        float minDist = Float.MAX_VALUE;
+
+        for (Bloc bloc : blocs) {
+            float bx   = bloc.cx * scaleX;
+            float by   = bloc.cy * scaleY;
+            float dist = (float) Math.hypot(imgX - bx, imgY - by);
+            if (dist < HIT_RADIUS && dist < minDist) {
+                minDist = dist;
+                closest = bloc;
+            }
+        }
+
+        if (closest != null) {
+            for (Bloc b : blocs) b.isSelected = false;
+            closest.isSelected = true;
+            invalidate();
+            if (clickListener != null) clickListener.onBlocClick(closest);
+        }
+    }
+
+    public void setOnBlocClickListener(OnBlocClickListener l) { this.clickListener = l; }
+    public void setCurrentLocation(String id) {
+        for (Bloc b : blocs) b.isCurrentLocation = b.id.equals(id);
         invalidate();
     }
-
-    public void clearSelection() {
-        for (Bloc b : blocs) { b.isSelected = false; b.isCurrentLocation = false; }
-        invalidate();
-    }
-
-    @Override
-    protected void onMeasure(int wSpec, int hSpec) {
-        float density = getResources().getDisplayMetrics().density;
-        // Ratio 722/758 ≈ 0.952
-        int w = (int)(900 * density);
-        int h = (int)(945 * density);
-        setMeasuredDimension(w, h);
-    }
+    public void zoomIn()    { zoomFactor = Math.min(3.0f, zoomFactor + 0.2f); invalidate(); }
+    public void zoomOut()   { zoomFactor = Math.max(0.8f, zoomFactor - 0.2f); invalidate(); }
+    public void resetZoom() { zoomFactor = 1.0f; translateX = 0; translateY = 0; invalidate(); }
 }

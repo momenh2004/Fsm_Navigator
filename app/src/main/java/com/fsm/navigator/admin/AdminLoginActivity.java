@@ -119,7 +119,7 @@ public class AdminLoginActivity extends AppCompatActivity {
             } catch (Exception e) {
                 runOnUiThread(() -> {
                     setLoading(false);
-                    Toast.makeText(this, "Impossible de contacter le serveur.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Impossible de contacter le serveur.", Toast.LENGTH_SHORT).show();
                 });
             }
         }).start();
@@ -177,7 +177,7 @@ public class AdminLoginActivity extends AppCompatActivity {
             } catch (Exception e) {
                 runOnUiThread(() -> {
                     setLoading(false);
-                    Toast.makeText(this, "Impossible de contacter le serveur.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Impossible de contacter le serveur.", Toast.LENGTH_SHORT).show();
                 });
             }
         }).start();

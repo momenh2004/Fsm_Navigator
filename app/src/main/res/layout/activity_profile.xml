@@ -185,6 +185,40 @@
                             android:visibility="visible"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
+                <!-- Section Favoris -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⭐ Mes favoris"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
+
+                <ProgressBar
+                    android:id="@+id/progressFavoris"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_horizontal"
+                    android:indeterminateTint="@color/accent_cyan"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/tvFavorisEmpty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Aucun favori enregistré"
+                    android:textColor="#607080"
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:visibility="gone"/>
+
+                <LinearLayout
+                    android:id="@+id/layoutFavorisItems"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
 
                 <!-- Actions -->
                 <androidx.cardview.widget.CardView

@@ -157,16 +157,39 @@ public class MapActivity extends BaseDrawerActivity {
             @Override
             public void onLocationFailed(String reason) {
                 runOnUiThread(() -> {
-                    String message;
+                    // Cacher la card bloc
+                    if (cardBlocInfo != null) cardBlocInfo.setVisibility(View.GONE);
+
                     switch (reason) {
-                        case "NOT_FSM_WIFI":   message = "Connectez-vous au WiFi FSM"; break;
-                        case "NO_FINGERPRINTS":message = "Données indisponibles"; break;
-                        case "KNN_FAILED":     message = "Localisation impossible, réessayez"; break;
-                        default:               message = "Erreur de localisation"; break;
+                        case "NOT_FSM_WIFI":
+                            // Afficher AlertDialog comme dans NavigationActivity
+                            new android.app.AlertDialog.Builder(MapActivity.this)
+                                    .setTitle("⚠️ WiFi FSM non détecté")
+                                    .setMessage("Vous n'êtes pas connecté au WiFi FSM.\n\n" +
+                                            "Connectez-vous au réseau WiFi de la faculté " +
+                                            "pour utiliser la localisation en temps réel.")
+                                    .setPositiveButton("OK", null)
+                                    .show();
+                            break;
+
+                        case "NO_FINGERPRINTS":
+                            Toast.makeText(getApplicationContext(),
+                                    "Données de localisation indisponibles",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+
+                        case "KNN_FAILED":
+                            Toast.makeText(getApplicationContext(),
+                                    "Localisation impossible, réessayez",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+
+                        default:
+                            Toast.makeText(getApplicationContext(),
+                                    "Erreur de localisation",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
                     }
-                    if (tvBlocDesc   != null) tvBlocDesc.setText(message);
-                    if (cardBlocInfo != null) cardBlocInfo.setVisibility(View.VISIBLE);
-                    Toast.makeText(getApplicationContext(), "...", Toast.LENGTH_SHORT).show();
                 });
             }
         });

@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.View;
@@ -13,42 +12,49 @@ import android.view.View;
 import java.util.List;
 
 /**
- * NavigationView.java – Vue Canvas pour l'itinéraire
+ * NavigationView.java – Vue Canvas pour l'itinéraire Bloc 3
  *
- * Affiche :
- *   - Le plan du bloc (murs, salles, couloirs)
- *   - Le chemin A* en bleu
- *   - La position actuelle (point rouge)
- *   - La destination (point vert)
- *   - Les flèches directionnelles
+ * Référentiel MONDE (portrait, comme à l'écran) :
+ *   - x_réel : axe horizontal  → largeur 17.76 m  (de gauche à droite)
+ *   - y_réel : axe vertical    → longueur 30.74 m (de haut en bas)
+ *
+ * Repère :
+ *   (0, 0) = coin haut-gauche du plan
+ *   x grandit vers la DROITE
+ *   y grandit vers le BAS
+ *
+ * Disposition (vue de haut, portrait) :
+ *   - SORTIE en haut (y ≈ 0)
+ *   - ENTRÉE en bas (y ≈ 30.74)
+ *   - Salles 305, 306, 307 à gauche (x ≈ 0..3.5)
+ *   - Salles 304, 303, Bureau, 302 à droite (x ≈ 14..17.76)
+ *   - 308 et 301 en bas, encadrant l'ENTRÉE
+ *   - Cour Centrale au milieu, avec Escalier juste au-dessus de l'entrée
  */
 public class NavigationView extends View {
 
-    private Paint pWall, pWallFill, pRoom, pRoomFill, pCorridor;
+    private Paint pWall, pWallFill, pRoom, pRoomFill, pCorridor, pCour;
     private Paint pPath, pPathArrow;
     private Paint pCurrent, pDestination;
     private Paint pText, pTextSmall, pBg;
-    private Paint pNode;
 
-    // Données de navigation
     private NavigationGraph.NavPath currentPath = null;
     private NavigationNode          currentPos  = null;
     private NavigationNode          destination = null;
-    private NavigationGraph         graph       = null;
 
-    // Dimensions réelles Bloc 3 (mètres)
-    private static final float REAL_W = 17f;
-    private static final float REAL_H = 15f;
+    // Dimensions réelles Bloc 3 (mètres) — orienté portrait
+    private static final float REAL_W = 17.76f;  // largeur (horizontal)
+    private static final float REAL_H = 30.74f;  // longueur (vertical)
 
-    // Marges
-    private float mL, mR, mT, mB;
-    private float sx, sy;
+    private float scale;
+    private float offsetX, offsetY;
 
     public NavigationView(Context ctx, AttributeSet attrs) { super(ctx, attrs); init(); }
     public NavigationView(Context ctx)                     { super(ctx); init(); }
 
     private void init() {
-        pBg = new Paint(); pBg.setColor(Color.parseColor("#0D1B2A"));
+        pBg = new Paint();
+        pBg.setColor(Color.parseColor("#0D1B2A"));
 
         pWall = new Paint(Paint.ANTI_ALIAS_FLAG);
         pWall.setColor(Color.parseColor("#4A90D9"));
@@ -72,34 +78,30 @@ public class NavigationView extends View {
         pCorridor.setColor(Color.parseColor("#061018"));
         pCorridor.setStyle(Paint.Style.FILL);
 
-        // Chemin A* — ligne bleue
+        pCour = new Paint(Paint.ANTI_ALIAS_FLAG);
+        pCour.setColor(Color.parseColor("#0D1B2A"));
+        pCour.setStyle(Paint.Style.STROKE);
+        pCour.setStrokeWidth(2f);
+
         pPath = new Paint(Paint.ANTI_ALIAS_FLAG);
         pPath.setColor(Color.parseColor("#2196F3"));
         pPath.setStyle(Paint.Style.STROKE);
         pPath.setStrokeWidth(6f);
         pPath.setStrokeCap(Paint.Cap.ROUND);
         pPath.setStrokeJoin(Paint.Join.ROUND);
-        pPath.setAlpha(200);
+        pPath.setAlpha(220);
 
-        // Flèches du chemin
         pPathArrow = new Paint(Paint.ANTI_ALIAS_FLAG);
         pPathArrow.setColor(Color.parseColor("#2196F3"));
         pPathArrow.setStyle(Paint.Style.FILL);
 
-        // Position actuelle — rouge
         pCurrent = new Paint(Paint.ANTI_ALIAS_FLAG);
         pCurrent.setColor(Color.parseColor("#E53935"));
         pCurrent.setStyle(Paint.Style.FILL);
 
-        // Destination — vert
         pDestination = new Paint(Paint.ANTI_ALIAS_FLAG);
         pDestination.setColor(Color.parseColor("#00C853"));
         pDestination.setStyle(Paint.Style.FILL);
-
-        pNode = new Paint(Paint.ANTI_ALIAS_FLAG);
-        pNode.setColor(Color.parseColor("#4A90D9"));
-        pNode.setStyle(Paint.Style.FILL);
-        pNode.setAlpha(120);
 
         pText = new Paint(Paint.ANTI_ALIAS_FLAG);
         pText.setColor(Color.WHITE);
@@ -111,187 +113,230 @@ public class NavigationView extends View {
         pTextSmall.setTextAlign(Paint.Align.CENTER);
     }
 
-    // ===== SETTER =====
     public void setNavigationData(NavigationGraph graph,
                                   NavigationGraph.NavPath path,
                                   NavigationNode current,
                                   NavigationNode destination) {
-        this.graph       = graph;
         this.currentPath = path;
         this.currentPos  = current;
         this.destination = destination;
         invalidate();
     }
 
-    // ===== DESSIN =====
+    // =========================================================
+    // CONVERSION MONDE → ÉCRAN  (pas de rotation)
+    //   screen_x = offsetX + world_x * scale
+    //   screen_y = offsetY + world_y * scale
+    // =========================================================
+    private float wx(float worldX) { return offsetX + worldX * scale; }
+    private float wy(float worldY) { return offsetY + worldY * scale; }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         int w = getWidth(), h = getHeight();
+        if (w == 0 || h == 0) return;
+        android.util.Log.d("NAV", "onDraw w=" + w + " h=" + h + " scale=" + scale);
 
         canvas.drawRect(0, 0, w, h, pBg);
 
-        mL = w * 0.07f; mR = w * 0.07f;
-        mT = h * 0.06f; mB = h * 0.10f;
-        float dW = w - mL - mR;
-        float dH = h - mT - mB;
-        sx = dW / REAL_W;
-        sy = dH / REAL_H;
+        float marginTop    = h * 0.06f;
+        float marginBottom = h * 0.12f;
+        float marginH      = w * 0.05f;
+
+        float availW = w - 2f * marginH;
+        float availH = h - marginTop - marginBottom;
+
+        float scaleW = availW / REAL_W;
+        float scaleH = availH / REAL_H;
+        scale = Math.min(scaleW, scaleH);
+
+        float drawnW = REAL_W * scale;
+        float drawnH = REAL_H * scale;
+        offsetX = (w - drawnW) / 2f;
+        offsetY = marginTop + (availH - drawnH) / 2f;
 
         drawBloc3Plan(canvas);
 
         if (currentPath != null) drawPath(canvas);
         if (currentPos  != null) drawCurrentPosition(canvas);
-        if (destination  != null) drawDestination(canvas);
+        if (destination != null) drawDestination(canvas);
 
         drawLegend(canvas, w, h);
     }
 
-    // ===== PLAN BLOC 3 =====
+    // =========================================================
+    // PLAN BLOC 3 — Tout en portrait, sans rotation
+    // Repère monde : (0,0) en haut-gauche, x → droite, y → bas
+    // Largeur 17.76 m, hauteur 30.74 m
+    // =========================================================
     private void drawBloc3Plan(Canvas canvas) {
-        // Périmètre
-        canvas.drawRect(mL, mT, mL + REAL_W*sx, mT + REAL_H*sy, pWallFill);
-        canvas.drawRect(mL, mT, mL + REAL_W*sx, mT + REAL_H*sy, pWall);
 
-        // Cour intérieure
-        canvas.drawRect(mL+3.5f*sx, mT+1.5f*sy,
-                mL+13.5f*sx, mT+12.5f*sy, pCorridor);
+        // ---- Périmètre extérieur du bloc ----
+        canvas.drawRect(wx(0), wy(0), wx(REAL_W), wy(REAL_H), pWallFill);
+        canvas.drawRect(wx(0), wy(0), wx(REAL_W), wy(REAL_H), pWall);
 
-        // Salles gauche
-        drawRoom(canvas, 0f, 2.5f,  3.5f, 5f,   "305");
-        drawRoom(canvas, 0f, 5.25f, 3.5f, 7.75f, "306");
-        drawRoom(canvas, 0f, 10.85f,3.5f, 13.35f,"307");
+        // ---- Cour centrale (rectangle vide au milieu) ----
+        // monde x ∈ [4.5, 13.5]  (largeur ≈ 9 m)
+        // monde y ∈ [3, 26]      (longueur ≈ 23 m)
+        float cx0 = 4.5f, cy0 = 3f, cx1 = 13.5f, cy1 = 26f;
+        canvas.drawRect(wx(cx0), wy(cy0), wx(cx1), wy(cy1), pCour);
+        // Label "Cour Centrale" au milieu
+        pText.setTextSize(scale * 0.9f);
+        canvas.drawText("Cour Centrale",
+                wx((cx0 + cx1) / 2f),
+                wy((cy0 + cy1) / 2f) + pText.getTextSize() / 3f,
+                pText);
 
-        // Salles droite
-        drawRoom(canvas, 13.5f, 2.5f,  17f, 5f,    "304");
-        drawRoom(canvas, 13.5f, 5.25f, 17f, 7.75f,  "303");
-        drawRoom(canvas, 13.5f, 10.85f,17f, 13.35f, "302");
+        // ---- Salles côté GAUCHE (x ≈ 0..3.5) ----
+        // 305 en haut, 306 en dessous, 307 en bas
+        drawWorldRoom(canvas, 0f,  3.5f,  3.5f,  6.5f,  "305");
+        drawWorldRoom(canvas, 0f,  6.8f,  3.5f,  9.8f,  "306");
+        drawWorldRoom(canvas, 0f, 22f,    3.5f, 25f,    "307");
 
-        // Bas
-        drawRoom(canvas, 0.5f, 13f,  7f,   15f, "308");
-        drawRoom(canvas, 10f,  13f,  16.5f, 15f, "301");
+        // ---- Salles côté DROIT (x ≈ 14.26..17.76) ----
+        drawWorldRoom(canvas, 14.26f,  3.5f,  17.76f,  6.5f,  "304");
+        drawWorldRoom(canvas, 14.26f,  6.8f,  17.76f,  9.8f,  "303");
+        drawWorldRoom(canvas, 14.26f, 13.5f,  17.76f, 16.5f,  "Bureau");
+        drawWorldRoom(canvas, 14.26f, 22f,    17.76f, 25f,    "302");
 
-        // Escalier
-        float ex0 = mL+5.5f*sx, ey0 = mT+11.5f*sy;
-        float ex1 = mL+11.5f*sx,ey1 = mT+13.5f*sy;
-        canvas.drawRect(ex0, ey0, ex1, ey1, pRoomFill);
-        canvas.drawRect(ex0, ey0, ex1, ey1, pRoom);
-        pTextSmall.setTextSize(sy * 0.8f);
-        canvas.drawText("Escalier", (ex0+ex1)/2f, (ey0+ey1)/2f+sy*0.3f, pTextSmall);
+        // ---- Salles BAS (autour de l'entrée) ----
+        // 308 à gauche, 301 à droite
+        drawWorldRoom(canvas, 1.5f,  27.5f,  6f,    30f,  "308");
+        drawWorldRoom(canvas, 11.76f, 27.5f, 16.26f, 30f, "301");
 
-        // Entrée / Sortie
-        float enX = mL+8.5f*sx;
-        canvas.drawRoundRect(new RectF(enX-2f*sx, mT+REAL_H*sy-0.7f*sy,
-                        enX+2f*sx, mT+REAL_H*sy), 6f, 6f,
-                makeFill("#00694A"));
-        pText.setTextSize(sy*0.8f);
-        canvas.drawText("ENTRÉE", enX, mT+REAL_H*sy-0.2f*sy, pText);
+        // ---- Escalier (au-dessus de l'entrée, dans le couloir bas) ----
+        drawWorldRect(canvas, 6.5f, 25.5f, 11.26f, 26.8f, pRoomFill, "Escalier");
 
-        canvas.drawRoundRect(new RectF(enX-2f*sx, mT,
-                        enX+2f*sx, mT+0.7f*sy), 6f, 6f,
-                makeFill("#8B3A00"));
-        canvas.drawText("SORTIE", enX, mT+0.5f*sy, pText);
+        // ---- ENTRÉE (en bas, au centre) ----
+        drawWorldRect(canvas, 7f, 30f, 10.76f, 30.74f, makeFill("#00694A"), "ENTRÉE");
+
+        // ---- SORTIE (en haut, au centre) ----
+        drawWorldRect(canvas, 7f, 0f, 10.76f, 0.74f, makeFill("#8B3A00"), "SORTIE");
     }
 
-    private void drawRoom(Canvas canvas, float x0, float y0,
-                          float x1, float y1, String nom) {
-        float rx0=mL+x0*sx, ry0=mT+y0*sy, rx1=mL+x1*sx, ry1=mT+y1*sy;
-        canvas.drawRect(rx0, ry0, rx1, ry1, pRoomFill);
-        canvas.drawRect(rx0, ry0, rx1, ry1, pRoom);
-        pText.setTextSize((ry1-ry0)*0.35f);
-        canvas.drawText(nom, (rx0+rx1)/2f, (ry0+ry1)/2f+pText.getTextSize()/3f, pText);
+    private void drawWorldRect(Canvas canvas, float wx0, float wy0,
+                               float wx1, float wy1, Paint fill, String label) {
+        float left   = wx(wx0);
+        float top    = wy(wy0);
+        float right  = wx(wx1);
+        float bottom = wy(wy1);
+        canvas.drawRect(left, top, right, bottom, fill);
+        if (label != null) {
+            pText.setTextSize(Math.min(scale * 0.65f, (bottom - top) * 0.5f));
+            canvas.drawText(label, (left + right) / 2f,
+                    (top + bottom) / 2f + pText.getTextSize() / 3f, pText);
+        }
     }
 
-    // ===== CHEMIN A* =====
+    private void drawWorldRoom(Canvas canvas, float wx0, float wy0,
+                               float wx1, float wy1, String nom) {
+        float left   = wx(wx0);
+        float top    = wy(wy0);
+        float right  = wx(wx1);
+        float bottom = wy(wy1);
+
+        canvas.drawRect(left, top, right, bottom, pRoomFill);
+        canvas.drawRect(left, top, right, bottom, pRoom);
+        pText.setTextSize(Math.min(scale * 0.8f, (bottom - top) * 0.4f));
+        canvas.drawText(nom, (left + right) / 2f,
+                (top + bottom) / 2f + pText.getTextSize() / 3f, pText);
+    }
+
+    // =========================================================
+    // CHEMIN A*
+    // =========================================================
     private void drawPath(Canvas canvas) {
         List<NavigationNode> nodes = currentPath.nodes;
         if (nodes == null || nodes.size() < 2) return;
 
         Path path = new Path();
         NavigationNode first = nodes.get(0);
-        path.moveTo(mL + first.x * sx, mT + first.y * sy);
+        path.moveTo(wx(first.x), wy(first.y));
 
         for (int i = 1; i < nodes.size(); i++) {
             NavigationNode n = nodes.get(i);
-            path.lineTo(mL + n.x * sx, mT + n.y * sy);
+            path.lineTo(wx(n.x), wy(n.y));
         }
         canvas.drawPath(path, pPath);
 
-        // Flèches directionnelles sur le chemin
         for (int i = 0; i < nodes.size() - 1; i++) {
             NavigationNode a = nodes.get(i);
             NavigationNode b = nodes.get(i + 1);
-            float mx = mL + (a.x + b.x) / 2f * sx;
-            float my = mT + (a.y + b.y) / 2f * sy;
-            float dx = b.x - a.x;
-            float dy = b.y - a.y;
-            float angle = (float) Math.toDegrees(Math.atan2(dy, dx));
+            float ax = wx(a.x);
+            float ay = wy(a.y);
+            float bx = wx(b.x);
+            float by = wy(b.y);
+            float mx = (ax + bx) / 2f;
+            float my = (ay + by) / 2f;
+            float angle = (float) Math.toDegrees(Math.atan2(by - ay, bx - ax));
             drawArrow(canvas, mx, my, angle);
         }
     }
 
     private void drawArrow(Canvas canvas, float x, float y, float angleDeg) {
-        float r = 14f;
+        float r = scale * 0.4f;
         canvas.save();
         canvas.translate(x, y);
         canvas.rotate(angleDeg);
         Path arrow = new Path();
-        arrow.moveTo(r,  0);
+        arrow.moveTo(r, 0);
         arrow.lineTo(-r/2f, -r/2f);
-        arrow.lineTo(-r/2f,  r/2f);
+        arrow.lineTo(-r/2f, r/2f);
         arrow.close();
         canvas.drawPath(arrow, pPathArrow);
         canvas.restore();
     }
 
-    // ===== POSITION ACTUELLE =====
     private void drawCurrentPosition(Canvas canvas) {
-        float x = mL + currentPos.x * sx;
-        float y = mT + currentPos.y * sy;
+        float x = wx(currentPos.x);
+        float y = wy(currentPos.y);
+        float radius = scale * 0.5f;
 
-        // Anneau extérieur
         Paint ring = new Paint(Paint.ANTI_ALIAS_FLAG);
         ring.setColor(Color.parseColor("#88E53935"));
         ring.setStyle(Paint.Style.STROKE);
         ring.setStrokeWidth(3f);
-        canvas.drawCircle(x, y, 22f, ring);
+        canvas.drawCircle(x, y, radius * 1.5f, ring);
 
-        canvas.drawCircle(x, y, 15f, pCurrent);
+        canvas.drawCircle(x, y, radius, pCurrent);
 
-        // Label
         Paint lp = new Paint(pText);
-        lp.setTextSize(14f);
-        canvas.drawText("📍 Vous", x, y - 25f, lp);
+        lp.setTextSize(scale * 0.6f);
+        canvas.drawText("📍 Vous", x, y - radius - scale * 0.3f, lp);
     }
 
-    // ===== DESTINATION =====
     private void drawDestination(Canvas canvas) {
-        float x = mL + destination.x * sx;
-        float y = mT + destination.y * sy;
+        float x = wx(destination.x);
+        float y = wy(destination.y);
+        float radius = scale * 0.5f;
 
-        canvas.drawCircle(x, y, 15f, pDestination);
+        canvas.drawCircle(x, y, radius, pDestination);
 
         Paint lp = new Paint(pText);
-        lp.setTextSize(14f);
-        canvas.drawText("🎯 " + destination.nom, x, y - 25f, lp);
+        lp.setTextSize(scale * 0.6f);
+        canvas.drawText("🎯 " + destination.nom, x, y - radius - scale * 0.3f, lp);
     }
 
-    // ===== LÉGENDE =====
     private void drawLegend(Canvas canvas, int w, int h) {
-        float y = h * 0.92f, x = w * 0.05f, s = h * 0.02f, gap = w * 0.32f;
+        float y   = h * 0.93f;
+        float x   = w * 0.05f;
+        float s   = h * 0.02f;
+        float gap = w * 0.30f;
 
-        canvas.drawCircle(x+s/2f, y+s/2f, s/2f, pCurrent);
-        pTextSmall.setTextSize(s*0.85f);
+        canvas.drawCircle(x + s/2f, y + s/2f, s/2f, pCurrent);
+        pTextSmall.setTextSize(s * 0.85f);
         pTextSmall.setTextAlign(Paint.Align.LEFT);
-        canvas.drawText("Votre position", x+s+4f, y+s*0.8f, pTextSmall);
+        canvas.drawText("Votre position", x + s + 4f, y + s * 0.8f, pTextSmall);
 
-        canvas.drawCircle(x+gap+s/2f, y+s/2f, s/2f, pDestination);
-        canvas.drawText("Destination", x+gap+s+4f, y+s*0.8f, pTextSmall);
+        canvas.drawCircle(x + gap + s/2f, y + s/2f, s/2f, pDestination);
+        canvas.drawText("Destination", x + gap + s + 4f, y + s * 0.8f, pTextSmall);
 
         pPath.setStrokeWidth(3f);
-        canvas.drawLine(x+gap*2f, y+s/2f, x+gap*2f+s*2f, y+s/2f, pPath);
+        canvas.drawLine(x + gap*2f, y + s/2f,
+                x + gap*2f + s*2f, y + s/2f, pPath);
         pPath.setStrokeWidth(6f);
-        canvas.drawText("Itinéraire", x+gap*2f+s*2f+4f, y+s*0.8f, pTextSmall);
+        canvas.drawText("Itinéraire", x + gap*2f + s*2f + 4f, y + s * 0.8f, pTextSmall);
 
         pTextSmall.setTextAlign(Paint.Align.CENTER);
     }
@@ -301,11 +346,5 @@ public class NavigationView extends View {
         p.setColor(Color.parseColor(hex));
         p.setStyle(Paint.Style.FILL);
         return p;
-    }
-
-    @Override
-    protected void onMeasure(int wSpec, int hSpec) {
-        float d = getResources().getDisplayMetrics().density;
-        setMeasuredDimension((int)(900*d), (int)(800*d));
     }
 }

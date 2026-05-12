@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -14,10 +15,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.fsm.navigator.auth.TokenManager;
 import com.fsm.navigator.admin.AdminLoginActivity;
 
-/**
- * BaseDrawerActivity.java
- * Classe parent pour toutes les activités avec Navigation Drawer.
- */
 public abstract class BaseDrawerActivity extends AppCompatActivity {
 
     protected DrawerLayout drawerLayout;
@@ -26,47 +23,76 @@ public abstract class BaseDrawerActivity extends AppCompatActivity {
         drawerLayout = findViewById(R.id.drawerLayout);
         if (drawerLayout == null) return;
 
-        // Remplir infos utilisateur
-        String email = TokenManager.getEmail(this);
-        if (email != null && !email.isEmpty()) {
-            String name        = email.contains("@") ? email.split("@")[0] : email;
-            String displayName = name.substring(0,1).toUpperCase() + name.substring(1);
+        boolean isLoggedIn = TokenManager.isLoggedIn(this);
 
-            TextView drawerName   = findViewById(R.id.drawerName);
-            TextView drawerEmail  = findViewById(R.id.drawerEmail);
-            TextView drawerAvatar = findViewById(R.id.drawerAvatarInitial);
+        // Header drawer
+        TextView drawerName   = findViewById(R.id.drawerName);
+        TextView drawerEmail  = findViewById(R.id.drawerEmail);
+        TextView drawerAvatar = findViewById(R.id.drawerAvatarInitial);
 
-            if (drawerName   != null) drawerName.setText(displayName);
-            if (drawerEmail  != null) drawerEmail.setText(email);
-            if (drawerAvatar != null) drawerAvatar.setText(String.valueOf(displayName.charAt(0)));
+        if (isLoggedIn) {
+            String email = TokenManager.getEmail(this);
+            if (email != null && !email.isEmpty()) {
+                String name        = email.contains("@") ? email.split("@")[0] : email;
+                String displayName = name.substring(0,1).toUpperCase() + name.substring(1);
+                if (drawerName   != null) drawerName.setText(displayName);
+                if (drawerEmail  != null) drawerEmail.setText(email);
+                if (drawerAvatar != null) drawerAvatar.setText(String.valueOf(displayName.charAt(0)));
+            }
+        } else {
+            if (drawerName   != null) drawerName.setText("Visiteur");
+            if (drawerEmail  != null) drawerEmail.setText("Mode invité");
+            if (drawerAvatar != null) drawerAvatar.setText("V");
         }
 
-        setupDrawerItems();
+        setupDrawerItems(isLoggedIn);
     }
 
-    private void setupDrawerItems() {
-        // Accueil
-        setupDrawerItem(R.id.drawerHome, () -> navigateTo(MainActivity.class));
-
-        // Carte
-        setupDrawerItem(R.id.drawerMap, () -> navigateTo(MapActivity.class));
-
-        // Recherche
+    private void setupDrawerItems(boolean isLoggedIn) {
+        // Toujours visibles
+        setupDrawerItem(R.id.drawerHome,   () -> navigateTo(MainActivity.class));
+        setupDrawerItem(R.id.drawerMap,    () -> navigateTo(MapActivity.class));
         setupDrawerItem(R.id.drawerSearch, () -> navigateTo(SearchActivity.class));
+        setupDrawerItem(R.id.drawerNav,    () -> navigateTo(SearchActivity.class));
+        setupDrawerItem(R.id.drawerAdmin,  () -> navigateTo(AdminLoginActivity.class));
 
-        // Navigation — ouvre SearchActivity pour choisir la destination
-        // NavigationActivity nécessite des extras obligatoires donc ne peut pas
-        // être lancée directement depuis le drawer
-        setupDrawerItem(R.id.drawerNav, () -> navigateTo(SearchActivity.class));
+        // Profil — visible uniquement si connecté
+        LinearLayout drawerProfile = findViewById(R.id.drawerProfile);
+        if (drawerProfile != null) {
+            drawerProfile.setVisibility(isLoggedIn ? View.VISIBLE : View.GONE);
+            if (isLoggedIn) {
+                drawerProfile.setOnClickListener(v -> {
+                    closeDrawer();
+                    drawerProfile.postDelayed(() -> navigateTo(ProfileActivity.class), 200);
+                });
+            }
+        }
 
-        // Profil
-        setupDrawerItem(R.id.drawerProfile, () -> navigateTo(ProfileActivity.class));
+        // Déconnexion / Se connecter
+        LinearLayout drawerLogout = findViewById(R.id.drawerLogout);
+        if (drawerLogout != null) {
+            // Trouver le TextView du label
+            TextView tvLabel = null;
+            for (int i = 0; i < drawerLogout.getChildCount(); i++) {
+                View child = drawerLogout.getChildAt(i);
+                if (child instanceof TextView) { tvLabel = (TextView) child; break; }
+            }
 
-        // Admin
-        setupDrawerItem(R.id.drawerAdmin, () -> navigateTo(AdminLoginActivity.class));
-
-        // Déconnexion
-        setupDrawerItem(R.id.drawerLogout, this::showLogoutDialog);
+            if (isLoggedIn) {
+                if (tvLabel != null) tvLabel.setText("Déconnexion");
+                drawerLogout.setOnClickListener(v -> {
+                    closeDrawer();
+                    drawerLogout.postDelayed(this::showLogoutDialog, 200);
+                });
+            } else {
+                if (tvLabel != null) tvLabel.setText("Se connecter");
+                drawerLogout.setOnClickListener(v -> {
+                    closeDrawer();
+                    drawerLogout.postDelayed(() ->
+                            startActivity(new Intent(this, LoginActivity.class)), 200);
+                });
+            }
+        }
     }
 
     private void setupDrawerItem(int viewId, Runnable action) {
@@ -97,10 +123,7 @@ public abstract class BaseDrawerActivity extends AppCompatActivity {
     }
 
     private void navigateTo(Class<?> activityClass) {
-        if (activityClass == getClass()) {
-            closeDrawer();
-            return;
-        }
+        if (activityClass == getClass()) { closeDrawer(); return; }
         startActivity(new Intent(this, activityClass));
     }
 

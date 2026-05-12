@@ -117,7 +117,7 @@ public class SearchActivity extends BaseDrawerActivity
             } catch (Exception e) {
                 runOnUiThread(() -> {
                     progressSearch.setVisibility(View.GONE);
-                    Toast.makeText(this, "Erreur connexion serveur", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this.getApplicationContext(), "Erreur connexion serveur", Toast.LENGTH_SHORT).show();
                 });
             }
         }).start();

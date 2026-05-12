@@ -71,7 +71,7 @@ public class BlocDetailView extends View {
         pRoomFill.setStyle(Paint.Style.FILL);
 
         pRoomSelected = new Paint(Paint.ANTI_ALIAS_FLAG);
-        pRoomSelected.setColor(Color.parseColor("#2600D4FF"));
+        pRoomSelected.setColor(Color.parseColor("#4400D4FF"));
         pRoomSelected.setStyle(Paint.Style.FILL);
 
         pText = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -104,7 +104,14 @@ public class BlocDetailView extends View {
         pDoor.setStyle(Paint.Style.STROKE);
         pDoor.setStrokeWidth(3f);
     }
-
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int w = MeasureSpec.getSize(widthMeasureSpec);
+        int h = MeasureSpec.getSize(heightMeasureSpec);
+        if (w == 0) w = 900;
+        if (h == 0) h = 800;
+        setMeasuredDimension(w, h);
+    }
     // ===== API PUBLIQUE =====
     public void setBlocId(String id)                       { this.blocId = id; invalidate(); }
     public void setEtage(int etage)                        { this.etage = etage; selectedSalle = null; invalidate(); }
