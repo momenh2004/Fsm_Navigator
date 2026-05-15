@@ -74,7 +74,7 @@ public class AdminController {
         try {
             String email    = body.get("email");
             String password = body.get("password");
-            String roleStr  = body.getOrDefault("role", "ETUDIANT");
+            String roleStr  = body.getOrDefault("role", "ETUDIANT").toUpperCase();
 
             if (email == null || email.isEmpty())
                 return ResponseEntity.badRequest().body(error("Email requis"));
@@ -83,11 +83,14 @@ public class AdminController {
             if (userRepo.findByEmail(email).isPresent())
                 return ResponseEntity.badRequest().body(error("Email déjà utilisé"));
 
-            User user = new User();
-            user.setEmail(email);
-            user.setPassword(passwordEncoder.encode(password));
-            try { user.setRole(User.Role.valueOf(roleStr.toUpperCase())); }
-            catch (Exception e) { user.setRole(User.Role.ETUDIANT); }
+            User user;
+            if ("ADMIN".equals(roleStr)) {
+                user = new Admin(email, passwordEncoder.encode(password));
+            } else {
+                String nom    = body.getOrDefault("nom", "");
+                String prenom = body.getOrDefault("prenom", "");
+                user = new Etudiant(email, passwordEncoder.encode(password), nom, prenom);
+            }
 
             return ResponseEntity.ok(userRepo.save(user));
         } catch (Exception e) {
@@ -99,12 +102,13 @@ public class AdminController {
     public ResponseEntity<?> updateUser(@PathVariable Long id,
                                          @RequestBody Map<String, String> body) {
         return userRepo.findById(id).map(u -> {
-            if (body.containsKey("email"))    u.setEmail(body.get("email"));
+            if (body.containsKey("email"))
+                u.setEmail(body.get("email"));
             if (body.containsKey("password") && !body.get("password").isEmpty())
                 u.setPassword(passwordEncoder.encode(body.get("password")));
-            if (body.containsKey("role")) {
-                try { u.setRole(User.Role.valueOf(body.get("role").toUpperCase())); }
-                catch (Exception ignored) {}
+            if (u instanceof Etudiant etudiant) {
+                if (body.containsKey("nom"))    etudiant.setNom(body.get("nom"));
+                if (body.containsKey("prenom")) etudiant.setPrenom(body.get("prenom"));
             }
             return ResponseEntity.ok(userRepo.save(u));
         }).orElse(ResponseEntity.notFound().build());
@@ -165,15 +169,12 @@ public class AdminController {
     public ResponseEntity<Map<String, String>> deleteBloc(@PathVariable Long id) {
         if (!blocRepo.existsById(id)) return ResponseEntity.notFound().build();
 
-        // Ordre : fingerprints → poi → salles → etages → poi bloc → bloc
         List<Etage> etages = etageRepo.findByBlocId(id);
         for (Etage etage : etages) {
-            // POI liés aux étages (COULOIR, ESCALIER)
             poiRepo.findByEtage_Id(etage.getId()).forEach(poi -> {
                 fpRepo.findByPoi_Id(poi.getId()).forEach(fp -> fpRepo.deleteById(fp.getId()));
                 poiRepo.deleteById(poi.getId());
             });
-            // Salles → POI liés aux salles
             salleRepo.findByEtageId(etage.getId()).forEach(salle -> {
                 poiRepo.findBySalle_Id(salle.getId()).forEach(poi -> {
                     fpRepo.findByPoi_Id(poi.getId()).forEach(fp -> fpRepo.deleteById(fp.getId()));
@@ -183,7 +184,6 @@ public class AdminController {
             });
             etageRepo.deleteById(etage.getId());
         }
-        // POI liés au bloc (ENTREE, SORTIE, RAMPE)
         poiRepo.findByBloc_Id(id).forEach(poi -> {
             fpRepo.findByPoi_Id(poi.getId()).forEach(fp -> fpRepo.deleteById(fp.getId()));
             poiRepo.deleteById(poi.getId());
@@ -230,8 +230,8 @@ public class AdminController {
     public ResponseEntity<?> updateEtage(@PathVariable Long id,
                                           @RequestBody Map<String, Object> body) {
         return etageRepo.findById(id).map(e -> {
-            if (body.containsKey("label"))        e.setLabel((String) body.get("label"));
-            if (body.containsKey("numero"))       e.setNumero(Integer.parseInt(body.get("numero").toString()));
+            if (body.containsKey("label"))  e.setLabel((String) body.get("label"));
+            if (body.containsKey("numero")) e.setNumero(Integer.parseInt(body.get("numero").toString()));
             if (body.containsKey("accessiblePmr"))
                 e.setAccessiblePmr(Boolean.TRUE.equals(body.get("accessiblePmr")));
             return ResponseEntity.ok(etageRepo.save(e));
@@ -257,14 +257,13 @@ public class AdminController {
     @PostMapping("/salles")
     public ResponseEntity<?> addSalle(@RequestBody Map<String, Object> body) {
         try {
-            String  nom           = (String) body.get("nom");
-            String  cat           = (String) body.getOrDefault("categorie", "SALLE");
-            boolean pmr           = Boolean.TRUE.equals(body.get("accessiblePmr"));
-            boolean estSalleEtude = Boolean.TRUE.equals(body.get("estSalleEtude"));
-            int     ordre         = body.containsKey("ordreDepuisEntree")
+            String  nom       = (String) body.get("nom");
+            String  catStr    = (String) body.getOrDefault("categorie", "SALLE_ETUDE");
+            boolean pmr       = Boolean.TRUE.equals(body.get("accessiblePmr"));
+            int     ordre     = body.containsKey("ordreDepuisEntree")
                     ? Integer.parseInt(body.get("ordreDepuisEntree").toString()) : 0;
-            String  entreeRef     = (String) body.getOrDefault("entreeReference", "");
-            Long    etageId       = Long.parseLong(body.get("etageId").toString());
+            String  entreeRef = (String) body.getOrDefault("entreeReference", "");
+            Long    etageId   = Long.parseLong(body.get("etageId").toString());
 
             if (nom == null || nom.isEmpty())
                 return ResponseEntity.badRequest().body(error("Nom requis"));
@@ -273,11 +272,14 @@ public class AdminController {
             if (etage == null)
                 return ResponseEntity.badRequest().body(error("Étage introuvable"));
 
-            Salle salle = new Salle(nom, cat, ordre, entreeRef, pmr, etage);
-            salle.setEstSalleEtude(estSalleEtude);
+            CategorieSalle categorie;
+            try { categorie = CategorieSalle.valueOf(catStr.toUpperCase()); }
+            catch (Exception e) { categorie = CategorieSalle.SALLE_ETUDE; }
+
+            Salle salle = new Salle(nom, categorie, ordre, entreeRef, pmr, etage);
             Salle saved = salleRepo.save(salle);
 
-            // ✅ Créer automatiquement un POI de type SALLE pour cette salle
+            // Créer automatiquement un POI de type SALLE
             PointLocalisation poi = new PointLocalisation(nom, 0f, 0f, pmr, saved);
             poiRepo.save(poi);
 
@@ -291,10 +293,16 @@ public class AdminController {
     public ResponseEntity<?> updateSalle(@PathVariable Long id,
                                           @RequestBody Map<String, Object> body) {
         return salleRepo.findById(id).map(s -> {
-            if (body.containsKey("nom"))           s.setNom((String) body.get("nom"));
-            if (body.containsKey("categorie"))     s.setCategorie((String) body.get("categorie"));
-            if (body.containsKey("accessiblePmr")) s.setAccessiblePmr(Boolean.TRUE.equals(body.get("accessiblePmr")));
-            if (body.containsKey("estSalleEtude")) s.setEstSalleEtude(Boolean.TRUE.equals(body.get("estSalleEtude")));
+            if (body.containsKey("nom"))
+                s.setNom((String) body.get("nom"));
+            if (body.containsKey("categorie")) {
+                try {
+                    s.setCategorie(CategorieSalle.valueOf(
+                        body.get("categorie").toString().toUpperCase()));
+                } catch (Exception ignored) {}
+            }
+            if (body.containsKey("accessiblePmr"))
+                s.setAccessiblePmr(Boolean.TRUE.equals(body.get("accessiblePmr")));
             return ResponseEntity.ok(salleRepo.save(s));
         }).orElse(ResponseEntity.notFound().build());
     }
@@ -307,7 +315,7 @@ public class AdminController {
     }
 
     // ===================================================
-    // POI — Points de Localisation
+    // POI
     // ===================================================
 
     @GetMapping("/poi")
@@ -350,29 +358,25 @@ public class AdminController {
             poi.setY(y);
             poi.setAccessiblePmr(pmr);
 
-            // Lier selon le type
             switch (type) {
-                case SALLE:
+                case SALLE -> {
                     Long salleId = Long.parseLong(body.get("salleId").toString());
                     Salle salle = salleRepo.findById(salleId).orElse(null);
                     if (salle == null) return ResponseEntity.badRequest().body(error("Salle introuvable"));
                     poi.setSalle(salle);
-                    break;
-                case COULOIR:
-                case ESCALIER:
+                }
+                case COULOIR, ESCALIER-> {
                     Long etageId = Long.parseLong(body.get("etageId").toString());
                     Etage etage = etageRepo.findById(etageId).orElse(null);
                     if (etage == null) return ResponseEntity.badRequest().body(error("Étage introuvable"));
                     poi.setEtage(etage);
-                    break;
-                case ENTREE:
-                case SORTIE:
-                case RAMPE:
+                }
+                case ENTREE, SORTIE -> {
                     Long blocId = Long.parseLong(body.get("blocId").toString());
                     Bloc bloc = blocRepo.findById(blocId).orElse(null);
                     if (bloc == null) return ResponseEntity.badRequest().body(error("Bloc introuvable"));
                     poi.setBloc(bloc);
-                    break;
+                }
             }
 
             return ResponseEntity.ok(poiRepo.save(poi));
@@ -385,10 +389,10 @@ public class AdminController {
     public ResponseEntity<?> updatePoi(@PathVariable Long id,
                                         @RequestBody Map<String, Object> body) {
         return poiRepo.findById(id).map(p -> {
-            if (body.containsKey("nom"))          p.setNom((String) body.get("nom"));
-            if (body.containsKey("x"))            p.setX(Float.parseFloat(body.get("x").toString()));
-            if (body.containsKey("y"))            p.setY(Float.parseFloat(body.get("y").toString()));
-            if (body.containsKey("accessiblePmr"))p.setAccessiblePmr(Boolean.TRUE.equals(body.get("accessiblePmr")));
+            if (body.containsKey("nom"))           p.setNom((String) body.get("nom"));
+            if (body.containsKey("x"))             p.setX(Float.parseFloat(body.get("x").toString()));
+            if (body.containsKey("y"))             p.setY(Float.parseFloat(body.get("y").toString()));
+            if (body.containsKey("accessiblePmr")) p.setAccessiblePmr(Boolean.TRUE.equals(body.get("accessiblePmr")));
             return ResponseEntity.ok(poiRepo.save(p));
         }).orElse(ResponseEntity.notFound().build());
     }
@@ -412,10 +416,10 @@ public class AdminController {
     @PostMapping("/fingerprints")
     public ResponseEntity<?> addFingerprint(@RequestBody Map<String, Object> body) {
         try {
-            String bssid  = (String) body.get("bssid");
-            String ssid   = (String) body.getOrDefault("ssid", "");
-            double rssi   = Double.parseDouble(body.get("rssiMoyen").toString());
-            Long   poiId  = Long.parseLong(body.get("poiId").toString());
+            String bssid = (String) body.get("bssid");
+            String ssid  = (String) body.getOrDefault("ssid", "");
+            double rssi  = Double.parseDouble(body.get("rssiMoyen").toString());
+            Long   poiId = Long.parseLong(body.get("poiId").toString());
 
             if (bssid == null || bssid.isEmpty())
                 return ResponseEntity.badRequest().body(error("BSSID requis"));
@@ -437,7 +441,8 @@ public class AdminController {
         return fpRepo.findById(id).map(f -> {
             if (body.containsKey("bssid"))
                 f.setBssid(((String) body.get("bssid")).toLowerCase().trim());
-            if (body.containsKey("ssid"))     f.setSsid((String) body.get("ssid"));
+            if (body.containsKey("ssid"))
+                f.setSsid((String) body.get("ssid"));
             if (body.containsKey("rssiMoyen"))
                 f.setRssiMoyen(Double.parseDouble(body.get("rssiMoyen").toString()));
             return ResponseEntity.ok(fpRepo.save(f));

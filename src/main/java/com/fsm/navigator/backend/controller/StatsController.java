@@ -1,7 +1,11 @@
 package com.fsm.navigator.backend.controller;
 
+import com.fsm.navigator.backend.model.Etudiant;
 import com.fsm.navigator.backend.model.NavigationHistory;
+import com.fsm.navigator.backend.model.Salle;
+import com.fsm.navigator.backend.model.User;
 import com.fsm.navigator.backend.repository.*;
+import com.fsm.navigator.backend.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +24,7 @@ public class StatsController {
     @Autowired private PointLocalisationRepository  poiRepo;
     @Autowired private NavigationHistoryRepository  histRepo;
     @Autowired private EtageRepository              etageRepo;
+    @Autowired private JwtUtil                      jwtUtil;
 
     // ===================================================
     // CARDS — Chiffres généraux
@@ -32,14 +37,15 @@ public class StatsController {
         stats.put("totalUsers",        userRepo.count());
         stats.put("totalFingerprints", fpRepo.count());
         stats.put("totalPoi",          poiRepo.count());
-        stats.put("totalNavigations",  histRepo.countByType(NavigationHistory.Type.NAVIGATION));
-        stats.put("totalViews",        histRepo.countByType(NavigationHistory.Type.VIEW));
+        stats.put("totalNavigations",
+            histRepo.countByType(NavigationHistory.TypeHistorique.NAVIGATION));
+        stats.put("totalViews",
+            histRepo.countByType(NavigationHistory.TypeHistorique.VIEW));
         return ResponseEntity.ok(stats);
     }
 
     // ===================================================
     // COUVERTURE WIFI PAR BLOC
-    // Nombre de fingerprints par bloc
     // ===================================================
     @GetMapping("/wifi-coverage")
     public ResponseEntity<List<Map<String, Object>>> getWifiCoverage() {
@@ -47,8 +53,8 @@ public class StatsController {
         blocRepo.findAll().forEach(bloc -> {
             long count = fpRepo.findByBlocId(bloc.getId()).size();
             Map<String, Object> entry = new LinkedHashMap<>();
-            entry.put("blocCode", bloc.getCode());
-            entry.put("blocNom",  bloc.getNom());
+            entry.put("blocCode",     bloc.getCode());
+            entry.put("blocNom",      bloc.getNom());
             entry.put("fingerprints", count);
             result.add(entry);
         });
@@ -59,11 +65,9 @@ public class StatsController {
 
     // ===================================================
     // DISTRIBUTION RSSI
-    // Histogramme des valeurs RSSI
     // ===================================================
     @GetMapping("/rssi-distribution")
     public ResponseEntity<Map<String, Object>> getRssiDistribution() {
-        // Tranches : < -80, -80 à -70, -70 à -60, -60 à -50, > -50
         int[] buckets = new int[5];
         String[] labels = {"< -80", "-80~-70", "-70~-60", "-60~-50", "> -50"};
 
@@ -108,13 +112,13 @@ public class StatsController {
     }
 
     // ===================================================
-    // RÉPARTITION DES TYPES DE SALLES
+    // RÉPARTITION DES CATÉGORIES DE SALLES
     // ===================================================
     @GetMapping("/salle-types")
     public ResponseEntity<Map<String, Long>> getSalleTypes() {
         Map<String, Long> types = new LinkedHashMap<>();
         salleRepo.findAll().forEach(s -> {
-            String cat = s.getCategorie();
+            String cat = s.getCategorie().name();
             types.put(cat, types.getOrDefault(cat, 0L) + 1);
         });
         return ResponseEntity.ok(types);
@@ -154,7 +158,7 @@ public class StatsController {
         histRepo.findTopNavigated().stream().limit(10).forEach(row -> {
             Map<String, Object> entry = new LinkedHashMap<>();
             entry.put("salleNom", row[0]);
-            entry.put("blocCode", row[1]);
+            entry.put("blocNom",  row[1]);
             entry.put("count",    row[2]);
             result.add(entry);
         });
@@ -167,7 +171,7 @@ public class StatsController {
         histRepo.findTopViewed().stream().limit(10).forEach(row -> {
             Map<String, Object> entry = new LinkedHashMap<>();
             entry.put("salleNom", row[0]);
-            entry.put("blocCode", row[1]);
+            entry.put("blocNom",  row[1]);
             entry.put("count",    row[2]);
             result.add(entry);
         });
@@ -208,16 +212,26 @@ public class StatsController {
     // LOG — Enregistrer une navigation ou vue
     // ===================================================
     @PostMapping("/log")
-    public ResponseEntity<Void> logNavigation(@RequestBody Map<String, Object> body) {
+    public ResponseEntity<Void> logNavigation(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody Map<String, Object> body) {
         try {
-            Long   salleId   = Long.parseLong(body.get("salleId").toString());
-            String salleNom  = (String) body.get("salleNom");
-            String blocCode  = (String) body.getOrDefault("blocCode", "");
-            String typeStr   = (String) body.getOrDefault("type", "VIEW");
-            String userEmail = (String) body.getOrDefault("userEmail", "anonyme");
+            String email = jwtUtil.extractEmail(authHeader.substring(7));
+            Optional<User> userOpt = userRepo.findByEmail(email);
+            if (userOpt.isEmpty() || !(userOpt.get() instanceof Etudiant))
+                return ResponseEntity.status(401).build();
 
-            NavigationHistory.Type type = NavigationHistory.Type.valueOf(typeStr.toUpperCase());
-            histRepo.save(new NavigationHistory(salleId, salleNom, blocCode, type, userEmail));
+            Etudiant etudiant = (Etudiant) userOpt.get();
+            Long salleId = Long.parseLong(body.get("salleId").toString());
+            String typeStr = (String) body.getOrDefault("type", "VIEW");
+
+            Salle salle = salleRepo.findById(salleId).orElse(null);
+            if (salle == null) return ResponseEntity.notFound().build();
+
+            NavigationHistory.TypeHistorique type =
+                NavigationHistory.TypeHistorique.valueOf(typeStr.toUpperCase());
+
+            histRepo.save(new NavigationHistory(etudiant, salle, type));
         } catch (Exception ignored) {}
         return ResponseEntity.ok().build();
     }

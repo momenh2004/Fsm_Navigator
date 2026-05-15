@@ -11,55 +11,39 @@ public class Favori {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String userEmail;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private TypeFavori type;
+    @ManyToOne
+    @JoinColumn(name = "etudiant_id", nullable = false)
+    private Etudiant etudiant;
 
     @ManyToOne
-    @JoinColumn(name = "salle_id", nullable = true)
+    @JoinColumn(name = "salle_id", nullable = false)
     private Salle salle;
-
-    @ManyToOne
-    @JoinColumn(name = "bloc_id", nullable = true)
-    private Bloc bloc;
-
-    @Column(nullable = false)
-    private String nom;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
-
-    public enum TypeFavori {
-        SALLE, BLOC
-    }
 
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
 
-    // ── Getters & Setters ─────────────────────────────────────
-    public Long getId()                    { return id; }
-    public void setId(Long id)             { this.id = id; }
+    // ===== CONSTRUCTEURS =====
+    public Favori() {}
 
-    public String getUserEmail()           { return userEmail; }
-    public void setUserEmail(String e)     { this.userEmail = e; }
+    public Favori(Etudiant etudiant, Salle salle) {
+        this.etudiant = etudiant;
+        this.salle    = salle;
+    }
 
-    public TypeFavori getType()            { return type; }
-    public void setType(TypeFavori t)      { this.type = t; }
+    // ===== GETTERS =====
+    public Long          getId()        { return id; }
+    public Etudiant      getEtudiant()  { return etudiant; }
+    public Salle         getSalle()     { return salle; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 
-    public Salle getSalle()                { return salle; }
-    public void setSalle(Salle s)          { this.salle = s; }
-
-    public Bloc getBloc()                  { return bloc; }
-    public void setBloc(Bloc b)            { this.bloc = b; }
-
-    public String getNom()                 { return nom; }
-    public void setNom(String n)           { this.nom = n; }
-
-    public LocalDateTime getCreatedAt()    { return createdAt; }
-    public void setCreatedAt(LocalDateTime d) { this.createdAt = d; }
+    // ===== SETTERS =====
+    public void setId(Long id)                   { this.id = id; }
+    public void setEtudiant(Etudiant e)          { this.etudiant = e; }
+    public void setSalle(Salle s)                { this.salle = s; }
+    public void setCreatedAt(LocalDateTime d)    { this.createdAt = d; }
 }

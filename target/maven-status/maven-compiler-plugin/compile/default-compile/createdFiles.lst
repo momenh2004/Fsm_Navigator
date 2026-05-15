@@ -6,7 +6,6 @@ com\fsm\navigator\backend\controller\FingerprintController.class
 com\fsm\navigator\backend\service\OtpService.class
 com\fsm\navigator\backend\repository\BlocRepository.class
 com\fsm\navigator\backend\security\JwtUtil.class
-com\fsm\navigator\backend\model\User$Role.class
 com\fsm\navigator\backend\repository\SalleRepository.class
 com\fsm\navigator\backend\service\EmailService.class
 com\fsm\navigator\backend\repository\FingerprintRepository.class

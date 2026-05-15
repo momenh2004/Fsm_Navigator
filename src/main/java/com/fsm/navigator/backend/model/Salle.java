@@ -14,8 +14,9 @@ public class Salle {
     @Column(nullable = false)
     private String nom;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String categorie;
+    private CategorieSalle categorie;
 
     @Column(name = "ordre_depuis_entree")
     private int ordreDepuisEntree;
@@ -26,10 +27,6 @@ public class Salle {
     @Column(name = "accessible_pmr")
     private boolean accessiblePmr = true;
 
-    // ✅ NOUVEAU — Salle d'étude (cours/TP/amphi) ou non (bureau, autre)
-    @Column(name = "est_salle_etude")
-    private boolean estSalleEtude = true;
-
     @ManyToOne
     @JoinColumn(name = "etage_id", nullable = false)
     @JsonIgnore
@@ -38,7 +35,7 @@ public class Salle {
     // ===== CONSTRUCTEURS =====
     public Salle() {}
 
-    public Salle(String nom, String categorie, int ordreDepuisEntree,
+    public Salle(String nom, CategorieSalle categorie, int ordreDepuisEntree,
                  String entreeReference, boolean accessiblePmr, Etage etage) {
         this.nom               = nom;
         this.categorie         = categorie;
@@ -46,37 +43,22 @@ public class Salle {
         this.entreeReference   = entreeReference;
         this.accessiblePmr     = accessiblePmr;
         this.etage             = etage;
-        this.estSalleEtude     = true; // par défaut
-    }
-
-    public Salle(String nom, String categorie, int ordreDepuisEntree,
-                 String entreeReference, String direction,
-                 boolean accessiblePmr, Etage etage) {
-        this.nom               = nom;
-        this.categorie         = categorie;
-        this.ordreDepuisEntree = ordreDepuisEntree;
-        this.entreeReference   = entreeReference;
-        this.accessiblePmr     = accessiblePmr;
-        this.etage             = etage;
-        this.estSalleEtude     = true;
     }
 
     // ===== GETTERS =====
-    public Long    getId()                { return id; }
-    public String  getNom()               { return nom; }
-    public String  getCategorie()         { return categorie; }
-    public int     getOrdreDepuisEntree() { return ordreDepuisEntree; }
-    public String  getEntreeReference()   { return entreeReference; }
-    public boolean isAccessiblePmr()      { return accessiblePmr; }
-    public boolean isEstSalleEtude()      { return estSalleEtude; }
-    public Etage   getEtage()             { return etage; }
+    public Long          getId()                { return id; }
+    public String        getNom()               { return nom; }
+    public CategorieSalle getCategorie()        { return categorie; }
+    public int           getOrdreDepuisEntree() { return ordreDepuisEntree; }
+    public String        getEntreeReference()   { return entreeReference; }
+    public boolean       isAccessiblePmr()      { return accessiblePmr; }
+    public Etage         getEtage()             { return etage; }
 
     // ===== SETTERS =====
-    public void setNom(String nom)               { this.nom = nom; }
-    public void setCategorie(String c)           { this.categorie = c; }
-    public void setOrdreDepuisEntree(int o)      { this.ordreDepuisEntree = o; }
-    public void setEntreeReference(String e)     { this.entreeReference = e; }
-    public void setAccessiblePmr(boolean p)      { this.accessiblePmr = p; }
-    public void setEstSalleEtude(boolean e)      { this.estSalleEtude = e; }
-    public void setEtage(Etage e)                { this.etage = e; }
+    public void setNom(String nom)                   { this.nom = nom; }
+    public void setCategorie(CategorieSalle c)       { this.categorie = c; }
+    public void setOrdreDepuisEntree(int o)          { this.ordreDepuisEntree = o; }
+    public void setEntreeReference(String e)         { this.entreeReference = e; }
+    public void setAccessiblePmr(boolean p)          { this.accessiblePmr = p; }
+    public void setEtage(Etage e)                    { this.etage = e; }
 }
