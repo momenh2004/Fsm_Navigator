@@ -30,7 +30,6 @@ public class ProfileActivity extends BaseDrawerActivity {
     private TextView     tvClearHistory, tvHistoryEmpty;
     private LinearLayout layoutHistoryItems;
     private LinearLayout btnChangePassword, btnLogout, btnDeleteAccount;
-    private TextView     tvAdminAccess;
 
     // Favoris
     private LinearLayout layoutFavorisItems;
@@ -71,7 +70,6 @@ public class ProfileActivity extends BaseDrawerActivity {
         btnChangePassword = findViewById(R.id.btnChangePassword);
         btnLogout         = findViewById(R.id.btnLogout);
         btnDeleteAccount  = findViewById(R.id.btnDeleteAccount);
-        tvAdminAccess     = findViewById(R.id.tvAdminAccess);
         layoutFavorisItems= findViewById(R.id.layoutFavorisItems);
         tvFavorisEmpty    = findViewById(R.id.tvFavorisEmpty);
         progressFavoris   = findViewById(R.id.progressFavoris);
@@ -301,9 +299,6 @@ public class ProfileActivity extends BaseDrawerActivity {
                         })
                         .setNegativeButton("Annuler", null).show());
 
-        if (tvAdminAccess != null) tvAdminAccess.setOnClickListener(v ->
-                startActivity(new Intent(this,
-                        com.fsm.navigator.admin.AdminLoginActivity.class)));
     }
 
     private int dp(int v) {

@@ -1,5 +1,7 @@
 package com.fsm.navigator.navigation;
 
+import android.util.Log;
+
 import java.util.*;
 
 /**
@@ -8,24 +10,24 @@ import java.util.*;
  * Bloc 3 — RDC + 1er étage
  * Référentiel portrait : x=largeur(0→17.76m), y=longueur(0→30.74m)
  *
- * Architecture du graphe RDC :
+ * Architecture du graphe RDC (couloir à x=3.8 G / x=13.9 D, hors salles) :
  *
  *   SORTIE
  *     |
- *   INT_HG ─────── INT_HD
- *     |       cour      |
- *   INT_BG ─────── INT_BD
- *     |                 |
- *   ESC (accès étage)   |
- *     |                 |
- *   ENTREE─────────────/
+ *   INT_HG ── G1 ── G2 ─────── G3 ── INT_BG
+ *     |   cour             cour   |
+ *   INT_HD ── D1 ── D2 ── D3 ── D4 ── INT_BD
+ *                                   |
+ *                               ESC (accès étage)
+ *                                   |
+ *                               ENTREE
  *
- * Salles gauche  : connectées à INT_HG ou INT_BG
- * Salles droite  : connectées à INT_HD ou INT_BD
+ * Salles gauche  : connectées horizontalement au nœud Gx de même y
+ * Salles droite  : connectées horizontalement au nœud Dx de même y
  * Salles bas     : connectées à ENTREE
  *
  * RÈGLE ESCALIER :
- *   - ESC est connecté UNIQUEMENT à INT_BG et ESC_E1
+ *   - ESC est connecté à INT_BG, INT_BD et ESC_E1
  *   - A* filtre ESC si même étage (sameFloor = true)
  */
 public class NavigationGraph {
@@ -48,139 +50,252 @@ public class NavigationGraph {
     public NavigationGraph() {
         buildBloc3RDC();
         buildBloc3Etage1();
+        buildBlocPalestineRDC();
         connectEtages();
     }
 
     // =========================================================
     // BLOC 3 — RDC
+    // Couloir positionné à x=3.8 (G) / x=13.9 (D), hors zones salles [0..3.5] et [14.26..17.76]
     // =========================================================
     private void buildBloc3RDC() {
 
-        // ── Salles ────────────────────────────────────────────
-        NavigationNode s301   = addNode("B3_RDC_301",   "Salle 301", "B3", 0, 14.0f, 28.5f, NavigationNode.Type.SALLE);
-        NavigationNode s302   = addNode("B3_RDC_302",   "Salle 302", "B3", 0, 16.5f, 23.5f, NavigationNode.Type.SALLE);
-        NavigationNode s303   = addNode("B3_RDC_303",   "Salle 303", "B3", 0, 16.5f,  8.0f, NavigationNode.Type.SALLE);
-        NavigationNode s304   = addNode("B3_RDC_304",   "Salle 304", "B3", 0, 16.5f,  2.0f, NavigationNode.Type.SALLE);
-        NavigationNode s305   = addNode("B3_RDC_305",   "Salle 305", "B3", 0,  1.25f, 2.0f, NavigationNode.Type.SALLE);
-        NavigationNode s306   = addNode("B3_RDC_306",   "Salle 306", "B3", 0,  1.25f, 8.0f, NavigationNode.Type.SALLE);
-        NavigationNode s307   = addNode("B3_RDC_307",   "Salle 307", "B3", 0,  1.25f,23.5f, NavigationNode.Type.SALLE);
-        NavigationNode s308   = addNode("B3_RDC_308",   "Salle 308", "B3", 0,  3.75f,28.5f, NavigationNode.Type.SALLE);
-        NavigationNode bureau = addNode("B3_RDC_BUREAU","Bureau",    "B3", 0, 16.5f, 15.0f, NavigationNode.Type.SALLE);
+        // ── Salles (centres calés sur NavigationView) ─────────
+        NavigationNode s301   = addNode("B3_RDC_301",   "Salle 301", "B3", 0, 14.01f, 28.75f, NavigationNode.Type.SALLE);
+        NavigationNode s302   = addNode("B3_RDC_302",   "Salle 302", "B3", 0, 16.01f, 23.5f,  NavigationNode.Type.SALLE);
+        NavigationNode s303   = addNode("B3_RDC_303",   "Salle 303", "B3", 0, 16.01f,  8.3f,  NavigationNode.Type.SALLE);
+        NavigationNode s304   = addNode("B3_RDC_304",   "Salle 304", "B3", 0, 16.01f,  5.0f,  NavigationNode.Type.SALLE);
+        NavigationNode s305   = addNode("B3_RDC_305",   "Salle 305", "B3", 0,  1.75f,  5.0f,  NavigationNode.Type.SALLE);
+        NavigationNode s306   = addNode("B3_RDC_306",   "Salle 306", "B3", 0,  1.75f,  8.3f,  NavigationNode.Type.SALLE);
+        NavigationNode s307   = addNode("B3_RDC_307",   "Salle 307", "B3", 0,  1.75f, 23.5f,  NavigationNode.Type.SALLE);
+        NavigationNode s308   = addNode("B3_RDC_308",   "Salle 308", "B3", 0,  3.75f, 28.75f, NavigationNode.Type.SALLE);
+        NavigationNode bureau = addNode("B3_RDC_BUREAU","Bureau",    "B3", 0, 16.01f, 15.0f,  NavigationNode.Type.SALLE);
 
         // ── Points clés ───────────────────────────────────────
         NavigationNode entree = addNode("B3_RDC_ENTREE", "Entrée",   "B3", 0,  8.88f, 30.0f, NavigationNode.Type.ENTREE);
         NavigationNode sortie = addNode("B3_RDC_SORTIE", "Sortie",   "B3", 0,  8.88f,  0.5f, NavigationNode.Type.ENTREE);
         NavigationNode esc    = addNode("B3_RDC_ESC",    "Escalier", "B3", 0,  8.88f, 26.5f, NavigationNode.Type.ESCALIER);
 
-        // ── 4 Intersections ───────────────────────────────────
-        // Ce sont les 4 coins du couloir autour de la cour centrale
-        NavigationNode intHG  = addNode("B3_RDC_INT_HG", "Intersect HG", "B3", 0,  1.75f,  2.0f, NavigationNode.Type.CARREFOUR);
-        NavigationNode intHD  = addNode("B3_RDC_INT_HD", "Intersect HD", "B3", 0, 16.0f,   2.0f, NavigationNode.Type.CARREFOUR);
-        NavigationNode intBG  = addNode("B3_RDC_INT_BG", "Intersect BG", "B3", 0,  1.75f, 26.0f, NavigationNode.Type.CARREFOUR);
-        NavigationNode intBD  = addNode("B3_RDC_INT_BD", "Intersect BD", "B3", 0, 16.0f,  26.0f, NavigationNode.Type.CARREFOUR);
+        // ── 4 coins du couloir (x=3.8 G / x=13.9 D) ──────────
+        NavigationNode intHG = addNode("B3_RDC_INT_HG", "Couloir HG", "B3", 0,  3.8f,  2.0f, NavigationNode.Type.CARREFOUR);
+        NavigationNode intHD = addNode("B3_RDC_INT_HD", "Couloir HD", "B3", 0, 13.9f,  2.0f, NavigationNode.Type.CARREFOUR);
+        NavigationNode intBG = addNode("B3_RDC_INT_BG", "Couloir BG", "B3", 0,  3.8f, 26.0f, NavigationNode.Type.CARREFOUR);
+        NavigationNode intBD = addNode("B3_RDC_INT_BD", "Couloir BD", "B3", 0, 13.9f, 26.0f, NavigationNode.Type.CARREFOUR);
 
-        // ── Intersections intermédiaires (niveau salles 303/306) ──
-        NavigationNode intMG = addNode("B3_RDC_INT_MG", "Int MG", "B3", 0,  1.75f,  8.0f, NavigationNode.Type.CARREFOUR);
-        NavigationNode intMD = addNode("B3_RDC_INT_MD", "Int MD", "B3", 0, 16.0f,   8.0f, NavigationNode.Type.CARREFOUR);
-        // Intersection intermédiaire niveau bureau
-        NavigationNode intBurD = addNode("B3_RDC_INT_BURD", "Int Bureau D", "B3", 0, 16.0f, 15.0f, NavigationNode.Type.CARREFOUR);
+        // ── Nœuds intermédiaires GAUCHE (x=3.8, un par salle) ─
+        NavigationNode intG1 = addNode("B3_RDC_INT_G1", "Couloir G1", "B3", 0,  3.8f,  5.0f, NavigationNode.Type.CARREFOUR);
+        NavigationNode intG2 = addNode("B3_RDC_INT_G2", "Couloir G2", "B3", 0,  3.8f,  8.3f, NavigationNode.Type.CARREFOUR);
+        NavigationNode intG3 = addNode("B3_RDC_INT_G3", "Couloir G3", "B3", 0,  3.8f, 23.5f, NavigationNode.Type.CARREFOUR);
 
-        // ── Connexions salles → intersections ─────────────────
-        // Salles gauche — chacune connectée à son intersection la plus proche
-        NavigationNode.connect(s305, intHG,  0.5f, "Entrez dans la salle 305", "Sortez de la salle 305");
-        NavigationNode.connect(s306, intMG,  0.5f, "Entrez dans la salle 306", "Sortez de la salle 306");
-        NavigationNode.connect(s307, intBG,  0.5f, "Entrez dans la salle 307", "Sortez de la salle 307");
+        // ── Nœuds intermédiaires DROIT (x=13.9, un par salle) ─
+        NavigationNode intD1 = addNode("B3_RDC_INT_D1", "Couloir D1", "B3", 0, 13.9f,  5.0f, NavigationNode.Type.CARREFOUR);
+        NavigationNode intD2 = addNode("B3_RDC_INT_D2", "Couloir D2", "B3", 0, 13.9f,  8.3f, NavigationNode.Type.CARREFOUR);
+        NavigationNode intD3 = addNode("B3_RDC_INT_D3", "Couloir D3", "B3", 0, 13.9f, 15.0f, NavigationNode.Type.CARREFOUR);
+        NavigationNode intD4 = addNode("B3_RDC_INT_D4", "Couloir D4", "B3", 0, 13.9f, 23.5f, NavigationNode.Type.CARREFOUR);
 
-        // Salles droite — chacune connectée à son intersection la plus proche
-        NavigationNode.connect(s304, intHD,   0.5f, "Entrez dans la salle 304", "Sortez de la salle 304");
-        NavigationNode.connect(s303, intMD,   0.5f, "Entrez dans la salle 303", "Sortez de la salle 303");
-        NavigationNode.connect(s302, intBD,   0.5f, "Entrez dans la salle 302", "Sortez de la salle 302");
-        NavigationNode.connect(bureau, intBurD, 0.5f, "Entrez dans le bureau",  "Sortez du bureau");
+        // ── Connexions salles → couloir (horizontal ~2m) ───────
+        NavigationNode.connect(s305,   intG1, 2.05f, "Entrez dans la salle 305", "Sortez de la salle 305");
+        NavigationNode.connect(s306,   intG2, 2.05f, "Entrez dans la salle 306", "Sortez de la salle 306");
+        NavigationNode.connect(s307,   intG3, 2.05f, "Entrez dans la salle 307", "Sortez de la salle 307");
+        NavigationNode.connect(s304,   intD1, 2.11f, "Entrez dans la salle 304", "Sortez de la salle 304");
+        NavigationNode.connect(s303,   intD2, 2.11f, "Entrez dans la salle 303", "Sortez de la salle 303");
+        NavigationNode.connect(bureau, intD3, 2.11f, "Entrez dans le bureau",    "Sortez du bureau");
+        NavigationNode.connect(s302,   intD4, 2.11f, "Entrez dans la salle 302", "Sortez de la salle 302");
 
         // Salles bas
-        NavigationNode.connect(s308, entree, 4.0f, "Tournez à gauche vers 308", "Continuez vers l'entrée");
-        NavigationNode.connect(s301, entree, 4.0f, "Tournez à droite vers 301", "Continuez vers l'entrée");
+        NavigationNode.connect(s308, entree, 5.3f, "Tournez à gauche vers 308", "Continuez vers l'entrée");
+        NavigationNode.connect(s301, entree, 5.3f, "Tournez à droite vers 301", "Continuez vers l'entrée");
 
-        // ── Couloir horizontal HAUT (INT_HG ↔ INT_HD) ─────────
-        NavigationNode.connect(intHG, intHD, 14.25f, "Continuez tout droit", "Continuez tout droit");
+        // ── Couloir horizontal HAUT ────────────────────────────
+        NavigationNode.connect(intHG, intHD, 10.1f, "Continuez tout droit", "Continuez tout droit");
 
-        // ── Couloir horizontal BAS (INT_BG ↔ INT_BD) ──────────
-        NavigationNode.connect(intBG, intBD, 14.25f, "Continuez tout droit", "Continuez tout droit");
+        // ── Couloir horizontal BAS ─────────────────────────────
+        NavigationNode.connect(intBG, intBD, 10.1f, "Continuez tout droit", "Continuez tout droit");
 
-        // ── Couloir vertical GAUCHE segmenté ───────────────────
-        NavigationNode.connect(intHG,  intMG,  6.0f,  "Continuez tout droit", "Continuez tout droit");
-        NavigationNode.connect(intMG,  intBG, 18.0f,  "Continuez tout droit", "Continuez tout droit");
+        // ── Couloir vertical GAUCHE (x=3.8, segmenté) ─────────
+        NavigationNode.connect(intHG, intG1,  3.0f, "Continuez tout droit", "Continuez tout droit");
+        NavigationNode.connect(intG1, intG2,  3.3f, "Continuez tout droit", "Continuez tout droit");
+        NavigationNode.connect(intG2, intG3, 15.2f, "Continuez tout droit", "Continuez tout droit");
+        NavigationNode.connect(intG3, intBG,  2.5f, "Continuez tout droit", "Continuez tout droit");
 
-        // ── Couloir vertical DROIT segmenté ────────────────────
-        NavigationNode.connect(intHD,    intMD,   6.0f,  "Continuez tout droit", "Continuez tout droit");
-        NavigationNode.connect(intMD,    intBurD, 7.0f,  "Continuez tout droit", "Continuez tout droit");
-        NavigationNode.connect(intBurD,  intBD,   11.0f, "Continuez tout droit", "Continuez tout droit");
+        // ── Couloir vertical DROIT (x=13.9, segmenté) ─────────
+        NavigationNode.connect(intHD, intD1,  3.0f, "Continuez tout droit", "Continuez tout droit");
+        NavigationNode.connect(intD1, intD2,  3.3f, "Continuez tout droit", "Continuez tout droit");
+        NavigationNode.connect(intD2, intD3,  6.7f, "Continuez tout droit", "Continuez tout droit");
+        NavigationNode.connect(intD3, intD4,  8.5f, "Continuez tout droit", "Continuez tout droit");
+        NavigationNode.connect(intD4, intBD,  2.5f, "Continuez tout droit", "Continuez tout droit");
 
-        // ── Entrée → intersections BAS ─────────────────────────
-        NavigationNode.connect(entree, intBG, 7.13f, "Tournez à gauche",  "Continuez vers l'entrée");
-        NavigationNode.connect(entree, intBD, 7.13f, "Tournez à droite",  "Continuez vers l'entrée");
+        // ── Entrée → coins BAS ────────────────────────────────
+        NavigationNode.connect(entree, intBG, 6.5f, "Tournez à gauche",  "Continuez vers l'entrée");
+        NavigationNode.connect(entree, intBD, 6.5f, "Tournez à droite",  "Continuez vers l'entrée");
 
-        // ── Sortie → intersections HAUT ────────────────────────
-        NavigationNode.connect(sortie, intHG, 7.13f, "Tournez à gauche",  "Continuez vers la sortie");
-        NavigationNode.connect(sortie, intHD, 7.13f, "Tournez à droite",  "Continuez vers la sortie");
+        // ── Sortie → coins HAUT ───────────────────────────────
+        NavigationNode.connect(sortie, intHG, 5.3f, "Tournez à gauche",  "Continuez vers la sortie");
+        NavigationNode.connect(sortie, intHD, 5.3f, "Tournez à droite",  "Continuez vers la sortie");
 
-        // ── Escalier → INT_BG UNIQUEMENT ───────────────────────
-        NavigationNode.connect(esc, intBG, 0.5f, "Accédez à l'escalier", "Quittez l'escalier");
+        // ── Escalier → coins BAS (des deux côtés) ─────────────
+        NavigationNode.connect(esc, intBG, 5.1f, "Accédez à l'escalier", "Quittez l'escalier");
+        NavigationNode.connect(esc, intBD, 5.1f, "Accédez à l'escalier", "Quittez l'escalier");
     }
 
     // =========================================================
-    // BLOC 3 — 1er ÉTAGE (même structure)
+    // BLOC 3 — 1er ÉTAGE (même structure que RDC)
     // =========================================================
     private void buildBloc3Etage1() {
 
-        NavigationNode s309   = addNode("B3_E1_309",   "Salle 309", "B3", 1, 14.0f, 28.5f, NavigationNode.Type.SALLE);
-        NavigationNode s310   = addNode("B3_E1_310",   "Salle 310", "B3", 1, 16.5f, 23.5f, NavigationNode.Type.SALLE);
-        NavigationNode s311   = addNode("B3_E1_311",   "Salle 311", "B3", 1, 16.5f,  8.0f, NavigationNode.Type.SALLE);
-        NavigationNode s312   = addNode("B3_E1_312",   "Salle 312", "B3", 1, 16.5f,  2.0f, NavigationNode.Type.SALLE);
-        NavigationNode s313   = addNode("B3_E1_313",   "Salle 313", "B3", 1,  1.25f, 2.0f, NavigationNode.Type.SALLE);
-        NavigationNode s314   = addNode("B3_E1_314",   "Salle 314", "B3", 1,  1.25f, 8.0f, NavigationNode.Type.SALLE);
-        NavigationNode s315   = addNode("B3_E1_315",   "Salle 315", "B3", 1,  1.25f,23.5f, NavigationNode.Type.SALLE);
-        NavigationNode s316   = addNode("B3_E1_316",   "Salle 316", "B3", 1,  3.75f,28.5f, NavigationNode.Type.SALLE);
+        // ── Salles ────────────────────────────────────────────
+        NavigationNode s309 = addNode("B3_E1_309", "Salle 309", "B3", 1, 14.01f, 28.75f, NavigationNode.Type.SALLE);
+        NavigationNode s310 = addNode("B3_E1_310", "Salle 310", "B3", 1, 16.01f, 23.5f,  NavigationNode.Type.SALLE);
+        NavigationNode s311 = addNode("B3_E1_311", "Salle 311", "B3", 1, 16.01f,  8.3f,  NavigationNode.Type.SALLE);
+        NavigationNode s312 = addNode("B3_E1_312", "Salle 312", "B3", 1, 16.01f,  5.0f,  NavigationNode.Type.SALLE);
+        NavigationNode s313 = addNode("B3_E1_313", "Salle 313", "B3", 1,  1.75f,  5.0f,  NavigationNode.Type.SALLE);
+        NavigationNode s314 = addNode("B3_E1_314", "Salle 314", "B3", 1,  1.75f,  8.3f,  NavigationNode.Type.SALLE);
+        NavigationNode s315 = addNode("B3_E1_315", "Salle 315", "B3", 1,  1.75f, 23.5f,  NavigationNode.Type.SALLE);
+        NavigationNode s316 = addNode("B3_E1_316", "Salle 316", "B3", 1,  3.75f, 28.75f, NavigationNode.Type.SALLE);
 
-        NavigationNode escE1  = addNode("B3_E1_ESC",     "Escalier E1", "B3", 1,  8.88f, 26.5f, NavigationNode.Type.ESCALIER);
-        NavigationNode intHGE = addNode("B3_E1_INT_HG",  "Int HG E1",   "B3", 1,  1.75f,  2.0f, NavigationNode.Type.CARREFOUR);
-        NavigationNode intHDE = addNode("B3_E1_INT_HD",  "Int HD E1",   "B3", 1, 16.0f,   2.0f, NavigationNode.Type.CARREFOUR);
-        NavigationNode intBGE = addNode("B3_E1_INT_BG",  "Int BG E1",   "B3", 1,  1.75f, 26.0f, NavigationNode.Type.CARREFOUR);
-        NavigationNode intBDE = addNode("B3_E1_INT_BD",  "Int BD E1",   "B3", 1, 16.0f,  26.0f, NavigationNode.Type.CARREFOUR);
+        NavigationNode escE1 = addNode("B3_E1_ESC", "Escalier E1", "B3", 1, 8.88f, 26.5f, NavigationNode.Type.ESCALIER);
 
-        // Intersections intermédiaires E1
-        NavigationNode intMGE   = addNode("B3_E1_INT_MG",   "Int MG E1",   "B3", 1,  1.75f,  8.0f, NavigationNode.Type.CARREFOUR);
-        NavigationNode intMDE   = addNode("B3_E1_INT_MD",   "Int MD E1",   "B3", 1, 16.0f,   8.0f, NavigationNode.Type.CARREFOUR);
-        NavigationNode intBurDE = addNode("B3_E1_INT_BURD", "Int Bureau E1","B3",1, 16.0f,  15.0f, NavigationNode.Type.CARREFOUR);
+        // ── 4 coins du couloir ────────────────────────────────
+        NavigationNode intHGE = addNode("B3_E1_INT_HG", "Couloir HG E1", "B3", 1,  3.8f,  2.0f, NavigationNode.Type.CARREFOUR);
+        NavigationNode intHDE = addNode("B3_E1_INT_HD", "Couloir HD E1", "B3", 1, 13.9f,  2.0f, NavigationNode.Type.CARREFOUR);
+        NavigationNode intBGE = addNode("B3_E1_INT_BG", "Couloir BG E1", "B3", 1,  3.8f, 26.0f, NavigationNode.Type.CARREFOUR);
+        NavigationNode intBDE = addNode("B3_E1_INT_BD", "Couloir BD E1", "B3", 1, 13.9f, 26.0f, NavigationNode.Type.CARREFOUR);
 
-        // Salles gauche
-        NavigationNode.connect(s313, intHGE, 0.5f, "Entrez dans la salle 313", "Sortez");
-        NavigationNode.connect(s314, intMGE, 0.5f, "Entrez dans la salle 314", "Sortez");
-        NavigationNode.connect(s315, intBGE, 0.5f, "Entrez dans la salle 315", "Sortez");
+        // ── Nœuds intermédiaires GAUCHE ───────────────────────
+        NavigationNode intG1E = addNode("B3_E1_INT_G1", "Couloir G1 E1", "B3", 1,  3.8f,  5.0f, NavigationNode.Type.CARREFOUR);
+        NavigationNode intG2E = addNode("B3_E1_INT_G2", "Couloir G2 E1", "B3", 1,  3.8f,  8.3f, NavigationNode.Type.CARREFOUR);
+        NavigationNode intG3E = addNode("B3_E1_INT_G3", "Couloir G3 E1", "B3", 1,  3.8f, 23.5f, NavigationNode.Type.CARREFOUR);
 
-        // Salles droite
-        NavigationNode.connect(s312, intHDE,   0.5f, "Entrez dans la salle 312", "Sortez");
-        NavigationNode.connect(s311, intMDE,   0.5f, "Entrez dans la salle 311", "Sortez");
-        NavigationNode.connect(s310, intBDE,   0.5f, "Entrez dans la salle 310", "Sortez");
+        // ── Nœuds intermédiaires DROIT ────────────────────────
+        NavigationNode intD1E = addNode("B3_E1_INT_D1", "Couloir D1 E1", "B3", 1, 13.9f,  5.0f, NavigationNode.Type.CARREFOUR);
+        NavigationNode intD2E = addNode("B3_E1_INT_D2", "Couloir D2 E1", "B3", 1, 13.9f,  8.3f, NavigationNode.Type.CARREFOUR);
+        NavigationNode intD3E = addNode("B3_E1_INT_D3", "Couloir D3 E1", "B3", 1, 13.9f, 15.0f, NavigationNode.Type.CARREFOUR);
+        NavigationNode intD4E = addNode("B3_E1_INT_D4", "Couloir D4 E1", "B3", 1, 13.9f, 23.5f, NavigationNode.Type.CARREFOUR);
+
+        // ── Connexions salles → couloir ───────────────────────
+        NavigationNode.connect(s313, intG1E, 2.05f, "Entrez dans la salle 313", "Sortez");
+        NavigationNode.connect(s314, intG2E, 2.05f, "Entrez dans la salle 314", "Sortez");
+        NavigationNode.connect(s315, intG3E, 2.05f, "Entrez dans la salle 315", "Sortez");
+        NavigationNode.connect(s312, intD1E, 2.11f, "Entrez dans la salle 312", "Sortez");
+        NavigationNode.connect(s311, intD2E, 2.11f, "Entrez dans la salle 311", "Sortez");
+        NavigationNode.connect(s310, intD4E, 2.11f, "Entrez dans la salle 310", "Sortez");
 
         // Salles bas
         NavigationNode escEntry1 = addNode("B3_E1_ENTREE_ESC", "Couloir esc E1", "B3", 1, 8.88f, 28.5f, NavigationNode.Type.COULOIR);
-        NavigationNode.connect(s316, escEntry1, 2.0f, "Tournez à gauche vers 316","Continuez");
-        NavigationNode.connect(s309, escEntry1, 4.0f, "Tournez à droite vers 309","Continuez");
-        NavigationNode.connect(escEntry1, intBGE, 4.0f, "Continuez", "Continuez");
-        NavigationNode.connect(escEntry1, intBDE, 4.0f, "Continuez", "Continuez");
+        NavigationNode.connect(s316,      escEntry1, 2.0f, "Tournez à gauche vers 316", "Continuez");
+        NavigationNode.connect(s309,      escEntry1, 4.0f, "Tournez à droite vers 309", "Continuez");
+        NavigationNode.connect(escEntry1, intBGE,    5.7f, "Continuez", "Continuez");
+        NavigationNode.connect(escEntry1, intBDE,    5.7f, "Continuez", "Continuez");
 
-        // Couloirs segmentés E1
-        NavigationNode.connect(intHGE, intHDE,   14.25f, "Continuez tout droit", "Continuez tout droit");
-        NavigationNode.connect(intBGE, intBDE,   14.25f, "Continuez tout droit", "Continuez tout droit");
-        NavigationNode.connect(intHGE,  intMGE,   6.0f,  "Continuez tout droit", "Continuez tout droit");
-        NavigationNode.connect(intMGE,  intBGE,  18.0f,  "Continuez tout droit", "Continuez tout droit");
-        NavigationNode.connect(intHDE,  intMDE,   6.0f,  "Continuez tout droit", "Continuez tout droit");
-        NavigationNode.connect(intMDE,  intBurDE, 7.0f,  "Continuez tout droit", "Continuez tout droit");
-        NavigationNode.connect(intBurDE,intBDE,  11.0f,  "Continuez tout droit", "Continuez tout droit");
+        // ── Couloir horizontal ────────────────────────────────
+        NavigationNode.connect(intHGE, intHDE, 10.1f, "Continuez tout droit", "Continuez tout droit");
+        NavigationNode.connect(intBGE, intBDE, 10.1f, "Continuez tout droit", "Continuez tout droit");
 
-        // Escalier E1 → INT_BG E1
-        NavigationNode.connect(escE1, intBGE, 0.5f, "Accédez à l'escalier E1", "Quittez l'escalier");
+        // ── Couloir vertical GAUCHE (x=3.8, segmenté) ─────────
+        NavigationNode.connect(intHGE, intG1E,  3.0f, "Continuez tout droit", "Continuez tout droit");
+        NavigationNode.connect(intG1E, intG2E,  3.3f, "Continuez tout droit", "Continuez tout droit");
+        NavigationNode.connect(intG2E, intG3E, 15.2f, "Continuez tout droit", "Continuez tout droit");
+        NavigationNode.connect(intG3E, intBGE,  2.5f, "Continuez tout droit", "Continuez tout droit");
+
+        // ── Couloir vertical DROIT (x=13.9, segmenté) ─────────
+        NavigationNode.connect(intHDE, intD1E,  3.0f, "Continuez tout droit", "Continuez tout droit");
+        NavigationNode.connect(intD1E, intD2E,  3.3f, "Continuez tout droit", "Continuez tout droit");
+        NavigationNode.connect(intD2E, intD3E,  6.7f, "Continuez tout droit", "Continuez tout droit");
+        NavigationNode.connect(intD3E, intD4E,  8.5f, "Continuez tout droit", "Continuez tout droit");
+        NavigationNode.connect(intD4E, intBDE,  2.5f, "Continuez tout droit", "Continuez tout droit");
+
+        // ── Escalier E1 → coins BAS (des deux côtés) ──────────
+        NavigationNode.connect(escE1, intBGE, 5.1f, "Accédez à l'escalier E1", "Quittez l'escalier");
+        NavigationNode.connect(escE1, intBDE, 5.1f, "Accédez à l'escalier E1", "Quittez l'escalier");
+    }
+    private void buildBlocPalestineRDC() {
+        String bId = "BPAL";
+
+        // ── 1. Nœuds des Salles (Coordonnées basées sur ton drawBlocPalestine) ────
+        // Côté GAUCHE
+        NavigationNode s105 = addNode("BP_105", "Salle 105", bId, 0, 1.75f, 7.0f, NavigationNode.Type.SALLE);
+        NavigationNode s106 = addNode("BP_106", "Salle 106", bId, 0, 1.75f, 12.0f, NavigationNode.Type.SALLE);
+        NavigationNode s107 = addNode("BP_107", "Salle 107", bId, 0, 1.75f, 20.5f, NavigationNode.Type.SALLE);
+
+        // Côté DROIT
+        NavigationNode s103 = addNode("BP_103", "Salle 103", bId, 0, 23.7f, 7.0f, NavigationNode.Type.SALLE);
+        NavigationNode s102 = addNode("BP_102", "Salle 102", bId, 0, 23.7f, 12.0f, NavigationNode.Type.SALLE);
+        NavigationNode s101 = addNode("BP_101", "Salle 101", bId, 0, 23.7f, 20.5f, NavigationNode.Type.SALLE);
+
+        // Côté HAUT
+        NavigationNode s104 = addNode("BP_104", "Salle 104", bId, 0, 15.75f, 1.75f, NavigationNode.Type.SALLE);
+
+        // Amphithéâtres (Centres des zones définies)
+        NavigationNode amphiA = addNode("BP_AA", "Amphi A", bId, 0, 21.0f, 24.5f, NavigationNode.Type.SALLE);
+        NavigationNode amphiB = addNode("BP_AB", "Amphi B", bId, 0, 21.0f, 2.5f, NavigationNode.Type.SALLE);
+        NavigationNode amphiC = addNode("BP_AC", "Amphi C", bId, 0, 4.5f, 2.5f, NavigationNode.Type.SALLE);
+        NavigationNode amphiD = addNode("BP_AD", "Amphi D", bId, 0, 4.5f, 24.5f, NavigationNode.Type.SALLE);
+
+        // ── 2. Points d'accès ──────────────────────────────────────────────────
+        NavigationNode entree = addNode("BPAL_RDC_ENTREE", "Entrée", bId, 0, 12.76f, 25.5f, NavigationNode.Type.ENTREE);
+        NavigationNode sortie = addNode("BP_SORTIE", "Sortie", bId, 0, 12.0f, 0.5f, NavigationNode.Type.ENTREE);
+        NavigationNode escG   = addNode("BP_ESC_G", "Escalier G", bId, 0, 8.0f, 25.4f, NavigationNode.Type.ESCALIER);
+        NavigationNode escD   = addNode("BP_ESC_D", "Escalier D", bId, 0, 18.0f, 25.4f, NavigationNode.Type.ESCALIER);
+
+        // ── 3. Architecture du Couloir ─────────────────────────────────────────
+        // 4 intersections aux coins
+        NavigationNode intHG = addNode("BP_INT_HG", "Int HG", bId, 0, 4.0f,  4.0f,  NavigationNode.Type.CARREFOUR);
+        NavigationNode intHD = addNode("BP_INT_HD", "Int HD", bId, 0, 21.0f, 4.0f,  NavigationNode.Type.CARREFOUR);
+        NavigationNode intBG = addNode("BP_INT_BG", "Int BG", bId, 0, 4.0f,  22.0f, NavigationNode.Type.CARREFOUR);
+        NavigationNode intBD = addNode("BP_INT_BD", "Int BD", bId, 0, 21.0f, 22.0f, NavigationNode.Type.CARREFOUR);
+
+        // Nœuds intermédiaires couloir GAUCHE (x=4.0), alignés sur les salles 105 et 106
+        NavigationNode intMG1 = addNode("BP_INT_MG1", "Int MG1", bId, 0, 4.0f, 7.0f,  NavigationNode.Type.CARREFOUR);
+        NavigationNode intMG2 = addNode("BP_INT_MG2", "Int MG2", bId, 0, 4.0f, 12.0f, NavigationNode.Type.CARREFOUR);
+
+        // Nœuds intermédiaires couloir DROIT (x=21.0), alignés sur les salles 103 et 102
+        NavigationNode intMD1 = addNode("BP_INT_MD1", "Int MD1", bId, 0, 21.0f, 7.0f,  NavigationNode.Type.CARREFOUR);
+        NavigationNode intMD2 = addNode("BP_INT_MD2", "Int MD2", bId, 0, 21.0f, 12.0f, NavigationNode.Type.CARREFOUR);
+
+        // ── 4. Connexions Salles & Amphis ──────────────────────────────────────
+        // Côté gauche → nœud intermédiaire le plus proche
+        NavigationNode.connect(s105, intMG1, 2.25f, "Entrez en 105", "Sortez vers couloir");
+        NavigationNode.connect(s106, intMG2, 2.25f, "Entrez en 106", "Sortez vers couloir");
+        NavigationNode.connect(s107, intBG,  2.7f,  "Entrez en 107", "Sortez vers couloir");
+
+        // Côté droit → nœud intermédiaire le plus proche
+        NavigationNode.connect(s103, intMD1, 2.7f, "Entrez en 103", "Sortez vers couloir");
+        NavigationNode.connect(s102, intMD2, 2.7f, "Entrez en 102", "Sortez vers couloir");
+        NavigationNode.connect(s101, intBD,  1.5f, "Entrez en 101", "Sortez vers couloir");
+
+        // Côté haut
+        NavigationNode.connect(s104,   intHD, 5.0f, "Entrez en 104",       "Sortez vers couloir");
+        NavigationNode.connect(sortie, intHG, 8.0f, "Allez vers la sortie", "Entrez dans le bloc");
+
+        // Amphis → intersections aux coins (restent inchangés)
+        NavigationNode.connect(amphiC, intHG, 1.5f, "Entrez Amphi C", "Sortez vers couloir");
+        NavigationNode.connect(amphiD, intBG, 1.5f, "Entrez Amphi D", "Sortez vers couloir");
+        NavigationNode.connect(amphiB, intHD, 1.5f, "Entrez Amphi B", "Sortez vers couloir");
+        NavigationNode.connect(amphiA, intBD, 1.5f, "Entrez Amphi A", "Sortez vers couloir");
+
+        // ── 5. Couloirs horizontaux (inchangés) ────────────────────────────────
+        NavigationNode.connect(intHG, intHD, 17.0f, "Allez tout droit", "Allez tout droit");
+        NavigationNode.connect(intBD, intBG, 17.0f, "Allez tout droit", "Allez tout droit");
+
+        // ── 6. Couloir GAUCHE segmenté : HG → MG1 → MG2 → BG (total 18 m) ───
+        NavigationNode.connect(intHG,  intMG1,  3.0f,  "Continuez tout droit", "Continuez tout droit");
+        NavigationNode.connect(intMG1, intMG2,  5.0f,  "Continuez tout droit", "Continuez tout droit");
+        NavigationNode.connect(intMG2, intBG,   10.0f, "Continuez tout droit", "Continuez tout droit");
+
+        // ── 7. Couloir DROIT segmenté : HD → MD1 → MD2 → BD (total 18 m) ────
+        NavigationNode.connect(intHD,  intMD1,  3.0f,  "Continuez tout droit", "Continuez tout droit");
+        NavigationNode.connect(intMD1, intMD2,  5.0f,  "Continuez tout droit", "Continuez tout droit");
+        NavigationNode.connect(intMD2, intBD,   10.0f, "Continuez tout droit", "Continuez tout droit");
+
+        // ── 8. Entrée et Escaliers ─────────────────────────────────────────────
+        NavigationNode.connect(entree, intBG, 8.5f, "Tournez à gauche", "Allez vers l'entrée");
+        NavigationNode.connect(entree, intBD, 8.5f, "Tournez à droite", "Allez vers l'entrée");
+        NavigationNode.connect(escG,   intBG, 1.5f, "Accédez à l'escalier", "Vers couloir");
+        NavigationNode.connect(escD,   intBD, 1.5f, "Accédez à l'escalier", "Vers couloir");
+
+        Log.d("GRAPH", "Total nodes = " + nodes.size());
+        Log.d("GRAPH", "Entrée voisins = " + entree.voisins.size());
+        Log.d("GRAPH", "Salle 105 voisins = " + s105.voisins.size());
     }
 
     // =========================================================
@@ -200,6 +315,11 @@ public class NavigationGraph {
     public NavPath findPath(String startId, String goalId) {
         NavigationNode start = nodes.get(startId);
         NavigationNode goal  = nodes.get(goalId);
+        Log.d("A_STAR", "start = " + startId + " (" + (start != null) + ")");
+        Log.d("A_STAR", "goal  = " + goalId + " (" + (goal != null) + ")");
+        if (start != null && goal != null) {
+            Log.d("A_STAR", "start voisins = " + start.voisins.size());
+        }
 
         if (start == null || goal == null) return null;
         if (startId.equals(goalId)) {

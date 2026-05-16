@@ -119,9 +119,18 @@ public class BlockDetailActivity extends BaseDrawerActivity {
     // Ex: "B3" + 0 + "Salle 301" → "B3_RDC_301"
     // =========================================================
     private String buildNodeId(String blocId, int etage, String salleNom) {
-        String etageCode = etage == 0 ? "RDC" : "E1";
-        String num       = salleNom.replaceAll("[^0-9]", "");
+        if ("B1".equals(blocId)) {
+            String n = salleNom.toUpperCase();
+            if (n.contains("AMPHI A")) return "BP_AA";
+            if (n.contains("AMPHI B")) return "BP_AB";
+            if (n.contains("AMPHI C")) return "BP_AC";
+            if (n.contains("AMPHI D")) return "BP_AD";
+            String num = salleNom.replaceAll("[^0-9]", "");
+            return "BP_" + (num.isEmpty() ? salleNom.replace(" ", "_") : num);
+        }
+        String num = salleNom.replaceAll("[^0-9]", "");
         if (num.isEmpty()) num = salleNom.replace(" ", "_");
+        String etageCode = etage == 0 ? "RDC" : "E1";
         return blocId + "_" + etageCode + "_" + num;
     }
 

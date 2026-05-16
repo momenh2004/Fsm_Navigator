@@ -291,18 +291,5 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Accès admin -->
-        <TextView
-            android:id="@+id/tvAdminAccess"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="40dp"
-            android:text="⚙ Espace administrateur"
-            android:textColor="#404A58"
-            android:textSize="12sp"
-            android:clickable="true"
-            android:focusable="true"/>
-
     </LinearLayout>
 </ScrollView>

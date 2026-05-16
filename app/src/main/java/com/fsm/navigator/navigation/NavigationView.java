@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import java.util.List;
@@ -43,11 +44,26 @@ public class NavigationView extends View {
     private NavigationNode          destination = null;
 
     // Dimensions réelles Bloc 3 (mètres) — orienté portrait
-    private static final float REAL_W = 17.76f;  // largeur (horizontal)
-    private static final float REAL_H = 30.74f;  // longueur (vertical)
+    private static float REAL_W = 17.76f;  // largeur (horizontal)
+    private static float REAL_H = 30.74f;  // longueur (vertical)
 
     private float scale;
     private float offsetX, offsetY;
+    private String currentBlocId = "B3"; // Par défaut
+
+    public void setBlocId(String blocId) {
+        this.currentBlocId = blocId;
+        // Palestine : accepter "B1" ou "BPAL"
+        if ("B1".equals(blocId) || "BPAL".equals(blocId)) {
+            this.REAL_W = 25.53f;
+            this.REAL_H = 26.32f;
+        } else {
+            this.REAL_W = 17.76f;
+            this.REAL_H = 30.74f;
+        }
+        invalidate();
+    }
+    
 
     public NavigationView(Context ctx, AttributeSet attrs) { super(ctx, attrs); init(); }
     public NavigationView(Context ctx)                     { super(ctx); init(); }
@@ -118,8 +134,20 @@ public class NavigationView extends View {
                                   NavigationNode current,
                                   NavigationNode destination) {
         this.currentPath = path;
-        this.currentPos  = current;
+        this.currentPos = current;
         this.destination = destination;
+
+        // Correction : Extraire le blocId du premier nœud du chemin
+        if (path != null && path.nodes != null && !path.nodes.isEmpty()) {
+            String pathBlocId = path.nodes.get(0).blocId;
+
+            // Si le bloc du chemin est différent du bloc actuel, on change l'échelle
+            if (!pathBlocId.equals(this.currentBlocId)) {
+                setBlocId(pathBlocId);
+                Log.d("NAV_VIEW", "Changement d'échelle auto pour : " + pathBlocId);
+            }
+        }
+
         invalidate();
     }
 
@@ -134,6 +162,7 @@ public class NavigationView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        scale = Math.min(getWidth() / REAL_W, (getHeight() * 0.88f) / REAL_H);
         int w = getWidth(), h = getHeight();
         if (w == 0 || h == 0) return;
         android.util.Log.d("NAV", "onDraw w=" + w + " h=" + h + " scale=" + scale);
@@ -156,13 +185,34 @@ public class NavigationView extends View {
         offsetX = (w - drawnW) / 2f;
         offsetY = marginTop + (availH - drawnH) / 2f;
 
-        drawBloc3Plan(canvas);
+        // 1. On vérifie quel bloc on doit dessiner
+        boolean planExiste = false;
+
+        if ("B3".equals(currentBlocId)) {
+            drawBloc3Plan(canvas);
+            planExiste = true;
+        } else if ("B1".equals(currentBlocId) || "BPAL".equals(currentBlocId)) {
+            drawBlocPalestinePlan(canvas);
+            planExiste = true;
+        }
+
+// 2. Si le plan n'existe pas, on affiche "À venir" et on ARRÊTE le dessin
+        if (!planExiste) {
+            drawComingSoon(canvas);
+            return; // Très important : on arrête ici pour ne pas dessiner l'itinéraire dans le vide
+        }
 
         if (currentPath != null) drawPath(canvas);
         if (currentPos  != null) drawCurrentPosition(canvas);
         if (destination != null) drawDestination(canvas);
 
         drawLegend(canvas, w, h);
+    }
+    private void drawComingSoon(Canvas canvas) {
+        pText.setTextSize(getHeight() * 0.04f);
+        pText.setColor(Color.parseColor("#4A90D9"));
+        canvas.drawText("Navigation à venir pour : " + currentBlocId,
+                getWidth() / 2f, getHeight() / 2f, pText);
     }
 
     // =========================================================
@@ -214,7 +264,58 @@ public class NavigationView extends View {
         // ---- SORTIE (en haut, au centre) ----
         drawWorldRect(canvas, 7f, 0f, 10.76f, 0.74f, makeFill("#8B3A00"), "SORTIE");
     }
+    private void drawBlocPalestinePlan(Canvas canvas) {
+        // 1. Structure extérieure (25.53m x 26.32m)
+        canvas.drawRect(wx(0), wy(0), wx(25.53f), wy(26.32f), pWallFill);
+        canvas.drawRect(wx(0), wy(0), wx(25.53f), wy(26.32f), pWall);
 
+        // 2. Cour Centrale
+        canvas.drawRect(wx(5.0f), wy(5.0f), wx(20.5f), wy(21.0f), pRoomFill);
+        canvas.drawRect(wx(5.0f), wy(5.0f), wx(20.5f), wy(21.0f), pWall);
+        drawLabel(canvas, 12.75f, 13.0f, "Cour Centrale");
+
+        // 3. Salles - Côté DROIT
+        drawWorldRoom(canvas, 22.0f, 18.5f, 25.53f, 22.5f, "101");
+        drawWorldRoom(canvas, 22.0f, 10.0f, 25.53f, 14.0f, "102");
+        drawWorldRoom(canvas, 22.0f, 5.0f, 25.53f, 9.0f, "103");
+
+        // 4. Salles - Côté GAUCHE
+        drawWorldRoom(canvas, 0.0f, 5.0f, 3.5f, 9.0f, "105");
+        drawWorldRoom(canvas, 0.0f, 10.0f, 3.5f, 14.0f, "106");
+        drawWorldRoom(canvas, 0.0f, 18.5f, 3.5f, 22.5f, "107");
+
+        // 5. Salle - Côté HAUT
+        drawWorldRoom(canvas, 14.0f, 0.0f, 17.5f, 3.5f, "104");
+
+        // 6. Amphithéâtres (Zones de texte)
+        pTextSmall.setTypeface(Typeface.DEFAULT_BOLD);
+        drawLabel(canvas, 21.0f, 2.5f, "Amphi B"); // Haut Droit
+        drawLabel(canvas, 4.5f, 2.5f, "Amphi C");  // Haut Gauche
+        drawLabel(canvas, 4.5f, 24.5f, "Amphi D"); // Bas Gauche
+        drawLabel(canvas, 21.0f, 24.5f, "Amphi A"); // Bas Droit
+        pTextSmall.setTypeface(Typeface.DEFAULT);
+
+        // 7. Entrée et Sortie
+        drawLabel(canvas, 12.76f, 25.5f, "ENTRÉE");
+        drawLabel(canvas, 12.0f, 1.0f, "SORTIE");
+
+        // 8. Escaliers (Gauche et Droit)
+        // Escalier DROIT
+        canvas.drawRect(wx(16.5f), wy(24.5f), wx(19.5f), wy(26.3f), pRoomFill);
+        canvas.drawRect(wx(16.5f), wy(24.5f), wx(19.5f), wy(26.3f), pRoom);
+        drawLabel(canvas, 18.0f, 25.4f, "Esc.");
+
+        // Escalier GAUCHE
+        canvas.drawRect(wx(6.5f), wy(24.5f), wx(9.5f), wy(26.3f), pRoomFill);
+        canvas.drawRect(wx(6.5f), wy(24.5f), wx(9.5f), wy(26.3f), pRoom);
+        drawLabel(canvas, 8.0f, 25.4f, "Esc.");
+    }
+
+    // Petite fonction utilitaire pour les étiquettes simples
+    private void drawLabel(Canvas c, float cx, float cy, String text) {
+        pTextSmall.setTextSize(scale * 0.5f);
+        c.drawText(text, wx(cx), wy(cy), pTextSmall);
+    }
     private void drawWorldRect(Canvas canvas, float wx0, float wy0,
                                float wx1, float wy1, Paint fill, String label) {
         float left   = wx(wx0);
@@ -248,7 +349,20 @@ public class NavigationView extends View {
     // =========================================================
     private void drawPath(Canvas canvas) {
         List<NavigationNode> nodes = currentPath.nodes;
-        if (nodes == null || nodes.size() < 2) return;
+        if (nodes == null || nodes.size() < 2) {
+            Log.d("NAV_VIEW", "drawPath ignoré (nodes null ou <2)");
+            return;
+        }
+        Log.d("NAV_VIEW", "drawPath avec " + nodes.size() + " nœuds");
+        Paint test = new Paint();
+        test.setColor(Color.RED);
+        test.setStyle(Paint.Style.FILL);
+        for (NavigationNode n : nodes) {
+            float sx = wx(n.x);
+            float sy = wy(n.y);
+            Log.d("NAV_VIEW", "nœud " + n.nom + " → écran (" + sx + "," + sy + ")");
+            canvas.drawCircle(sx, sy, scale * 0.8f, test);
+        }
 
         Path path = new Path();
         NavigationNode first = nodes.get(0);

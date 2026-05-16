@@ -57,7 +57,7 @@ public class FsmMapView extends View {
         pNormal = new Paint(Paint.ANTI_ALIAS_FLAG);
         pNormal.setColor(Color.parseColor("#00D4FF"));
         pNormal.setStyle(Paint.Style.FILL);
-        pNormal.setAlpha(180);
+        pNormal.setAlpha(200);
 
         pSelected = new Paint(Paint.ANTI_ALIAS_FLAG);
         pSelected.setColor(Color.parseColor("#FF4B6E"));
@@ -67,14 +67,15 @@ public class FsmMapView extends View {
         pLocation.setColor(Color.parseColor("#00C853"));
         pLocation.setStyle(Paint.Style.FILL);
 
+        // Labels plus petits et nets
         pLabel = new Paint(Paint.ANTI_ALIAS_FLAG);
         pLabel.setColor(Color.WHITE);
         pLabel.setTextAlign(Paint.Align.CENTER);
-        pLabel.setTextSize(28f);
-        pLabel.setFakeBoldText(true);
+        pLabel.setTextSize(22f);
+        pLabel.setFakeBoldText(false);
 
         pLabelBg = new Paint(Paint.ANTI_ALIAS_FLAG);
-        pLabelBg.setColor(Color.parseColor("#CC000000"));
+        pLabelBg.setColor(Color.parseColor("#99000000")); // Plus transparent
         pLabelBg.setStyle(Paint.Style.FILL);
 
         scaleDetector = new ScaleGestureDetector(context,
@@ -93,24 +94,25 @@ public class FsmMapView extends View {
 
     private void initBlocs() {
         blocs.clear();
-        blocs.add(new Bloc("BP2",   "Bloc Physique 2",  943f, 231f));
-        blocs.add(new Bloc("BP1",   "Bloc Physique 1",  808f, 271f));
-        blocs.add(new Bloc("BM",    "Bloc Math",        418f, 462f));
-        blocs.add(new Bloc("B4",    "Bloc 4",           835f, 490f));
-        blocs.add(new Bloc("COUR",  "Cour Rouge",       621f, 502f));
-        blocs.add(new Bloc("B2",    "Bloc 2",           432f, 583f));
-        blocs.add(new Bloc("PCOUR", "Petite Cour",      624f, 600f));
-        blocs.add(new Bloc("BPAL",  "Bloc Palestine",   273f, 623f));
-        blocs.add(new Bloc("BC",    "Bloc C",           865f, 683f));
-        blocs.add(new Bloc("BC2",   "Bloc Chimie 2",    195f, 729f));
-        blocs.add(new Bloc("BIB",   "Bibliothèque",     449f, 729f));
-        blocs.add(new Bloc("BC1",   "Bloc Chimie 1",    271f, 731f));
-        blocs.add(new Bloc("ADM",   "Administration",    79f, 744f));
-        blocs.add(new Bloc("INF",   "Infirmerie",        96f, 814f));
-        blocs.add(new Bloc("B3",    "Bloc 3",           763f, 867f));
-        blocs.add(new Bloc("STH",   "Salle Thèse",      475f, 880f));
-        blocs.add(new Bloc("D1D2",  "D1 et D2",         332f, 886f));
-        blocs.add(new Bloc("SRV",   "Bloc Service",     159f, 906f));
+        // Coordonnées synchronisées avec ton fichier JSON (1024x1024)
+        blocs.add(new Bloc("BP2",   "Bloc Physique 2",  870f, 691f));
+        blocs.add(new Bloc("BP1",   "Bloc Physique 1",  624f, 600f));
+        blocs.add(new Bloc("BM",    "Bloc Math",        275f, 629f));
+        blocs.add(new Bloc("B4",    "Bloc 4",           945f, 230f));
+        blocs.add(new Bloc("COUR",  "Cour Rouge",       438f, 727f));
+        blocs.add(new Bloc("B2",    "Bloc 2",           432f, 586f));
+        blocs.add(new Bloc("PCOUR", "Petite Cour",      472f, 881f));
+        blocs.add(new Bloc("B1",  "Bloc Palestine",   765f, 868f));
+        blocs.add(new Bloc("BC",    "Bloc C",           199f, 732f));
+        blocs.add(new Bloc("BC2",   "Bloc Chimie 2",    837f, 495f));
+        blocs.add(new Bloc("BIB",   "Bibliothèque",     277f, 730f));
+        blocs.add(new Bloc("BC1",   "Bloc Chimie 1",    623f, 505f));
+        blocs.add(new Bloc("ADM",   "Administration",   341f, 884f));
+        blocs.add(new Bloc("INF",   "Infirmerie",       169f, 912f));
+        blocs.add(new Bloc("B3",    "Bloc 3",           807f, 271f));
+        blocs.add(new Bloc("STH",   "Salle Thèse",      94f, 824f));
+        blocs.add(new Bloc("D2",    "D2",               78f, 760f));
+        blocs.add(new Bloc("D1",    "D1",               76f, 736f));
     }
 
     @Override
@@ -122,6 +124,7 @@ public class FsmMapView extends View {
         canvas.translate(translateX, translateY);
         canvas.scale(zoomFactor, zoomFactor, getWidth() / 2f, getHeight() / 2f);
 
+        // Dessin de l'image sur toute la surface de la vue
         canvas.drawBitmap(satelliteBmp, null, new RectF(0, 0, getWidth(), getHeight()), null);
 
         float scaleX = getWidth()  / REF_W;
@@ -130,32 +133,36 @@ public class FsmMapView extends View {
         for (Bloc bloc : blocs) {
             float dx = bloc.cx * scaleX;
             float dy = bloc.cy * scaleY;
-            float r  = 22f;
+
+            // Puces réduites pour ne pas cacher les bâtiments
+            float r = 12f;
 
             Paint p = bloc.isCurrentLocation ? pLocation
                     : bloc.isSelected        ? pSelected
                     : pNormal;
 
-            // Anneau extérieur
-            Paint ring = new Paint(Paint.ANTI_ALIAS_FLAG);
-            ring.setColor(p.getColor());
-            ring.setAlpha(80);
-            ring.setStyle(Paint.Style.STROKE);
-            ring.setStrokeWidth(6f);
-            canvas.drawCircle(dx, dy, r + 8f, ring);
+            // Cercle principal avec contour blanc fin
+            Paint stroke = new Paint(Paint.ANTI_ALIAS_FLAG);
+            stroke.setStyle(Paint.Style.STROKE);
+            stroke.setColor(Color.WHITE);
+            stroke.setStrokeWidth(3f);
 
-            // Cercle principal
+            canvas.drawCircle(dx, dy, r, stroke);
             canvas.drawCircle(dx, dy, r, p);
 
-            // Label avec fond
-            float lw = pLabel.measureText(bloc.nom) + 16f;
-            float lh = 36f;
-            float lx = dx - lw / 2f;
-            float ly = dy + r + 8f;
-            canvas.drawRoundRect(new RectF(lx, ly, lx + lw, ly + lh), 8f, 8f, pLabelBg);
-            canvas.drawText(bloc.nom, dx, ly + lh - 8f, pLabel);
-        }
+            // Affichage intelligent des labels (Zoom > 1.2 ou Sélection)
+            if (zoomFactor > 1.2f || bloc.isSelected) {
+                String txt = bloc.nom;
+                float lw = pLabel.measureText(txt) + 12f;
+                float lh = 28f;
+                float lx = dx - lw / 2f;
+                float ly = dy + r + 5f;
 
+                // Fond arrondi
+                canvas.drawRoundRect(new RectF(lx, ly, lx + lw, ly + lh), 12f, 12f, pLabelBg);
+                canvas.drawText(txt, dx, ly + lh - 8f, pLabel);
+            }
+        }
         canvas.restore();
     }
 
@@ -192,30 +199,49 @@ public class FsmMapView extends View {
     }
 
     private void handleClick(float touchX, float touchY) {
+        // 1. Calcul des échelles d'affichage
         float scaleX = getWidth()  / REF_W;
         float scaleY = getHeight() / REF_H;
 
-        float imgX = (touchX - translateX - (1 - zoomFactor) * getWidth()  / 2f) / zoomFactor;
-        float imgY = (touchY - translateY - (1 - zoomFactor) * getHeight() / 2f) / zoomFactor;
+        // 2. Inverser les transformations de la vue (Zoom et Translation)
+        // On calcule où le clic se situe sur le canvas "virtuel" avant les transformations
+        float unzoomedX = (touchX - translateX - (1 - zoomFactor) * getWidth() / 2f) / zoomFactor;
+        float unzoomedY = (touchY - translateY - (1 - zoomFactor) * getHeight() / 2f) / zoomFactor;
 
-        Bloc  closest = null;
+        Bloc closest = null;
         float minDist = Float.MAX_VALUE;
 
+        // 3. Rayon de détection dynamique
+        // On divise par zoomFactor pour que la zone de clic reste cohérente visuellement
+        float adjustedHitRadius = HIT_RADIUS / zoomFactor;
+
         for (Bloc bloc : blocs) {
-            float bx   = bloc.cx * scaleX;
-            float by   = bloc.cy * scaleY;
-            float dist = (float) Math.hypot(imgX - bx, imgY - by);
-            if (dist < HIT_RADIUS && dist < minDist) {
+            // Coordonnées du bloc scalées au canvas (sans zoom)
+            float bx = bloc.cx * scaleX;
+            float by = bloc.cy * scaleY;
+
+            // Calcul de la distance Euclidienne
+            float dist = (float) Math.hypot(unzoomedX - bx, unzoomedY - by);
+
+            if (dist < adjustedHitRadius && dist < minDist) {
                 minDist = dist;
                 closest = bloc;
             }
         }
 
+        // 4. Mise à jour de l'état et notification
         if (closest != null) {
+            // Déselectionner les autres et sélectionner le nouveau
             for (Bloc b : blocs) b.isSelected = false;
             closest.isSelected = true;
+
+            // Rafraîchir la vue pour afficher le changement de couleur (pSelected)
             invalidate();
-            if (clickListener != null) clickListener.onBlocClick(closest);
+
+            // Notifier MapActivity
+            if (clickListener != null) {
+                clickListener.onBlocClick(closest);
+            }
         }
     }
 

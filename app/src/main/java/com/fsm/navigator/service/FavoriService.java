@@ -1,5 +1,7 @@
 package com.fsm.navigator.service;
 
+import com.fsm.navigator.AppConfig;
+
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -22,7 +24,7 @@ import java.util.List;
  */
 public class FavoriService {
 
-    private static final String BASE_URL = "http://10.0.2.2:8080/api/favoris";
+    private static final String BASE_URL = AppConfig.BASE_URL + "/api/favoris";
 
     public interface FavoriCallback {
         void onSuccess(boolean isFavori, long favoriId);

@@ -1,5 +1,7 @@
 package com.fsm.navigator.auth;
 
+import com.fsm.navigator.AppConfig;
+
 import android.os.AsyncTask;
 
 import org.json.JSONObject;
@@ -20,7 +22,7 @@ import java.net.URL;
  */
 public class AuthService {
 
-    private static final String BASE_URL = "http://10.0.2.2:8080/api/auth";
+    private static final String BASE_URL = AppConfig.BASE_URL + "/api/auth";
 
     // ===== INTERFACES CALLBACK =====
     public interface AuthCallback {

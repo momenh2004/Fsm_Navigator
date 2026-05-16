@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -41,7 +42,7 @@ import java.util.List;
  */
 public class NavigationActivity extends AppCompatActivity {
 
-    private static final String BASE_URL = "http://10.0.2.2:8080";
+    private static final String BASE_URL = AppConfig.BASE_URL;
 
     // ── Mode navigation ──────────────────────────────────────
     private NavigationView    navView;
@@ -85,6 +86,9 @@ public class NavigationActivity extends AppCompatActivity {
             } else {
                 startNavigation();
             }
+        }
+        if (targetBlocId != null) {
+            navView.setBlocId(targetBlocId); // On appelle la méthode qu'on va créer
         }
     }
 
@@ -322,20 +326,54 @@ public class NavigationActivity extends AppCompatActivity {
     private void navigateTo(PointInteret poi) {
         ProfileActivity.addToHistory(this, poi.getNom());
 
-        String blocCode  = poi.getBlocId() != null ? poi.getBlocId() : "B3";
-        String etage     = poi.getEtage();
+        String blocCode = poi.getBlocId() != null ? poi.getBlocId() : "B3";
+        String batiment = poi.getBatiment(); // ex: "Palestine", "Bloc 3", etc.
+        String etage = poi.getEtage();
         String etageCode = "RDC";
         if (etage != null && etage.contains("1er")) etageCode = "E1";
-        else if (etage != null && etage.contains("2"))  etageCode = "E2";
+        else if (etage != null && etage.contains("2")) etageCode = "E2";
+
         String num = poi.getNom().replaceAll("[^0-9]", "");
         if (num.isEmpty()) num = poi.getNom().replace(" ", "_");
-        String nodeId = blocCode + "_" + etageCode + "_" + num;
+
+        String nodeId;
+
+        // DÉTECTION PAR LE NOM DU BÂTIMENT (plus fiable)
+        if (batiment != null && batiment.toLowerCase().contains("palestine")) {
+            // Bloc Palestine
+            if (!num.isEmpty()) {
+                nodeId = "BP_" + num;
+            } else {
+                String nomUpper = poi.getNom().toUpperCase().trim();
+                if (nomUpper.contains("AMPHI")) {
+                    if (nomUpper.endsWith(" A") || nomUpper.equals("AMPHI A")) nodeId = "BP_AA";
+                    else if (nomUpper.endsWith(" B") || nomUpper.equals("AMPHI B")) nodeId = "BP_AB";
+                    else if (nomUpper.endsWith(" C") || nomUpper.equals("AMPHI C")) nodeId = "BP_AC";
+                    else if (nomUpper.endsWith(" D") || nomUpper.equals("AMPHI D")) nodeId = "BP_AD";
+                    else nodeId = "BP_105";
+                } else nodeId = "BP_105";
+            }
+            // Forcer le blocId pour la vue et le graphe
+            blocCode = "BPAL";
+            Log.d("NAV_ACT", "Palestine détecté → nodeId = " + nodeId);
+        } else {
+            // Bloc 3 ou autre
+            nodeId = blocCode + "_" + etageCode + "_" + num;
+            Log.d("NAV_ACT", "Autre bloc → nodeId = " + nodeId);
+        }
 
         targetNodeId = nodeId;
-        targetNom    = poi.getNom();
+        targetNom = poi.getNom();
         targetBlocId = blocCode;
-        android.util.Log.d("NAV", "buildNodeId: " + nodeId + " | exists: " +
-                (new NavigationGraph().getNode(nodeId) != null));
+
+        // Important : informer la vue du bon bloc
+        navView.setBlocId(blocCode);
+
+        // Vérification rapide
+        NavigationGraph testGraph = new NavigationGraph();
+        boolean exists = testGraph.getNode(nodeId) != null;
+        Log.d("NAV_ACT", "Node existe dans graphe ? " + exists);
+        Toast.makeText(this, "Navigation vers " + nodeId + (exists ? "" : " (inexistant)"), Toast.LENGTH_SHORT).show();
 
         showNavigationMode();
         navManager = new NavigationManager(this);
@@ -362,7 +400,6 @@ public class NavigationActivity extends AppCompatActivity {
         if (tvStatus    != null) tvStatus.setText("Mode hors ligne...");
         navManager = new NavigationManager(this);
         navManager.startOfflineNavigation(targetNodeId, targetNom, buildCallback());
-
     }
 
     private NavigationManager.NavigationCallback buildCallback() {
@@ -371,8 +408,10 @@ public class NavigationActivity extends AppCompatActivity {
             @Override
             public void onPositionUpdated(NavigationNode current,
                                           NavigationGraph.NavPath path) {
+                Log.d("CALLBACK", "onPositionUpdated called, path=" + (path != null ? path.nodes.size() : "null"));
                 if (progressNav != null) progressNav.setVisibility(View.GONE);
                 NavigationNode destNode = navManager.getGraph().getNode(targetNodeId);
+                navView.setBlocId(path.nodes.get(0).blocId);
                 navView.setNavigationData(navManager.getGraph(), path, current, destNode);
                 if (path != null && !path.instructions.isEmpty()) {
                     if (tvInstruction != null) tvInstruction.setText(path.instructions.get(0));
@@ -405,7 +444,9 @@ public class NavigationActivity extends AppCompatActivity {
                 if (progressNav != null) progressNav.setVisibility(View.GONE);
                 showOfflineDialog();
             }
+
         };
+
     }
 
     private void showOfflineDialog() {

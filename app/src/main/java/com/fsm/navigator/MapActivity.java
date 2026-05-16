@@ -81,7 +81,23 @@ public class MapActivity extends BaseDrawerActivity {
             tvBlocNom.setText(bloc.nom.replace("\n", " "));
             tvBlocDesc.setText(getBlocDetails(bloc.id));
             cardBlocInfo.setVisibility(View.VISIBLE);
+            if (btnVoirPlan != null)
+                btnVoirPlan.setVisibility(hasPlan(bloc.id) ? View.VISIBLE : View.GONE);
         });
+    }
+
+    private boolean hasPlan(String blocId) {
+        switch (blocId) {
+            case "COUR":
+            case "PCOUR":
+            case "ADM":
+            case "STH":
+            case "D1":
+            case "D2":
+                return false;
+            default:
+                return true;
+        }
     }
 
     // =========================================================

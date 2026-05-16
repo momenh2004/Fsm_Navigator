@@ -84,7 +84,7 @@ public class MainActivity extends BaseDrawerActivity {
     private void setupPopularDestinations() {
         if (cardDest1 != null)
             cardDest1.setOnClickListener(v ->
-                    goToNavigation("B1_RDC_AMPHI_A", "Amphithéâtre A", "B1"));
+                    goToNavigation("BP_AA", "Amphithéâtre A", "B1"));
         if (cardDest2 != null)
             cardDest2.setOnClickListener(v ->
                     goToNavigation("B3_RDC_301", "Salle 301", "B3"));

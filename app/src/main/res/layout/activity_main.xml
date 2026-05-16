@@ -526,20 +526,7 @@
                         android:text="Profil" android:textColor="#B0BEC5" android:textSize="14sp"/>
                 </LinearLayout>
 
-                <!-- Admin -->
-                <LinearLayout android:id="@+id/drawerAdmin"
-                    android:layout_width="match_parent" android:layout_height="52dp"
-                    android:orientation="horizontal" android:gravity="center_vertical"
-                    android:paddingStart="16dp" android:paddingEnd="16dp"
-                    android:layout_marginBottom="4dp" android:clickable="true" android:focusable="true">
-                    <TextView android:layout_width="24dp" android:layout_height="24dp"
-                        android:text="⚙" android:textSize="14sp" android:textColor="#607080"
-                        android:gravity="center" android:layout_marginEnd="14dp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="Administration" android:textColor="#B0BEC5" android:textSize="14sp"/>
-                </LinearLayout>
-
-                <!-- Divider -->
+<!-- Divider -->
                 <View android:layout_width="match_parent" android:layout_height="1dp"
                     android:background="#0FFFFFFF" android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"/>

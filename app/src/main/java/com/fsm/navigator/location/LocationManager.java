@@ -1,5 +1,7 @@
 package com.fsm.navigator.location;
 
+import com.fsm.navigator.AppConfig;
+
 import android.content.Context;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
@@ -30,7 +32,7 @@ import java.util.Map;
  */
 public class LocationManager {
 
-    private static final String BASE_URL = "http://10.0.2.2:8080";
+    private static final String BASE_URL = AppConfig.BASE_URL;
 
     private final Context         context;
     private final KalmanFilter    kalmanFilter;

@@ -8,26 +8,19 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.util.Patterns;
 import android.widget.TextView;
+import android.text.method.HideReturnsTransformationMethod;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.fsm.navigator.admin.AdminLoginActivity;
 import com.fsm.navigator.auth.AuthService;
 import com.fsm.navigator.auth.TokenManager;
 import androidx.appcompat.widget.SwitchCompat;
 import com.fsm.navigator.auth.PmrManager;
 
-/**
- * LoginActivity.java – Contrôleur de la page de connexion
- *
- * Flux :
- *  1. L'utilisateur saisit email + mot de passe
- *  2. AuthService appelle POST /api/auth/login
- *  3. En cas de succès → token sauvegardé → redirect MainActivity
- *  4. En cas d'erreur  → message affiché en rouge
- *  5. "Continuer sans compte" → redirect directement MainActivity
- */
+//Handles User Login and navigation to the main app
+
 public class LoginActivity extends AppCompatActivity {
 
     // Vues
@@ -42,8 +35,6 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Si déjà connecté → aller directement à MainActivity
         if (TokenManager.isLoggedIn(this)) {
             goToMain();
             return;
@@ -53,8 +44,6 @@ public class LoginActivity extends AppCompatActivity {
         initViews();
         setupListeners();
     }
-
-    // =========================================================
     private void initViews() {
         etEmail          = findViewById(R.id.etEmail);
         etPassword       = findViewById(R.id.etPassword);
@@ -66,57 +55,43 @@ public class LoginActivity extends AppCompatActivity {
         btnTogglePassword= findViewById(R.id.btnTogglePassword);
         switchPmr = findViewById(R.id.switchPmr);
     }
-
-    // =========================================================
     private void setupListeners() {
-
-        // Bouton connexion
+        // Login
         btnLogin.setOnClickListener(v -> attemptLogin());
 
-        // Afficher/masquer mot de passe
+        // Toggle password visibility
         btnTogglePassword.setOnClickListener(v -> {
             passwordVisible = !passwordVisible;
-            if (passwordVisible) {
-                etPassword.setTransformationMethod(null);
-            } else {
-                etPassword.setTransformationMethod(new PasswordTransformationMethod());
-            }
+            etPassword.setTransformationMethod(passwordVisible
+                ? HideReturnsTransformationMethod.getInstance()
+                : PasswordTransformationMethod.getInstance());
             etPassword.setSelection(etPassword.getText().length());
         });
 
-        // Aller à RegisterActivity
+        // Créer un compte → RegisterActivity
         tvRegister.setOnClickListener(v -> {
             startActivity(new Intent(this, RegisterActivity.class));
         });
 
-        // Continuer sans compte → MainActivity directement
+        // Visiteur → MainActivity
         tvGuest.setOnClickListener(v -> goToMain());
 
+        // Enable/disable PMR
         switchPmr.setOnCheckedChangeListener((buttonView, isChecked) -> {
             PmrManager.setEnabled(isChecked);
         });
-        TextView tvAdminAccess = findViewById(R.id.tvAdminAccess);
-        tvAdminAccess.setOnClickListener(v ->
-                startActivity(new Intent(this, AdminLoginActivity.class))
-        );
     }
 
-    // =========================================================
     private void attemptLogin() {
-        String email    = etEmail.getText().toString().trim();
+        String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
-        // Validation locale
-        if (email.isEmpty()) {
-            showError("Veuillez entrer votre email");
-            return;
-        }
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            showError("Adresse email invalide");
-            return;
-        }
-        if (password.isEmpty()) {
-            showError("Veuillez entrer votre mot de passe");
+        // Vérifier les champs
+        if (email.isEmpty()) showError("Veuillez entrer votre email");
+        else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) showError("Adresse email invalide");
+        else if (password.isEmpty()) showError("Veuillez entrer votre mot de passe");
+
+        if (tvError.getVisibility() == View.VISIBLE) {
             return;
         }
 
@@ -139,13 +114,13 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
-                setLoading(false);
-                showError(message);
+                runOnUiThread(() -> {
+                    setLoading(false);
+                    showError(message);
+                });
             }
         });
     }
-
-    // =========================================================
     private void showError(String message) {
         tvError.setText(message);
         tvError.setVisibility(View.VISIBLE);

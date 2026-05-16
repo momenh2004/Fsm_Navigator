@@ -33,7 +33,7 @@ import java.util.List;
 public class SearchActivity extends BaseDrawerActivity
         implements SearchResultAdapter.OnNavigateClickListener {
 
-    private static final String BASE_URL = "http://10.0.2.2:8080";
+    private static final String BASE_URL = AppConfig.BASE_URL;
 
     private EditText     etSearch;
     private ImageButton  btnClear;
@@ -92,7 +92,7 @@ public class SearchActivity extends BaseDrawerActivity
                 if (conn.getResponseCode() != 200) {
                     runOnUiThread(() -> {
                         progressSearch.setVisibility(View.GONE);
-                        Toast.makeText(this, "Impossible de charger les données", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Impossible de charger les données", Toast.LENGTH_SHORT).show();
                     });
                     return;
                 }
@@ -304,7 +304,7 @@ public class SearchActivity extends BaseDrawerActivity
         if (tvClearHistory != null) tvClearHistory.setOnClickListener(v -> {
             ProfileActivity.clearHistory(this);
             layoutHistory.setVisibility(View.GONE);
-            Toast.makeText(this, "Historique effacé", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Historique effacé", Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -327,7 +327,24 @@ public class SearchActivity extends BaseDrawerActivity
     }
 
     private String buildNodeId(PointInteret poi) {
-        String blocId    = poi.getBlocId() != null ? poi.getBlocId() : "B3";
+        String blocId   = poi.getBlocId() != null ? poi.getBlocId() : "B3";
+        String batiment = poi.getBatiment();
+
+        boolean isPalestine = "B1".equals(blocId) || "BPAL".equals(blocId)
+                || (batiment != null && batiment.toLowerCase().contains("palestine"));
+        if (isPalestine) {
+            String num = poi.getNom().replaceAll("[^0-9]", "");
+            if (!num.isEmpty()) return "BP_" + num;
+            String n = poi.getNom().toUpperCase().trim();
+            if (n.contains("AMPHI")) {
+                if (n.endsWith(" A") || n.equals("AMPHI A")) return "BP_AA";
+                if (n.endsWith(" B") || n.equals("AMPHI B")) return "BP_AB";
+                if (n.endsWith(" C") || n.equals("AMPHI C")) return "BP_AC";
+                if (n.endsWith(" D") || n.equals("AMPHI D")) return "BP_AD";
+            }
+            return "BPAL_RDC_ENTREE";
+        }
+
         String etage     = poi.getEtage();
         String etageCode = "RDC";
         if (etage != null && etage.contains("1er")) etageCode = "E1";

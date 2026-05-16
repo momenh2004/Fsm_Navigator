@@ -44,6 +44,9 @@ public class BlocDetailView extends View {
     private Paint pWall, pWallFill, pRoom, pRoomFill, pRoomSelected;
     private Paint pText, pTextSmall, pBg;
     private Paint pEntree, pSortie, pEscalier, pCour, pDoor;
+    private float realWidth = 17.76f;
+    private float realHeight = 30.74f;
+    private float scale;
 
     public BlocDetailView(Context ctx, AttributeSet attrs) { super(ctx, attrs); init(); }
     public BlocDetailView(Context ctx)                     { super(ctx); init(); }
@@ -146,7 +149,7 @@ public class BlocDetailView extends View {
                 if (etage == 0) drawBloc3RDC(canvas);
                 else            drawBloc3Etage1(canvas);
                 break;
-            case "B1": drawBloc1(canvas);    break;
+            case "B1": drawBlocPalestine(canvas);    break;
             default:   drawGeneric(canvas);  break;
         }
     }
@@ -257,68 +260,90 @@ public class BlocDetailView extends View {
     // =========================================================
     // BLOC 1 — Palestine
     // =========================================================
-    private void drawBloc1(Canvas canvas) {
+    // =========================================================
+// BLOC PALESTINE — RDC (Basé sur le schéma Draw.io)
+// =========================================================
+    private void drawBlocPalestine(Canvas canvas) {
         int w = getWidth(), h = getHeight();
-        float mx=w*0.06f, my=h*0.07f;
-        float dw=w-2*mx, dh=h-my-h*0.12f;
 
-        canvas.drawRect(mx,my,mx+dw,my+dh,pWallFill);
-        canvas.drawRect(mx,my,mx+dw,my+dh,pWall);
+        // 1. Marges et zone de dessin
+        float mL = w * 0.10f, mT = h * 0.10f;
+        float dW = w - 2 * mL, dH = h - mT - h * 0.15f;
 
-        float cx0=mx+dw*0.25f,cy0=my+dh*0.2f,cx1=mx+dw*0.75f,cy1=my+dh*0.82f;
-        canvas.drawRect(cx0,cy0,cx1,cy1,pCour);
-        pWall.setAlpha(100); canvas.drawRect(cx0,cy0,cx1,cy1,pWall); pWall.setAlpha(255);
-        pTextSmall.setTextSize(dh*0.06f);
-        canvas.drawText("Cour",(cx0+cx1)/2f,(cy0+cy1)/2f,pTextSmall);
+        // 2. Échelles (25.53m x 26.32m)
+        float sx = dW / 25.53f;
+        float sy = dH / 26.32f;
 
-        // Amphi A,B droite
-        String[] aD={"Amphi A","Amphi B"};
-        for (int i=0;i<2;i++) {
-            float ay0=my+dh*(0.05f+i*0.2f), ay1=ay0+dh*0.15f;
-            float ax0=mx+dw*0.76f, ax1=mx+dw;
-            RectF r=new RectF(ax0,ay0,ax1,ay1);
-            canvas.drawRect(ax0,ay0,ax1,ay1,pRoomFill);
-            canvas.drawRect(ax0,ay0,ax1,ay1,pRoom);
-            pText.setTextSize(dh*0.055f);
-            canvas.drawText(aD[i],(ax0+ax1)/2f,(ay0+ay1)/2f+dh*0.02f,pText);
-            salleRects.add(new SalleRect(aD[i],r,0));
-        }
+        // 3. Structure extérieure
+        canvas.drawRect(mL, mT, mL + dW, mT + dH, pWallFill);
+        canvas.drawRect(mL, mT, mL + dW, mT + dH, pWall);
 
-        // Amphi C,D gauche
-        String[] aG={"Amphi C","Amphi D"};
-        for (int i=0;i<2;i++) {
-            float ay0=my+dh*(0.05f+i*0.2f), ay1=ay0+dh*0.15f;
-            float ax0=mx, ax1=mx+dw*0.24f;
-            RectF r=new RectF(ax0,ay0,ax1,ay1);
-            canvas.drawRect(ax0,ay0,ax1,ay1,pRoomFill);
-            canvas.drawRect(ax0,ay0,ax1,ay1,pRoom);
-            pText.setTextSize(dh*0.055f);
-            canvas.drawText(aG[i],(ax0+ax1)/2f,(ay0+ay1)/2f+dh*0.02f,pText);
-            salleRects.add(new SalleRect(aG[i],r,0));
-        }
+        // 4. Cour Centrale
+        float cX0 = mL + 5.0f * sx, cY0 = mT + 5.0f * sy;
+        float cX1 = mL + 20.5f * sx, cY1 = mT + 21.0f * sy;
+        canvas.drawRect(cX0, cY0, cX1, cY1, pCour);
+        canvas.drawRect(cX0, cY0, cX1, cY1, pWall);
+        pTextSmall.setTextSize(sy * 1.5f);
+        pTextSmall.setTypeface(Typeface.DEFAULT);
+        canvas.drawText("Cour Centrale", (cX0 + cX1) / 2f, (cY0 + cY1) / 2f, pTextSmall);
 
-        // Salles 101→107
-        float sw=dw/7f;
-        for (int i=0;i<7;i++) {
-            float sx0=mx+i*sw, sx1=sx0+sw-2;
-            float sy0=my+dh*0.83f, sy1=my+dh;
-            String nom=String.valueOf(101+i);
-            RectF r=new RectF(sx0,sy0,sx1,sy1);
-            Paint fill=nom.equals(selectedSalle)?pRoomSelected:pRoomFill;
-            canvas.drawRect(sx0,sy0,sx1,sy1,fill);
-            canvas.drawRect(sx0,sy0,sx1,sy1,pRoom);
-            pText.setTextSize(dh*0.048f);
-            canvas.drawText(nom,(sx0+sx1)/2f,(sy0+sy1)/2f+dh*0.018f,pText);
-            salleRects.add(new SalleRect("Salle "+nom,r,0));
-        }
+        // 5. Salles - 101 et 107 remontées pour créer un gap
+        // Côté DROIT
+        drawRoom(canvas, mL, mT, sx, sy, new float[]{22.0f, 18.5f, 25.53f, 22.5f}, "101", 0);
+        drawRoom(canvas, mL, mT, sx, sy, new float[]{22.0f, 10.0f, 25.53f, 14.0f}, "102", 0);
+        drawRoom(canvas, mL, mT, sx, sy, new float[]{22.0f, 5.0f, 25.53f, 9.0f}, "103", 0);
 
-        float entX=mx+dw*0.5f;
-        canvas.drawRoundRect(new RectF(entX-dw*0.12f,my+dh,entX+dw*0.12f,my+dh+h*0.04f),6f,6f,pEntree);
-        pText.setTextSize(dh*0.05f);
-        canvas.drawText("ENTRÉE",entX,my+dh+h*0.028f,pText);
+        // Côté GAUCHE
+        drawRoom(canvas, mL, mT, sx, sy, new float[]{0.0f, 5.0f, 3.5f, 9.0f}, "105", 0);
+        drawRoom(canvas, mL, mT, sx, sy, new float[]{0.0f, 10.0f, 3.5f, 14.0f}, "106", 0);
+        drawRoom(canvas, mL, mT, sx, sy, new float[]{0.0f, 18.5f, 3.5f, 22.5f}, "107", 0);
 
-        pText.setTextSize(h*0.032f);
-        canvas.drawText("Bloc 1 — RDC",w/2f,h*0.97f,pText);
+        // Côté HAUT
+        drawRoom(canvas, mL, mT, sx, sy, new float[]{14.0f, 0.0f, 17.5f, 3.5f}, "104", 0);
+
+        // 6. Amphithéâtres (cliquables)
+        drawAmphiRoom(canvas, mL, mT, sx, sy, 19.5f,  0.0f, 25.53f,  5.0f, "Amphi B");
+        drawAmphiRoom(canvas, mL, mT, sx, sy,  0.0f,  0.0f,  5.0f,   5.0f, "Amphi C");
+        drawAmphiRoom(canvas, mL, mT, sx, sy,  0.0f, 22.5f,  5.0f,  26.32f, "Amphi D");
+        drawAmphiRoom(canvas, mL, mT, sx, sy, 19.5f, 22.5f, 25.53f, 26.32f, "Amphi A");
+
+        // 7. Circulation et Issues
+        // Entrée Principale (Milieu Bas)
+        drawFeature(canvas, mL + 12.76f * sx, mT + dH, sx * 4, sy * 1.2f, "ENTRÉE", pEntree);
+        // Sortie (Haut)
+        drawFeature(canvas, mL + 12.0f * sx, mT, sx * 3, sy * 1.2f, "SORTIE", pSortie);
+
+        // Escalier DROIT (Existant)
+        float exR0 = mL + 16.5f * sx, eyR0 = mT + 24.5f * sy;
+        canvas.drawRect(exR0, eyR0, exR0 + 3f * sx, eyR0 + 1.8f * sy, pEscalier);
+        canvas.drawRect(exR0, eyR0, exR0 + 3f * sx, eyR0 + 1.8f * sy, pRoom);
+
+        // Escalier GAUCHE (Nouveau - à gauche de l'entrée)
+        float exL0 = mL + 6.5f * sx, eyL0 = mT + 24.5f * sy;
+        canvas.drawRect(exL0, eyL0, exL0 + 3f * sx, eyL0 + 1.8f * sy, pEscalier);
+        canvas.drawRect(exL0, eyL0, exL0 + 3f * sx, eyL0 + 1.8f * sy, pRoom);
+
+        pTextSmall.setTypeface(Typeface.DEFAULT);
+        canvas.drawText("Esc.", exR0 + 1.5f * sx, eyR0 + 1.2f * sy, pTextSmall);
+        canvas.drawText("Esc.", exL0 + 1.5f * sx, eyL0 + 1.2f * sy, pTextSmall);
+
+        // Entrées latérales
+        drawFeature(canvas, mL, mT + 3.0f * sy, sx * 0.5f, sy * 2, "E2", pEntree);
+        drawFeature(canvas, mL, mT + 23.0f * sy, sx * 0.5f, sy * 2, "E3", pEntree);
+
+        // 8. Titre
+        drawLegend(canvas, w, h);
+        pText.setColor(Color.WHITE);
+        pText.setTextSize(h * 0.035f);
+        canvas.drawText("Bloc Palestine — RDC", w / 2f, h * 0.97f, pText);
+    }
+
+    // Fonction utilitaire pour dessiner les entrées/sorties rapidement
+    private void drawFeature(Canvas canvas, float cx, float cy, float w, float h, String label, Paint paint) {
+        RectF r = new RectF(cx - w/2, cy - h/2, cx + w/2, cy + h/2);
+        canvas.drawRoundRect(r, 4f, 4f, paint);
+        pText.setTextSize(h * 0.8f);
+        canvas.drawText(label, cx, cy + h/4, pText);
     }
 
     // =========================================================
@@ -356,6 +381,28 @@ public class BlocDetailView extends View {
         pText.setTextSize((y1-y0)*0.38f);
         c.drawText(nom,(x0+x1)/2f,(y0+y1)/2f+pText.getTextSize()/3f,pText);
         salleRects.add(new SalleRect(displayNom, r, etageRoom));
+    }
+
+    private void drawAmphiRoom(Canvas c, float mL, float mT, float sx, float sy,
+                              float wx0, float wy0, float wx1, float wy1, String label) {
+        float x0 = mL + wx0 * sx, y0 = mT + wy0 * sy;
+        float x1 = mL + wx1 * sx, y1 = mT + wy1 * sy;
+        RectF r = new RectF(x0, y0, x1, y1);
+
+        Paint fill = label.equals(selectedSalle) ? pRoomSelected : pRoomFill;
+        c.drawRect(x0, y0, x1, y1, fill);
+        c.drawRect(x0, y0, x1, y1, pRoom);
+
+        if (label.equals(selectedSalle)) {
+            Paint border = new Paint(pRoom);
+            border.setColor(Color.parseColor("#00D4FF"));
+            border.setStrokeWidth(3f);
+            c.drawRect(x0, y0, x1, y1, border);
+        }
+
+        pTextSmall.setTextSize((y1 - y0) * 0.25f);
+        c.drawText(label, (x0 + x1) / 2f, (y0 + y1) / 2f + pTextSmall.getTextSize() / 3f, pTextSmall);
+        salleRects.add(new SalleRect(label, r, 0));
     }
 
     private void drawLegend(Canvas canvas, int w, int h) {

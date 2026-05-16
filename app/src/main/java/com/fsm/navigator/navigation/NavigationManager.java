@@ -1,5 +1,7 @@
 package com.fsm.navigator.navigation;
 
+import com.fsm.navigator.AppConfig;
+
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -8,6 +10,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
 
@@ -36,7 +39,7 @@ import java.util.Map;
  */
 public class NavigationManager {
 
-    private static final String  BASE_URL      = "http://10.0.2.2:8080/api/fingerprints";
+    private static final String  BASE_URL      = AppConfig.BASE_URL + "/api/fingerprints";
     private static final int     SCAN_INTERVAL = 4000;
 
     // SSIDs reconnus comme étant le WiFi FSM
@@ -108,46 +111,55 @@ public class NavigationManager {
      */
     public void startOfflineNavigation(String targetNodeId, String targetNom,
                                        NavigationCallback callback) {
+        Log.d("OFFLINE", "startOfflineNavigation appelé, targetNodeId=" + targetNodeId);
         this.targetNodeId = targetNodeId;
         this.targetNom    = targetNom;
         this.callback     = callback;
-        this.isRunning    = false; // pas de scan continu
+        this.isRunning    = false;
 
-        // Extraire le blocId depuis targetNodeId (ex: "B3_RDC_305" → "B3")
-        String blocId = targetNodeId.contains("_")
-                ? targetNodeId.split("_")[0] : "B3";
+        // 1. Récupérer le nœud destination
+        NavigationNode targetNode = graph.getNode(targetNodeId);
+        Log.d("OFFLINE", "targetNode = " + (targetNode != null ? targetNode.nom : "null"));
+        if (targetNode == null) {
+            handler.post(() -> callback.onError("Destination inconnue : " + targetNodeId));
+            return;
+        }
 
-        // Trouver le nœud d'entrée du bloc
+        // 2. Utiliser son blocId réel (ex: "BPAL")
+        String blocId = targetNode.blocId;
+        Log.d("OFFLINE", "blocId = " + blocId);
+
+        // 3. Trouver l'entrée du bloc
         NavigationNode entree = graph.findEntree(blocId);
+        Log.d("OFFLINE", "entree = " + (entree != null ? entree.id : "null"));
         if (entree == null) {
-            // Prendre le premier nœud disponible du bloc
             entree = graph.findAnyNodeInBloc(blocId);
+            Log.d("OFFLINE", "findAnyNodeInBloc = " + (entree != null ? entree.id : "null"));
         }
         if (entree == null) {
-            handler.post(() -> callback.onError("Impossible de trouver le point de départ"));
+            handler.post(() -> callback.onError("Point de départ introuvable pour " + blocId));
             return;
         }
 
         final NavigationNode startNode = entree;
+        Log.d("OFFLINE", "startNode.id = " + startNode.id + ", targetNode.id = " + targetNode.id);
 
-        // Calculer A* depuis l'entrée vers la destination
+
+        // 4. Calcul du chemin A*
         NavigationGraph.NavPath path = graph.findPath(startNode.id, targetNodeId);
+        Log.d("OFFLINE", "findPath retourne " + (path != null ? path.nodes.size() + " nœuds" : "null"));
 
         handler.post(() -> {
             currentNode = startNode;
             if (path == null) {
+                Log.e("OFFLINE", "path est null, on appelle onError");
                 callback.onError("Chemin introuvable");
                 return;
             }
+            Log.d("OFFLINE", "path OK, on appelle onPositionUpdated");
             callback.onPositionUpdated(startNode, path);
         });
-        android.util.Log.d("NAV", "start=" + startNode.id);
-        android.util.Log.d("NAV", "target=" + targetNodeId);
-        android.util.Log.d("NAV", "target exists=" + (graph.getNode(targetNodeId) != null));
-        android.util.Log.d("NAV", "path=" + (path == null ? "NULL" : path.nodes.size() + " nodes"));
-        for (NavigationNode n : path.nodes) {
-            android.util.Log.d("NAV", "node=" + n.id + " x=" + n.x + " y=" + n.y);
-        }
+
     }
 
     // =========================================================

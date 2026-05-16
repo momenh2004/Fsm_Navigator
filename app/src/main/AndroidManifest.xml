@@ -19,8 +19,6 @@
         <activity android:name=".ChangePasswordActivity" android:exported="false"/>
         <activity android:name=".MapActivity" android:exported="false"/>
         <activity android:name=".BlockDetailActivity" android:exported="false"/>
-        <activity android:name=".admin.AdminLoginActivity" android:exported="false"/>
-        <activity android:name=".admin.AdminDashboardActivity" android:exported="false"/>
-        <activity android:name=".NavigationActivity" android:exported="false"/>
+<activity android:name=".NavigationActivity" android:exported="false"/>
     </application>
 </manifest>

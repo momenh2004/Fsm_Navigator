@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.fsm.navigator.auth.TokenManager;
-import com.fsm.navigator.admin.AdminLoginActivity;
 
 public abstract class BaseDrawerActivity extends AppCompatActivity {
 
@@ -54,7 +53,6 @@ public abstract class BaseDrawerActivity extends AppCompatActivity {
         setupDrawerItem(R.id.drawerMap,    () -> navigateTo(MapActivity.class));
         setupDrawerItem(R.id.drawerSearch, () -> navigateTo(SearchActivity.class));
         setupDrawerItem(R.id.drawerNav,    () -> navigateTo(SearchActivity.class));
-        setupDrawerItem(R.id.drawerAdmin,  () -> navigateTo(AdminLoginActivity.class));
 
         // Profil — visible uniquement si connecté
         LinearLayout drawerProfile = findViewById(R.id.drawerProfile);
