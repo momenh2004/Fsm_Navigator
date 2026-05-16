@@ -14,12 +14,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 
 @RestController
 @RequestMapping("/api/favoris")
 @CrossOrigin(origins = "*")
 public class FavoriController {
+
+    private static final Logger log = LoggerFactory.getLogger(FavoriController.class);
 
     @Autowired private FavoriRepository favoriRepo;
     @Autowired private SalleRepository  salleRepo;
@@ -29,14 +34,20 @@ public class FavoriController {
     // Récupérer l'étudiant depuis le token JWT
     private Etudiant getEtudiantFromToken(String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) return null;
-        String email = jwtUtil.extractEmail(authHeader.substring(7));
-        Optional<User> userOpt = userRepo.findByEmail(email);
-        if (userOpt.isEmpty() || !(userOpt.get() instanceof Etudiant)) return null;
-        return (Etudiant) userOpt.get();
+        try {
+            String email = jwtUtil.extractEmail(authHeader.substring(7));
+            Optional<User> userOpt = userRepo.findByEmail(email);
+            if (userOpt.isEmpty() || !(userOpt.get() instanceof Etudiant)) return null;
+            return (Etudiant) userOpt.get();
+        } catch (Exception e) {
+            log.warn("JWT invalide ou expiré : {}", e.getMessage());
+            return null;
+        }
     }
 
     // ── GET /api/favoris ──────────────────────────────────────
     @GetMapping
+    @Transactional(readOnly = true)
     public ResponseEntity<List<Map<String, Object>>> getFavoris(
             @RequestHeader("Authorization") String authHeader) {
 
@@ -62,6 +73,7 @@ public class FavoriController {
 
     // ── POST /api/favoris ─────────────────────────────────────
     @PostMapping
+    @Transactional
     public ResponseEntity<Map<String, Object>> addFavori(
             @RequestHeader("Authorization") String authHeader,
             @RequestBody Map<String, Object> body) {
@@ -70,7 +82,21 @@ public class FavoriController {
         if (etudiant == null)
             return ResponseEntity.status(401).build();
 
-        Long salleId = Long.parseLong(body.get("salleId").toString());
+        Object salleIdRaw = body.get("salleId");
+        if (salleIdRaw == null) {
+            Map<String, Object> err = new LinkedHashMap<>();
+            err.put("message", "salleId manquant dans la requête");
+            return ResponseEntity.badRequest().body(err);
+        }
+
+        Long salleId;
+        try {
+            salleId = Long.parseLong(salleIdRaw.toString());
+        } catch (NumberFormatException e) {
+            Map<String, Object> err = new LinkedHashMap<>();
+            err.put("message", "salleId invalide : " + salleIdRaw);
+            return ResponseEntity.badRequest().body(err);
+        }
 
         Map<String, Object> response = new LinkedHashMap<>();
 
@@ -83,9 +109,9 @@ public class FavoriController {
         if (salle == null) return ResponseEntity.notFound().build();
 
         Favori f = new Favori(etudiant, salle);
-        favoriRepo.save(f);
+        Favori saved = favoriRepo.save(f);
 
-        response.put("id",      f.getId());
+        response.put("id",      saved.getId());
         response.put("message", "Ajouté aux favoris");
         return ResponseEntity.ok(response);
     }
