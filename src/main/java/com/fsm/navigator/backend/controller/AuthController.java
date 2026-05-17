@@ -1,7 +1,7 @@
 package com.fsm.navigator.backend.controller;
 
 import com.fsm.navigator.backend.model.Admin;
-import com.fsm.navigator.backend.model.Etudiant;
+import com.fsm.navigator.backend.model.Membre;
 import com.fsm.navigator.backend.model.User;
 import com.fsm.navigator.backend.security.JwtUtil;
 import com.fsm.navigator.backend.service.EmailService;
@@ -20,9 +20,9 @@ import java.util.Optional;
 /**
  * AuthController.java
  *
- * POST /api/auth/login          → Admin → OTP ; Etudiant → JWT direct
+ * POST /api/auth/login          → Admin → OTP ; Membre → JWT direct
  * POST /api/auth/verify-otp     → vérifie OTP admin → retourne JWT
- * POST /api/auth/register       → inscription Etudiant
+ * POST /api/auth/register       → inscription Membre
  * POST /api/auth/change-password
  * DELETE /api/auth/account
  */
@@ -70,7 +70,7 @@ public class AuthController {
             return ResponseEntity.ok(res);
         }
 
-        // Etudiant → JWT direct
+        // Membre → JWT direct
         String token = jwtUtil.generateToken(user.getEmail(), user.getRoleAsString());
         return ResponseEntity.ok(successObj(token, user.getEmail(), user.getRoleAsString()));
     }
@@ -110,7 +110,7 @@ public class AuthController {
     }
 
     // =========================================================
-    // POST /api/auth/register  → crée un Etudiant
+    // POST /api/auth/register  → crée un Membre
     // =========================================================
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> register(@RequestBody Map<String, String> body) {
@@ -126,11 +126,11 @@ public class AuthController {
         if (userRepository.findByEmail(email).isPresent())
             return ResponseEntity.status(409).body(error("Cet email est déjà utilisé"));
 
-        Etudiant etudiant = new Etudiant(email, passwordEncoder.encode(password), nom, prenom);
-        userRepository.save(etudiant);
+        Membre membre = new Membre(email, passwordEncoder.encode(password), nom, prenom);
+        userRepository.save(membre);
 
-        String token = jwtUtil.generateToken(email, "ETUDIANT");
-        return ResponseEntity.status(201).body(successObj(token, email, "ETUDIANT"));
+        String token = jwtUtil.generateToken(email, "MEMBRE");
+        return ResponseEntity.status(201).body(successObj(token, email, "MEMBRE"));
     }
 
     // =========================================================

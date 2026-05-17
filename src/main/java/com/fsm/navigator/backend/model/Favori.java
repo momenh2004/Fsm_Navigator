@@ -12,8 +12,8 @@ public class Favori {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "etudiant_id", nullable = false)
-    private Etudiant etudiant;
+    @JoinColumn(name = "membre_id", nullable = false)
+    private Membre membre;
 
     @ManyToOne
     @JoinColumn(name = "salle_id", nullable = false)
@@ -30,20 +30,20 @@ public class Favori {
     // ===== CONSTRUCTEURS =====
     public Favori() {}
 
-    public Favori(Etudiant etudiant, Salle salle) {
-        this.etudiant = etudiant;
-        this.salle    = salle;
+    public Favori(Membre membre, Salle salle) {
+        this.membre = membre;
+        this.salle  = salle;
     }
 
     // ===== GETTERS =====
     public Long          getId()        { return id; }
-    public Etudiant      getEtudiant()  { return etudiant; }
+    public Membre        getMembre()    { return membre; }
     public Salle         getSalle()     { return salle; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 
     // ===== SETTERS =====
-    public void setId(Long id)                   { this.id = id; }
-    public void setEtudiant(Etudiant e)          { this.etudiant = e; }
-    public void setSalle(Salle s)                { this.salle = s; }
-    public void setCreatedAt(LocalDateTime d)    { this.createdAt = d; }
+    public void setId(Long id)                { this.id = id; }
+    public void setMembre(Membre m)           { this.membre = m; }
+    public void setSalle(Salle s)             { this.salle = s; }
+    public void setCreatedAt(LocalDateTime d) { this.createdAt = d; }
 }

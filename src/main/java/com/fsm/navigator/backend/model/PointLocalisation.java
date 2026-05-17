@@ -13,14 +13,14 @@ import java.util.List;
  * ESCALIER  → etage_id
  * ENTREE    → bloc_id
  * SORTIE    → bloc_id
- * RAMPE     → bloc_id
+ * INTERSECTION → bloc_id
  */
 @Entity
 @Table(name = "poi")
 public class PointLocalisation {
 
     public enum Type {
-        SALLE, COULOIR, ESCALIER, ENTREE, SORTIE, RAMPE
+        SALLE, COULOIR, ESCALIER, ENTREE, SORTIE, INTERSECTION
     }
 
     @Id
@@ -58,10 +58,10 @@ public class PointLocalisation {
     @ManyToOne
     @JoinColumn(name = "bloc_id", nullable = true)
     @JsonIgnore
-    private Bloc bloc;       // ENTREE, SORTIE, RAMPE
+    private Bloc bloc;       // ENTREE, SORTIE, INTERSECTION
 
     @OneToMany(mappedBy = "poi", cascade = CascadeType.ALL)
-    private List<Fingerprint> fingerprints;
+    private List<WifiFingerprint> wifiFingerprints;
 
     // ===== CONSTRUCTEURS =====
     public PointLocalisation() {}
@@ -88,7 +88,7 @@ public class PointLocalisation {
         this.etage         = etage;
     }
 
-    // Pour ENTREE / SORTIE / RAMPE
+    // Pour ENTREE / SORTIE / INTERSECTION
     public PointLocalisation(String nom, Type type, float x, float y,
                               boolean accessiblePmr, Bloc bloc) {
         this.nom           = nom;
@@ -109,7 +109,7 @@ public class PointLocalisation {
     public Salle  getSalle()         { return salle; }
     public Etage  getEtage()         { return etage; }
     public Bloc   getBloc()          { return bloc; }
-    public List<Fingerprint> getFingerprints() { return fingerprints; }
+    public List<WifiFingerprint> getWifiFingerprints() { return wifiFingerprints; }
 
     // ID de référence (utile pour le frontend)
     public Long getSalleId()  { return salle  != null ? salle.getId()  : null; }

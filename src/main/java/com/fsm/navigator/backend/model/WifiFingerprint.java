@@ -3,15 +3,9 @@ package com.fsm.navigator.backend.model;
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-/**
- * Fingerprint.java – Empreinte WiFi liée à un POI
- *
- * Relation : Fingerprint → PointLocalisation (poi_id)
- * Plus de relation directe avec Salle
- */
 @Entity
 @Table(name = "fingerprints")
-public class Fingerprint {
+public class WifiFingerprint {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,9 +26,9 @@ public class Fingerprint {
     private PointLocalisation poi;
 
     // ===== CONSTRUCTEURS =====
-    public Fingerprint() {}
+    public WifiFingerprint() {}
 
-    public Fingerprint(String bssid, String ssid, double rssiMoyen, PointLocalisation poi) {
+    public WifiFingerprint(String bssid, String ssid, double rssiMoyen, PointLocalisation poi) {
         this.bssid     = bssid;
         this.ssid      = ssid;
         this.rssiMoyen = rssiMoyen;

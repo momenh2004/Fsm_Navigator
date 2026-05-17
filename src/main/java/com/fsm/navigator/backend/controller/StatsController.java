@@ -1,6 +1,6 @@
 package com.fsm.navigator.backend.controller;
 
-import com.fsm.navigator.backend.model.Etudiant;
+import com.fsm.navigator.backend.model.Membre;
 import com.fsm.navigator.backend.model.NavigationHistory;
 import com.fsm.navigator.backend.model.Salle;
 import com.fsm.navigator.backend.model.User;
@@ -20,7 +20,7 @@ public class StatsController {
     @Autowired private BlocRepository               blocRepo;
     @Autowired private SalleRepository              salleRepo;
     @Autowired private UserRepository               userRepo;
-    @Autowired private FingerprintRepository        fpRepo;
+    @Autowired private WifiFingerprintRepository    fpRepo;
     @Autowired private PointLocalisationRepository  poiRepo;
     @Autowired private NavigationHistoryRepository  histRepo;
     @Autowired private EtageRepository              etageRepo;
@@ -218,10 +218,10 @@ public class StatsController {
         try {
             String email = jwtUtil.extractEmail(authHeader.substring(7));
             Optional<User> userOpt = userRepo.findByEmail(email);
-            if (userOpt.isEmpty() || !(userOpt.get() instanceof Etudiant))
+            if (userOpt.isEmpty() || !(userOpt.get() instanceof Membre))
                 return ResponseEntity.status(401).build();
 
-            Etudiant etudiant = (Etudiant) userOpt.get();
+            Membre membre = (Membre) userOpt.get();
             Long salleId = Long.parseLong(body.get("salleId").toString());
             String typeStr = (String) body.getOrDefault("type", "VIEW");
 
@@ -231,7 +231,7 @@ public class StatsController {
             NavigationHistory.TypeHistorique type =
                 NavigationHistory.TypeHistorique.valueOf(typeStr.toUpperCase());
 
-            histRepo.save(new NavigationHistory(etudiant, salle, type));
+            histRepo.save(new NavigationHistory(membre, salle, type));
         } catch (Exception ignored) {}
         return ResponseEntity.ok().build();
     }

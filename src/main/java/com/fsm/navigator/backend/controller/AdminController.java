@@ -25,7 +25,7 @@ public class AdminController {
     @Autowired private BlocRepository               blocRepo;
     @Autowired private SalleRepository              salleRepo;
     @Autowired private EtageRepository              etageRepo;
-    @Autowired private FingerprintRepository        fpRepo;
+    @Autowired private WifiFingerprintRepository    fpRepo;
     @Autowired private PointLocalisationRepository  poiRepo;
 
     @Value("${admin.email}")
@@ -74,7 +74,7 @@ public class AdminController {
         try {
             String email    = body.get("email");
             String password = body.get("password");
-            String roleStr  = body.getOrDefault("role", "ETUDIANT").toUpperCase();
+            String roleStr  = body.getOrDefault("role", "MEMBRE").toUpperCase();
 
             if (email == null || email.isEmpty())
                 return ResponseEntity.badRequest().body(error("Email requis"));
@@ -89,7 +89,7 @@ public class AdminController {
             } else {
                 String nom    = body.getOrDefault("nom", "");
                 String prenom = body.getOrDefault("prenom", "");
-                user = new Etudiant(email, passwordEncoder.encode(password), nom, prenom);
+                user = new Membre(email, passwordEncoder.encode(password), nom, prenom);
             }
 
             return ResponseEntity.ok(userRepo.save(user));
@@ -106,9 +106,9 @@ public class AdminController {
                 u.setEmail(body.get("email"));
             if (body.containsKey("password") && !body.get("password").isEmpty())
                 u.setPassword(passwordEncoder.encode(body.get("password")));
-            if (u instanceof Etudiant etudiant) {
-                if (body.containsKey("nom"))    etudiant.setNom(body.get("nom"));
-                if (body.containsKey("prenom")) etudiant.setPrenom(body.get("prenom"));
+            if (u instanceof Membre membre) {
+                if (body.containsKey("nom"))    membre.setNom(body.get("nom"));
+                if (body.containsKey("prenom")) membre.setPrenom(body.get("prenom"));
             }
             return ResponseEntity.ok(userRepo.save(u));
         }).orElse(ResponseEntity.notFound().build());
@@ -409,7 +409,7 @@ public class AdminController {
     // ===================================================
 
     @GetMapping("/fingerprints")
-    public ResponseEntity<List<Fingerprint>> getAllFingerprints() {
+    public ResponseEntity<List<WifiFingerprint>> getAllFingerprints() {
         return ResponseEntity.ok(fpRepo.findAll());
     }
 
@@ -428,7 +428,7 @@ public class AdminController {
             if (poi == null)
                 return ResponseEntity.badRequest().body(error("POI introuvable"));
 
-            Fingerprint fp = new Fingerprint(bssid.toLowerCase().trim(), ssid, rssi, poi);
+            WifiFingerprint fp = new WifiFingerprint(bssid.toLowerCase().trim(), ssid, rssi, poi);
             return ResponseEntity.ok(fpRepo.save(fp));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(error("Erreur: " + e.getMessage()));

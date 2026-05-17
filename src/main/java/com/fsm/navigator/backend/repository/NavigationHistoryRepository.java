@@ -1,7 +1,7 @@
 package com.fsm.navigator.backend.repository;
 
 import com.fsm.navigator.backend.model.NavigationHistory;
-import com.fsm.navigator.backend.model.Etudiant;
+import com.fsm.navigator.backend.model.Membre;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -33,12 +33,12 @@ public interface NavigationHistoryRepository extends JpaRepository<NavigationHis
     // Répartition par type
     long countByType(NavigationHistory.TypeHistorique type);
 
-    // Stats par étudiant
-    @Query("SELECT n.etudiant.email, COUNT(n) as cnt " +
+    // Stats par membre
+    @Query("SELECT n.membre.email, COUNT(n) as cnt " +
            "FROM NavigationHistory n " +
-           "GROUP BY n.etudiant.email ORDER BY cnt DESC")
+           "GROUP BY n.membre.email ORDER BY cnt DESC")
     List<Object[]> findTopUsers();
 
-    // Historique d'un étudiant
-    List<NavigationHistory> findByEtudiantOrderByCreatedAtDesc(Etudiant etudiant);
+    // Historique d'un membre
+    List<NavigationHistory> findByMembreOrderByCreatedAtDesc(Membre membre);
 }

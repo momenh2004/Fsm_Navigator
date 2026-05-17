@@ -19,8 +19,8 @@ public class NavigationHistory {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "etudiant_id", nullable = false)
-    private Etudiant etudiant;
+    @JoinColumn(name = "membre_id", nullable = false)
+    private Membre membre;
 
     @ManyToOne
     @JoinColumn(name = "salle_id", nullable = false)
@@ -41,23 +41,23 @@ public class NavigationHistory {
     // ===== CONSTRUCTEURS =====
     public NavigationHistory() {}
 
-    public NavigationHistory(Etudiant etudiant, Salle salle, TypeHistorique type) {
-        this.etudiant = etudiant;
-        this.salle    = salle;
-        this.type     = type;
+    public NavigationHistory(Membre membre, Salle salle, TypeHistorique type) {
+        this.membre = membre;
+        this.salle  = salle;
+        this.type   = type;
     }
 
     // ===== GETTERS =====
-    public Long            getId()        { return id; }
-    public Etudiant        getEtudiant()  { return etudiant; }
-    public Salle           getSalle()     { return salle; }
-    public TypeHistorique  getType()      { return type; }
-    public LocalDateTime   getCreatedAt() { return createdAt; }
+    public Long           getId()        { return id; }
+    public Membre         getMembre()    { return membre; }
+    public Salle          getSalle()     { return salle; }
+    public TypeHistorique getType()      { return type; }
+    public LocalDateTime  getCreatedAt() { return createdAt; }
 
     // ===== SETTERS =====
-    public void setId(Long id)                  { this.id = id; }
-    public void setEtudiant(Etudiant e)         { this.etudiant = e; }
-    public void setSalle(Salle s)               { this.salle = s; }
-    public void setType(TypeHistorique t)       { this.type = t; }
-    public void setCreatedAt(LocalDateTime d)   { this.createdAt = d; }
+    public void setId(Long id)                { this.id = id; }
+    public void setMembre(Membre m)           { this.membre = m; }
+    public void setSalle(Salle s)             { this.salle = s; }
+    public void setType(TypeHistorique t)     { this.type = t; }
+    public void setCreatedAt(LocalDateTime d) { this.createdAt = d; }
 }

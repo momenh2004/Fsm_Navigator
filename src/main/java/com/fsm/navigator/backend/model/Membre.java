@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@DiscriminatorValue("ETUDIANT")
-public class Etudiant extends User {
+@DiscriminatorValue("MEMBRE")
+public class Membre extends User {
 
     @Column
     private String nom;
@@ -13,27 +13,27 @@ public class Etudiant extends User {
     @Column
     private String prenom;
 
-    @OneToMany(mappedBy = "etudiant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "membre", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favori> favoris;
 
-    @OneToMany(mappedBy = "etudiant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "membre", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NavigationHistory> historique;
 
     // ===== CONSTRUCTEURS =====
-    public Etudiant() {}
+    public Membre() {}
 
-    public Etudiant(String email, String password) {
+    public Membre(String email, String password) {
         super(email, password);
     }
 
-    public Etudiant(String email, String password, String nom, String prenom) {
+    public Membre(String email, String password, String nom, String prenom) {
         super(email, password);
         this.nom    = nom;
         this.prenom = prenom;
     }
 
     @Override
-    public String getRoleAsString() { return "ETUDIANT"; }
+    public String getRoleAsString() { return "MEMBRE"; }
 
     // ===== GETTERS =====
     public String                  getNom()       { return nom; }

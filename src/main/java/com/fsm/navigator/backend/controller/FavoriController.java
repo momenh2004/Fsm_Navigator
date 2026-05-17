@@ -1,6 +1,6 @@
 package com.fsm.navigator.backend.controller;
 
-import com.fsm.navigator.backend.model.Etudiant;
+import com.fsm.navigator.backend.model.Membre;
 import com.fsm.navigator.backend.model.Favori;
 import com.fsm.navigator.backend.model.Salle;
 import com.fsm.navigator.backend.model.User;
@@ -31,14 +31,14 @@ public class FavoriController {
     @Autowired private UserRepository   userRepo;
     @Autowired private JwtUtil          jwtUtil;
 
-    // Récupérer l'étudiant depuis le token JWT
-    private Etudiant getEtudiantFromToken(String authHeader) {
+    // Récupérer le membre depuis le token JWT
+    private Membre getMembreFromToken(String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) return null;
         try {
             String email = jwtUtil.extractEmail(authHeader.substring(7));
             Optional<User> userOpt = userRepo.findByEmail(email);
-            if (userOpt.isEmpty() || !(userOpt.get() instanceof Etudiant)) return null;
-            return (Etudiant) userOpt.get();
+            if (userOpt.isEmpty() || !(userOpt.get() instanceof Membre)) return null;
+            return (Membre) userOpt.get();
         } catch (Exception e) {
             log.warn("JWT invalide ou expiré : {}", e.getMessage());
             return null;
@@ -51,11 +51,11 @@ public class FavoriController {
     public ResponseEntity<List<Map<String, Object>>> getFavoris(
             @RequestHeader("Authorization") String authHeader) {
 
-        Etudiant etudiant = getEtudiantFromToken(authHeader);
-        if (etudiant == null)
+        Membre membre = getMembreFromToken(authHeader);
+        if (membre == null)
             return ResponseEntity.status(401).build();
 
-        List<Favori> favoris = favoriRepo.findByEtudiant(etudiant);
+        List<Favori> favoris = favoriRepo.findByMembre(membre);
         List<Map<String, Object>> result = new ArrayList<>();
 
         for (Favori f : favoris) {
@@ -78,8 +78,8 @@ public class FavoriController {
             @RequestHeader("Authorization") String authHeader,
             @RequestBody Map<String, Object> body) {
 
-        Etudiant etudiant = getEtudiantFromToken(authHeader);
-        if (etudiant == null)
+        Membre membre = getMembreFromToken(authHeader);
+        if (membre == null)
             return ResponseEntity.status(401).build();
 
         Object salleIdRaw = body.get("salleId");
@@ -100,7 +100,7 @@ public class FavoriController {
 
         Map<String, Object> response = new LinkedHashMap<>();
 
-        if (favoriRepo.existsByEtudiantAndSalle_Id(etudiant, salleId)) {
+        if (favoriRepo.existsByMembreAndSalle_Id(membre, salleId)) {
             response.put("message", "Déjà en favori");
             return ResponseEntity.ok(response);
         }
@@ -108,7 +108,7 @@ public class FavoriController {
         Salle salle = salleRepo.findById(salleId).orElse(null);
         if (salle == null) return ResponseEntity.notFound().build();
 
-        Favori f = new Favori(etudiant, salle);
+        Favori f = new Favori(membre, salle);
         Favori saved = favoriRepo.save(f);
 
         response.put("id",      saved.getId());
@@ -123,8 +123,8 @@ public class FavoriController {
             @PathVariable Long id,
             @RequestHeader("Authorization") String authHeader) {
 
-        Etudiant etudiant = getEtudiantFromToken(authHeader);
-        if (etudiant == null)
+        Membre membre = getMembreFromToken(authHeader);
+        if (membre == null)
             return ResponseEntity.status(401).build();
 
         Map<String, Object> response = new LinkedHashMap<>();
@@ -136,7 +136,7 @@ public class FavoriController {
         }
 
         Favori f = opt.get();
-        if (!f.getEtudiant().getId().equals(etudiant.getId())) {
+        if (!f.getMembre().getId().equals(membre.getId())) {
             response.put("message", "Non autorisé");
             return ResponseEntity.status(403).body(response);
         }
@@ -152,16 +152,16 @@ public class FavoriController {
             @RequestHeader("Authorization") String authHeader,
             @RequestParam Long salleId) {
 
-        Etudiant etudiant = getEtudiantFromToken(authHeader);
-        if (etudiant == null)
+        Membre membre = getMembreFromToken(authHeader);
+        if (membre == null)
             return ResponseEntity.status(401).build();
 
         Map<String, Object> response = new LinkedHashMap<>();
-        boolean isFavori = favoriRepo.existsByEtudiantAndSalle_Id(etudiant, salleId);
+        boolean isFavori = favoriRepo.existsByMembreAndSalle_Id(membre, salleId);
         Long favoriId = null;
 
         if (isFavori) {
-            favoriId = favoriRepo.findByEtudiantAndSalle_Id(etudiant, salleId)
+            favoriId = favoriRepo.findByMembreAndSalle_Id(membre, salleId)
                     .map(Favori::getId).orElse(null);
         }
 

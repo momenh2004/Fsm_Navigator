@@ -17,7 +17,7 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired private EtageRepository             etageRepo;
     @Autowired private SalleRepository             salleRepo;
     @Autowired private PointLocalisationRepository poiRepo;
-    @Autowired private FingerprintRepository       fpRepo;
+    @Autowired private WifiFingerprintRepository   fpRepo;
 
     @Override
     public void run(String... args) throws Exception {
@@ -58,7 +58,7 @@ public class DataInitializer implements CommandLineRunner {
         // POI de passage Bloc 3 RDC
         poiRepo.save(new PointLocalisation("Entrée Bloc 3",   PointLocalisation.Type.ENTREE,   8.5f, 15f,   true,  b3));
         poiRepo.save(new PointLocalisation("Sortie Bloc 3",   PointLocalisation.Type.SORTIE,   8.5f,  0f,   true,  b3));
-        poiRepo.save(new PointLocalisation("Rampe Bloc 3",    PointLocalisation.Type.RAMPE,    2f,   15f,   true,  b3));
+        poiRepo.save(new PointLocalisation("Intersection Bloc 3", PointLocalisation.Type.INTERSECTION, 2f, 15f, true, b3));
         poiRepo.save(new PointLocalisation("Escalier B3 RDC", PointLocalisation.Type.ESCALIER, 8.5f, 13f,   false, b3rdc));
         poiRepo.save(new PointLocalisation("Couloir B3 G1",   PointLocalisation.Type.COULOIR,  3.5f,  3.75f,true,  b3rdc));
         poiRepo.save(new PointLocalisation("Couloir B3 G2",   PointLocalisation.Type.COULOIR,  3.5f,  6.5f, true,  b3rdc));
@@ -199,7 +199,7 @@ public class DataInitializer implements CommandLineRunner {
         Bloc cour = blocRepo.save(new Bloc("COUR ROUGE", "Amphi 1→6 • Bibliothèques", "", true));
         Etage courrdc = etageRepo.save(new Etage(0, "Rez-de-chaussée", true, cour));
         poiRepo.save(new PointLocalisation("Entrée Cour Rouge", PointLocalisation.Type.ENTREE, 0f, 0f, true, cour));
-        poiRepo.save(new PointLocalisation("Rampe Cour Rouge",  PointLocalisation.Type.RAMPE,  0f, 0f, true, cour));
+        poiRepo.save(new PointLocalisation("Intersection Cour Rouge", PointLocalisation.Type.INTERSECTION, 0f, 0f, true, cour));
 
         save(new Salle("Amphithéâtre 1",        CategorieSalle.SALLE_ETUDE, 1, "DROITE", true, courrdc), false);
         save(new Salle("Amphithéâtre 2",        CategorieSalle.SALLE_ETUDE, 2, "CENTRE", true, courrdc), false);
@@ -237,7 +237,7 @@ public class DataInitializer implements CommandLineRunner {
             System.err.println("⚠️ Aucun POI pour la salle : " + salle.getNom());
             return;
         }
-        fpRepo.save(new Fingerprint(bssid, ssid, rssi, pois.get(0)));
+        fpRepo.save(new WifiFingerprint(bssid, ssid, rssi, pois.get(0)));
     }
 
     private void saveDept(String code, String nom, String desc, String salleName) {

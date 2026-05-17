@@ -13,7 +13,7 @@ import java.util.*;
 public class NavigationController {
 
     @Autowired private BlocRepository              blocRepo;
-    @Autowired private FingerprintRepository       fpRepo;
+    @Autowired private WifiFingerprintRepository   fpRepo;
     @Autowired private PointLocalisationRepository poiRepo;
 
     /**
