@@ -1,4 +1,4 @@
-package com.fsm.navigator.navigation;
+package com.fsm.navigator.model;
 
 import android.util.Log;
 
@@ -51,6 +51,7 @@ public class NavigationGraph {
         buildBloc3RDC();
         buildBloc3Etage1();
         buildBlocPalestineRDC();
+        buildCampusOutdoor();
         connectEtages();
     }
 
@@ -299,6 +300,91 @@ public class NavigationGraph {
     }
 
     // =========================================================
+    // CAMPUS OUTDOOR — Petite Cour → Cour Rouge → Amphis 1→6
+    // Coordonnées outdoor : canvas FsmMapView / 5  (référentiel campus)
+    // Coordonnées A1-6 indoor : mètres réels dans le bâtiment (21.65×41.65m)
+    //
+    //   [PCOUR] ──30m──> [COUR] ──25m──> [A1-6_ENTREE]
+    //                                         │
+    //              ┌──────┬──────┬────────────┼────────────┬──────┬──────┐
+    //            ENT_6  ENT_5  ENT_4        ENT_1        ENT_2  ENT_3
+    //              │      │      │             │             │      │
+    //           AMPHI_6 AMPHI_5 AMPHI_4    AMPHI_1      AMPHI_2 AMPHI_3
+    // =========================================================
+    private void buildCampusOutdoor() {
+
+        // ── Nœuds outdoor (blocId = code du bloc dans FsmMapView) ─────────
+        NavigationNode pcour = addNode("PCOUR_ENTREE", "Petite Cour", "PCOUR", 0,
+                94f, 176f, NavigationNode.Type.ENTREE);
+        NavigationNode cour  = addNode("COUR_ENTREE",  "Cour Rouge",  "COUR",  0,
+                88f, 145f, NavigationNode.Type.ENTREE);
+
+        // ── Hub d'entrée du bâtiment A1-6 (transition outdoor → indoor) ───
+        NavigationNode a16hub = addNode("A1-6_ENTREE", "Entrée Amphis 1→6", "A1-6", 0,
+                86f, 117f, NavigationNode.Type.ENTREE);
+
+        // ── Entrées individuelles ──────────────────────────────────────────
+        // Mur GAUCHE (x=0) : Amphis 6, 5, 4  — midpoint de chaque ligne
+        NavigationNode ent6 = addNode("A16_ENT_6", "Entrée Amphi 6", "A1-6", 0,
+                 0f,    6.94f, NavigationNode.Type.ENTREE);
+        NavigationNode ent5 = addNode("A16_ENT_5", "Entrée Amphi 5", "A1-6", 0,
+                 0f,   20.83f, NavigationNode.Type.ENTREE);
+        NavigationNode ent4 = addNode("A16_ENT_4", "Entrée Amphi 4", "A1-6", 0,
+                 0f,   34.72f, NavigationNode.Type.ENTREE);
+        // Mur DROIT (x=21.65) : Amphis 1, 2, 3
+        NavigationNode ent1 = addNode("A16_ENT_1", "Entrée Amphi 1", "A1-6", 0,
+                21.65f,  6.94f, NavigationNode.Type.ENTREE);
+        NavigationNode ent2 = addNode("A16_ENT_2", "Entrée Amphi 2", "A1-6", 0,
+                21.65f, 20.83f, NavigationNode.Type.ENTREE);
+        NavigationNode ent3 = addNode("A16_ENT_3", "Entrée Amphi 3", "A1-6", 0,
+                21.65f, 34.72f, NavigationNode.Type.ENTREE);
+
+        // ── Salles amphis (centres, grille 2×3 dans 21.65×41.65m) ─────────
+        NavigationNode a1 = addNode("A16_AMPHI_1", "Amphi 1", "A1-6", 0,
+                16.24f,  6.94f, NavigationNode.Type.SALLE);
+        NavigationNode a2 = addNode("A16_AMPHI_2", "Amphi 2", "A1-6", 0,
+                16.24f, 20.83f, NavigationNode.Type.SALLE);
+        NavigationNode a3 = addNode("A16_AMPHI_3", "Amphi 3", "A1-6", 0,
+                16.24f, 34.72f, NavigationNode.Type.SALLE);
+        NavigationNode a4 = addNode("A16_AMPHI_4", "Amphi 4", "A1-6", 0,
+                 5.41f, 34.72f, NavigationNode.Type.SALLE);
+        NavigationNode a5 = addNode("A16_AMPHI_5", "Amphi 5", "A1-6", 0,
+                 5.41f, 20.83f, NavigationNode.Type.SALLE);
+        NavigationNode a6 = addNode("A16_AMPHI_6", "Amphi 6", "A1-6", 0,
+                 5.41f,  6.94f, NavigationNode.Type.SALLE);
+
+        // ── Connexions outdoor ─────────────────────────────────────────────
+        NavigationNode.connect(pcour, cour,   30f,
+                "Continuez vers la Cour Rouge",
+                "Continuez vers la Petite Cour");
+        NavigationNode.connect(cour,  a16hub, 25f,
+                "Dirigez-vous vers les Amphis 1→6",
+                "Retournez vers la Cour Rouge");
+
+        // ── Hub → entrées individuelles ────────────────────────────────────
+        NavigationNode.connect(a16hub, ent6, 20f,
+                "Entrez par l'entrée Amphi 6", "Sortez vers la Cour Rouge");
+        NavigationNode.connect(a16hub, ent5, 22f,
+                "Entrez par l'entrée Amphi 5", "Sortez vers la Cour Rouge");
+        NavigationNode.connect(a16hub, ent4, 24f,
+                "Entrez par l'entrée Amphi 4", "Sortez vers la Cour Rouge");
+        NavigationNode.connect(a16hub, ent1, 20f,
+                "Entrez par l'entrée Amphi 1", "Sortez vers la Cour Rouge");
+        NavigationNode.connect(a16hub, ent2, 22f,
+                "Entrez par l'entrée Amphi 2", "Sortez vers la Cour Rouge");
+        NavigationNode.connect(a16hub, ent3, 24f,
+                "Entrez par l'entrée Amphi 3", "Sortez vers la Cour Rouge");
+
+        // ── Entrées → salles ───────────────────────────────────────────────
+        NavigationNode.connect(ent6, a6, 5.41f, "Entrez dans l'Amphi 6", "Sortez de l'Amphi 6");
+        NavigationNode.connect(ent5, a5, 5.41f, "Entrez dans l'Amphi 5", "Sortez de l'Amphi 5");
+        NavigationNode.connect(ent4, a4, 5.41f, "Entrez dans l'Amphi 4", "Sortez de l'Amphi 4");
+        NavigationNode.connect(ent1, a1, 5.41f, "Entrez dans l'Amphi 1", "Sortez de l'Amphi 1");
+        NavigationNode.connect(ent2, a2, 5.41f, "Entrez dans l'Amphi 2", "Sortez de l'Amphi 2");
+        NavigationNode.connect(ent3, a3, 5.41f, "Entrez dans l'Amphi 3", "Sortez de l'Amphi 3");
+    }
+
+    // =========================================================
     private void connectEtages() {
         NavigationNode escRDC = nodes.get("B3_RDC_ESC");
         NavigationNode escE1  = nodes.get("B3_E1_ESC");
@@ -440,10 +526,16 @@ public class NavigationGraph {
     }
 
     public NavigationNode findEntree(String blocId) {
+        // Lookup direct : B3 → "B3_RDC_ENTREE", A1-6 → "A1-6_ENTREE"
         NavigationNode n = nodes.get(blocId + "_RDC_ENTREE");
+        if (n == null) n = nodes.get(blocId + "_ENTREE");
         if (n != null) return n;
+        // Lookup outdoor : PCOUR → "PCOUR_ENTREE", COUR → "COUR_ENTREE"
+        n = nodes.get(blocId + "_ENTREE");
+        if (n != null) return n;
+        // Fallback : premier nœud du bloc contenant "entrée"
         for (NavigationNode node : nodes.values())
-            if (node.id.startsWith(blocId) &&
+            if (node.blocId.equals(blocId) &&
                     (node.nom.toLowerCase().contains("entrée") ||
                             node.nom.toLowerCase().contains("entree")))
                 return node;

@@ -188,22 +188,18 @@ public class LocationManager {
 
         JSONArray array = new JSONArray(sb.toString());
         for (int i = 0; i < array.length(); i++) {
-            JSONObject fp    = array.getJSONObject(i);
-            JSONObject salle = fp.getJSONObject("salle");
-            JSONObject etage = salle.getJSONObject("etage");
-            JSONObject bloc  = etage.getJSONObject("bloc");
+            JSONObject fp       = array.getJSONObject(i);
+            String salleId  = fp.optString("salleId",  String.valueOf(i));
+            String salleNom = fp.optString("salleNom", "");
+            String blocCode = fp.optString("blocCode", "");
+            float  x        = (float) fp.optDouble("x", 0.0);
+            float  y        = (float) fp.optDouble("y", 0.0);
+            String bssid    = fp.optString("bssid", "");
+            double rssi     = fp.optDouble("rssiMoyen", -80.0);
 
-            float x = (float) salle.optDouble("x", 0.0);
-            float y = (float) salle.optDouble("y", 0.0);
-
-            list.add(new WeightedKNN.Fingerprint(
-                    String.valueOf(salle.getLong("id")),
-                    salle.getString("nom"),
-                    bloc.getString("code"),
-                    x, y,
-                    fp.getString("bssid"),
-                    fp.getDouble("rssiMoyen")
-            ));
+            if (!bssid.isEmpty() && !salleNom.isEmpty())
+                list.add(new WeightedKNN.Fingerprint(
+                        salleId, salleNom, blocCode, x, y, bssid, rssi));
         }
         return list;
     }

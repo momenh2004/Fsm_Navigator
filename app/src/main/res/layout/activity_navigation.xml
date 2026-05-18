@@ -158,7 +158,7 @@
             android:layout_height="0dp"
             android:layout_weight="1">
 
-            <com.fsm.navigator.navigation.NavigationView
+            <com.fsm.navigator.view.NavigationView
                 android:id="@+id/navigationView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>

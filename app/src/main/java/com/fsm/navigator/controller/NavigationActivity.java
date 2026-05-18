@@ -1,4 +1,6 @@
-package com.fsm.navigator;
+package com.fsm.navigator.controller;
+
+import com.fsm.navigator.R;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,11 +19,12 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.fsm.navigator.AppConfig;
+import com.fsm.navigator.model.NavigationGraph;
+import com.fsm.navigator.model.NavigationNode;
 import com.fsm.navigator.model.PointInteret;
-import com.fsm.navigator.navigation.NavigationGraph;
 import com.fsm.navigator.navigation.NavigationManager;
-import com.fsm.navigator.navigation.NavigationNode;
-import com.fsm.navigator.navigation.NavigationView;
+import com.fsm.navigator.view.NavigationView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -87,8 +90,13 @@ public class NavigationActivity extends AppCompatActivity {
                 startNavigation();
             }
         }
-        if (targetBlocId != null) {
-            navView.setBlocId(targetBlocId); // On appelle la méthode qu'on va créer
+        if (targetBlocId != null && navView != null) {
+            navView.setBlocId(targetBlocId);
+        }
+
+        if (targetNodeId == null) {
+            showSearchMode();
+            loadDestinations();
         }
     }
 
@@ -353,9 +361,13 @@ public class NavigationActivity extends AppCompatActivity {
                     else nodeId = "BP_105";
                 } else nodeId = "BP_105";
             }
-            // Forcer le blocId pour la vue et le graphe
             blocCode = "BPAL";
             Log.d("NAV_ACT", "Palestine détecté → nodeId = " + nodeId);
+        } else if ("COUR".equals(blocCode) && poi.getNom().toLowerCase().contains("amphi")) {
+            // Amphis 1→6 (bloc "COUR" dans le backend = bâtiment A1-6)
+            nodeId   = "A16_AMPHI_" + num;
+            blocCode = "A1-6";
+            Log.d("NAV_ACT", "Amphi 1→6 détecté → nodeId = " + nodeId);
         } else {
             // Bloc 3 ou autre
             nodeId = blocCode + "_" + etageCode + "_" + num;

@@ -1,4 +1,6 @@
-package com.fsm.navigator;
+package com.fsm.navigator.controller;
+
+import com.fsm.navigator.R;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,7 +10,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.cardview.widget.CardView;
 
-import com.fsm.navigator.navigation.NavigationGraph;
+import com.fsm.navigator.model.NavigationGraph;
+import com.fsm.navigator.view.BlocDetailView;
 
 /**
  * BlockDetailActivity.java
@@ -134,10 +137,4 @@ public class BlockDetailActivity extends BaseDrawerActivity {
         return blocId + "_" + etageCode + "_" + num;
     }
 
-    // =========================================================
-    // Interface callback pour BlocDetailView
-    // =========================================================
-    public interface OnSalleClickListener {
-        void onSalleClick(String salleNom, int etage);
-    }
 }

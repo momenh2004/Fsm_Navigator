@@ -1,4 +1,6 @@
-package com.fsm.navigator;
+package com.fsm.navigator.controller;
+
+import com.fsm.navigator.R;
 
 import android.content.Intent;
 import android.os.Bundle;

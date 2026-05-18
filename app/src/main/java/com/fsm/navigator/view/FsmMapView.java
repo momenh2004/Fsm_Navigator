@@ -1,4 +1,4 @@
-package com.fsm.navigator.map;
+package com.fsm.navigator.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -37,6 +38,8 @@ public class FsmMapView extends View {
     private OnBlocClickListener clickListener;
 
     private Paint pNormal, pSelected, pLocation, pLabel, pLabelBg;
+    private Paint pNavPath, pNavArrow;
+    private List<String> navPath = null;
 
     private float zoomFactor = 1.0f;
     private float translateX = 0f, translateY = 0f;
@@ -75,8 +78,20 @@ public class FsmMapView extends View {
         pLabel.setFakeBoldText(false);
 
         pLabelBg = new Paint(Paint.ANTI_ALIAS_FLAG);
-        pLabelBg.setColor(Color.parseColor("#99000000")); // Plus transparent
+        pLabelBg.setColor(Color.parseColor("#99000000"));
         pLabelBg.setStyle(Paint.Style.FILL);
+
+        pNavPath = new Paint(Paint.ANTI_ALIAS_FLAG);
+        pNavPath.setColor(Color.parseColor("#2196F3"));
+        pNavPath.setStyle(Paint.Style.STROKE);
+        pNavPath.setStrokeWidth(8f);
+        pNavPath.setStrokeCap(Paint.Cap.ROUND);
+        pNavPath.setStrokeJoin(Paint.Join.ROUND);
+        pNavPath.setAlpha(230);
+
+        pNavArrow = new Paint(Paint.ANTI_ALIAS_FLAG);
+        pNavArrow.setColor(Color.parseColor("#2196F3"));
+        pNavArrow.setStyle(Paint.Style.FILL);
 
         scaleDetector = new ScaleGestureDetector(context,
                 new ScaleGestureDetector.SimpleOnScaleGestureListener() {
@@ -84,6 +99,7 @@ public class FsmMapView extends View {
                     public boolean onScale(ScaleGestureDetector d) {
                         zoomFactor *= d.getScaleFactor();
                         zoomFactor  = Math.max(0.8f, Math.min(3.0f, zoomFactor));
+                        clampTranslation();
                         invalidate();
                         return true;
                     }
@@ -100,7 +116,8 @@ public class FsmMapView extends View {
         blocs.add(new Bloc("BM",    "Bloc Math",        275f, 629f));
         blocs.add(new Bloc("B4",    "Bloc 4",           945f, 230f));
         blocs.add(new Bloc("COUR",  "Cour Rouge",       438f, 727f));
-        blocs.add(new Bloc("B2",    "Bloc 2",           432f, 586f));
+        blocs.add(new Bloc("A1-6",  "Amphis 1→6",       432f, 586f));
+        blocs.add(new Bloc("B2",    "Bloc 2",           432f, 490f));
         blocs.add(new Bloc("PCOUR", "Petite Cour",      472f, 881f));
         blocs.add(new Bloc("B1",  "Bloc Palestine",   765f, 868f));
         blocs.add(new Bloc("BC",    "Bloc C",           199f, 732f));
@@ -129,6 +146,9 @@ public class FsmMapView extends View {
 
         float scaleX = getWidth()  / REF_W;
         float scaleY = getHeight() / REF_H;
+
+        if (navPath != null && navPath.size() >= 2)
+            drawCampusPath(canvas, scaleX, scaleY);
 
         for (Bloc bloc : blocs) {
             float dx = bloc.cx * scaleX;
@@ -184,6 +204,7 @@ public class FsmMapView extends View {
                     isDragging  = true;
                     translateX += dx;
                     translateY += dy;
+                    clampTranslation();
                     lastTouchX  = event.getX();
                     lastTouchY  = event.getY();
                     invalidate();
@@ -245,12 +266,83 @@ public class FsmMapView extends View {
         }
     }
 
+    // =========================================================
+    // NAVIGATION OUTDOOR — chemin entre markers
+    // =========================================================
+    public void setNavigationPath(List<String> blocIds) {
+        this.navPath = blocIds;
+        invalidate();
+    }
+
+    public void clearNavigationPath() {
+        this.navPath = null;
+        invalidate();
+    }
+
+    private void drawCampusPath(Canvas canvas, float scaleX, float scaleY) {
+        for (int i = 0; i < navPath.size() - 1; i++) {
+            Bloc from = getBlocById(navPath.get(i));
+            Bloc to   = getBlocById(navPath.get(i + 1));
+            if (from == null || to == null) continue;
+
+            float x1 = from.cx * scaleX;
+            float y1 = from.cy * scaleY;
+            float x2 = to.cx   * scaleX;
+            float y2 = to.cy   * scaleY;
+
+            canvas.drawLine(x1, y1, x2, y2, pNavPath);
+
+            float mx    = (x1 + x2) / 2f;
+            float my    = (y1 + y2) / 2f;
+            float angle = (float) Math.toDegrees(Math.atan2(y2 - y1, x2 - x1));
+            drawCampusArrow(canvas, mx, my, angle);
+        }
+
+        // Marquer la destination avec un cercle vert pulsant
+        Bloc dest = getBlocById(navPath.get(navPath.size() - 1));
+        if (dest != null) {
+            float dx = dest.cx * scaleX;
+            float dy = dest.cy * scaleY;
+            Paint pDest = new Paint(Paint.ANTI_ALIAS_FLAG);
+            pDest.setColor(Color.parseColor("#00C853"));
+            pDest.setStyle(Paint.Style.STROKE);
+            pDest.setStrokeWidth(4f);
+            canvas.drawCircle(dx, dy, 22f, pDest);
+        }
+    }
+
+    private void drawCampusArrow(Canvas canvas, float x, float y, float angleDeg) {
+        float r = 16f;
+        canvas.save();
+        canvas.translate(x, y);
+        canvas.rotate(angleDeg);
+        Path arrow = new Path();
+        arrow.moveTo(r, 0);
+        arrow.lineTo(-r / 2f, -r / 2f);
+        arrow.lineTo(-r / 2f,  r / 2f);
+        arrow.close();
+        canvas.drawPath(arrow, pNavArrow);
+        canvas.restore();
+    }
+
+    private Bloc getBlocById(String id) {
+        for (Bloc b : blocs) if (b.id.equals(id)) return b;
+        return null;
+    }
+
     public void setOnBlocClickListener(OnBlocClickListener l) { this.clickListener = l; }
     public void setCurrentLocation(String id) {
         for (Bloc b : blocs) b.isCurrentLocation = b.id.equals(id);
         invalidate();
     }
-    public void zoomIn()    { zoomFactor = Math.min(3.0f, zoomFactor + 0.2f); invalidate(); }
-    public void zoomOut()   { zoomFactor = Math.max(0.8f, zoomFactor - 0.2f); invalidate(); }
+    public void zoomIn()    { zoomFactor = Math.min(3.0f, zoomFactor + 0.2f); clampTranslation(); invalidate(); }
+    public void zoomOut()   { zoomFactor = Math.max(0.8f, zoomFactor - 0.2f); clampTranslation(); invalidate(); }
     public void resetZoom() { zoomFactor = 1.0f; translateX = 0; translateY = 0; invalidate(); }
+
+    private void clampTranslation() {
+        float maxTX = getWidth()  * (zoomFactor - 1) / 2f;
+        float maxTY = getHeight() * (zoomFactor - 1) / 2f;
+        translateX = Math.max(-maxTX, Math.min(maxTX, translateX));
+        translateY = Math.max(-maxTY, Math.min(maxTY, translateY));
+    }
 }

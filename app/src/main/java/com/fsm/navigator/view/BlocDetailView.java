@@ -1,4 +1,6 @@
-package com.fsm.navigator;
+package com.fsm.navigator.view;
+
+import com.fsm.navigator.R;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -149,8 +151,9 @@ public class BlocDetailView extends View {
                 if (etage == 0) drawBloc3RDC(canvas);
                 else            drawBloc3Etage1(canvas);
                 break;
-            case "B1": drawBlocPalestine(canvas);    break;
-            default:   drawGeneric(canvas);  break;
+            case "B1":    drawBlocPalestine(canvas); break;
+            case "A1-6":  drawAmphis16(canvas);      break;
+            default:      drawGeneric(canvas);        break;
         }
     }
 
@@ -344,6 +347,87 @@ public class BlocDetailView extends View {
         canvas.drawRoundRect(r, 4f, 4f, paint);
         pText.setTextSize(h * 0.8f);
         canvas.drawText(label, cx, cy + h/4, pText);
+    }
+
+    // =========================================================
+    // AMPHIS 1→6  (21.65 m × 41.65 m)
+    // Grille 2 colonnes × 3 rangées :
+    //   Col gauche  : Amphi 6 (haut)  / Amphi 5 (milieu) / Amphi 4 (bas)
+    //   Col droite  : Amphi 1 (haut)  / Amphi 2 (milieu) / Amphi 3 (bas)
+    // Points blancs = entrées (mur latéral extérieur)
+    // =========================================================
+    private void drawAmphis16(Canvas canvas) {
+        int w = getWidth(), h = getHeight();
+        float mL = w * 0.06f, mT = h * 0.05f;
+        float dW = w - 2 * mL, dH = h - mT - h * 0.12f;
+
+        // Échelle réelle
+        final float RW = 21.65f, RH = 41.65f;
+        float sx = dW / RW, sy = dH / RH;
+
+        // Structure extérieure
+        canvas.drawRect(mL, mT, mL + dW, mT + dH, pWallFill);
+        canvas.drawRect(mL, mT, mL + dW, mT + dH, pWall);
+
+        // Limites de la grille (en mètres)
+        float midX = RW / 2f;          // 10.825 m
+        float row1 = RH / 3f;          // 13.883 m
+        float row2 = 2f * RH / 3f;     // 27.767 m
+
+        // 6 amphis cliquables
+        drawAmphiRoom(canvas, mL, mT, sx, sy,    0f,   0f,  midX,  row1,  "Amphi 6");
+        drawAmphiRoom(canvas, mL, mT, sx, sy,  midX,   0f,   RW,   row1,  "Amphi 1");
+        drawAmphiRoom(canvas, mL, mT, sx, sy,    0f,  row1,  midX,  row2,  "Amphi 5");
+        drawAmphiRoom(canvas, mL, mT, sx, sy,  midX,  row1,  RW,   row2,  "Amphi 2");
+        drawAmphiRoom(canvas, mL, mT, sx, sy,    0f,  row2,  midX,  RH,   "Amphi 4");
+        drawAmphiRoom(canvas, mL, mT, sx, sy,  midX,  row2,  RW,   RH,   "Amphi 3");
+
+        // Points d'entrée — cliquables comme entrées générales
+        float dotR = sx * 0.55f;
+        float midR1 = (row1 / 2f) * sy;
+        float midR2 = (row1 + row1 / 2f) * sy;
+        float midR3 = (row2 + row1 / 2f) * sy;
+
+        // Gauche : Amphi 6, 5, 4
+        drawEntreePoint(canvas, mL,       mT + midR1, dotR, "Entrée Amphi 6");
+        drawEntreePoint(canvas, mL,       mT + midR2, dotR, "Entrée Amphi 5");
+        drawEntreePoint(canvas, mL,       mT + midR3, dotR, "Entrée Amphi 4");
+
+        // Droite : Amphi 1, 2, 3
+        drawEntreePoint(canvas, mL + dW, mT + midR1, dotR, "Entrée Amphi 1");
+        drawEntreePoint(canvas, mL + dW, mT + midR2, dotR, "Entrée Amphi 2");
+        drawEntreePoint(canvas, mL + dW, mT + midR3, dotR, "Entrée Amphi 3");
+
+        drawLegend(canvas, w, h);
+        pText.setColor(Color.WHITE);
+        pText.setTextSize(h * 0.03f);
+        canvas.drawText("Amphis 1→6", w / 2f, h * 0.97f, pText);
+    }
+
+    // =========================================================
+    // HELPER — Point d'entrée cliquable (cercle sur mur)
+    // =========================================================
+    private void drawEntreePoint(Canvas canvas, float cx, float cy, float dotR, String nom) {
+        boolean sel = nom.equals(selectedSalle);
+
+        // Fond du point
+        Paint pFill = new Paint(Paint.ANTI_ALIAS_FLAG);
+        pFill.setStyle(Paint.Style.FILL);
+        pFill.setColor(sel ? Color.parseColor("#00D4FF") : Color.WHITE);
+        canvas.drawCircle(cx, cy, dotR, pFill);
+
+        // Anneau cyan quand sélectionné
+        if (sel) {
+            Paint pRing = new Paint(Paint.ANTI_ALIAS_FLAG);
+            pRing.setStyle(Paint.Style.STROKE);
+            pRing.setColor(Color.parseColor("#00D4FF"));
+            pRing.setStrokeWidth(3f);
+            canvas.drawCircle(cx, cy, dotR * 2f, pRing);
+        }
+
+        // Zone de clic (RectF centré sur le point, rayon 2.5× dotR)
+        float hr = dotR * 2.5f;
+        salleRects.add(new SalleRect(nom, new RectF(cx - hr, cy - hr, cx + hr, cy + hr), 0));
     }
 
     // =========================================================

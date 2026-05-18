@@ -1,4 +1,6 @@
-package com.fsm.navigator.navigation;
+package com.fsm.navigator.view;
+
+import com.fsm.navigator.R;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -11,6 +13,9 @@ import android.util.Log;
 import android.view.View;
 
 import java.util.List;
+
+import com.fsm.navigator.model.NavigationGraph;
+import com.fsm.navigator.model.NavigationNode;
 
 /**
  * NavigationView.java – Vue Canvas pour l'itinéraire Bloc 3
@@ -44,8 +49,8 @@ public class NavigationView extends View {
     private NavigationNode          destination = null;
 
     // Dimensions réelles Bloc 3 (mètres) — orienté portrait
-    private static float REAL_W = 17.76f;  // largeur (horizontal)
-    private static float REAL_H = 30.74f;  // longueur (vertical)
+    private float REAL_W = 17.76f;  // largeur (horizontal)
+    private float REAL_H = 30.74f;  // longueur (vertical)
 
     private float scale;
     private float offsetX, offsetY;

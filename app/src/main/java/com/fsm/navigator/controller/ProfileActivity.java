@@ -1,4 +1,6 @@
-package com.fsm.navigator;
+package com.fsm.navigator.controller;
+
+import com.fsm.navigator.R;
 
 import android.app.AlertDialog;
 import android.content.Context;

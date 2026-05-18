@@ -1,4 +1,6 @@
-package com.fsm.navigator;
+package com.fsm.navigator.controller;
+
+import com.fsm.navigator.R;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +19,7 @@ import android.widget.Toast;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.fsm.navigator.AppConfig;
 import com.fsm.navigator.adapter.SearchResultAdapter;
 import com.fsm.navigator.model.PointInteret;
 

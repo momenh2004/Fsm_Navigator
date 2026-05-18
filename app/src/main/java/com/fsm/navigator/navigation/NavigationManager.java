@@ -1,6 +1,8 @@
 package com.fsm.navigator.navigation;
 
 import com.fsm.navigator.AppConfig;
+import com.fsm.navigator.model.NavigationGraph;
+import com.fsm.navigator.model.NavigationNode;
 
 import android.Manifest;
 import android.content.Context;

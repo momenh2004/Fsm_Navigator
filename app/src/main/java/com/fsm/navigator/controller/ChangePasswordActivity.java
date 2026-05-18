@@ -1,4 +1,6 @@
-package com.fsm.navigator;
+package com.fsm.navigator.controller;
+
+import com.fsm.navigator.R;
 
 import android.os.Bundle;
 import android.text.method.PasswordTransformationMethod;
@@ -60,7 +62,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
 
         // Afficher/masquer ancien mdp
-        btnToggleOld.setOnClickListener(v -> {
+        if (btnToggleOld != null) btnToggleOld.setOnClickListener(v -> {
             oldVisible = !oldVisible;
             etOldPassword.setTransformationMethod(
                     oldVisible ? null : new PasswordTransformationMethod());
@@ -68,7 +70,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
         });
 
         // Afficher/masquer nouveau mdp
-        btnToggleNew.setOnClickListener(v -> {
+        if (btnToggleNew != null) btnToggleNew.setOnClickListener(v -> {
             newVisible = !newVisible;
             etNewPassword.setTransformationMethod(
                     newVisible ? null : new PasswordTransformationMethod());

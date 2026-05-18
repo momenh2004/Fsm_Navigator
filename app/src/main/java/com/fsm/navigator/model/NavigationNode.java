@@ -1,4 +1,4 @@
-package com.fsm.navigator.navigation;
+package com.fsm.navigator.model;
 
 import java.util.ArrayList;
 import java.util.List;
