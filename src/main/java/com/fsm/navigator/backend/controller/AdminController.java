@@ -10,7 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -277,6 +279,8 @@ public class AdminController {
             catch (Exception e) { categorie = CategorieSalle.SALLE_ETUDE; }
 
             Salle salle = new Salle(nom, categorie, ordre, entreeRef, pmr, etage);
+            if (body.containsKey("disponible"))
+                salle.setDisponible(Boolean.TRUE.equals(body.get("disponible")));
             Salle saved = salleRepo.save(salle);
 
             // Créer automatiquement un POI de type SALLE
@@ -303,6 +307,8 @@ public class AdminController {
             }
             if (body.containsKey("accessiblePmr"))
                 s.setAccessiblePmr(Boolean.TRUE.equals(body.get("accessiblePmr")));
+            if (body.containsKey("disponible"))
+                s.setDisponible(Boolean.TRUE.equals(body.get("disponible")));
             return ResponseEntity.ok(salleRepo.save(s));
         }).orElse(ResponseEntity.notFound().build());
     }
@@ -454,6 +460,100 @@ public class AdminController {
         if (!fpRepo.existsById(id)) return ResponseEntity.notFound().build();
         fpRepo.deleteById(id);
         return ResponseEntity.ok(success("Fingerprint supprimé"));
+    }
+
+    // ===================================================
+    // EXPORT / IMPORT BLOCS
+    // ===================================================
+
+    @GetMapping("/blocs/{id}/export")
+    public ResponseEntity<?> exportBloc(@PathVariable Long id) {
+        Bloc bloc = blocRepo.findById(id).orElse(null);
+        if (bloc == null) return ResponseEntity.notFound().build();
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("code",         bloc.getCode());
+        result.put("nom",          bloc.getNom());
+        result.put("description",  bloc.getDescription());
+        result.put("accessiblePmr", bloc.isAccessiblePmr());
+
+        List<Map<String, Object>> etagesList = new ArrayList<>();
+        for (Etage etage : etageRepo.findByBlocId(bloc.getId())) {
+            Map<String, Object> em = new LinkedHashMap<>();
+            em.put("numero",       etage.getNumero());
+            em.put("label",        etage.getLabel());
+            em.put("accessiblePmr", etage.isAccessiblePmr());
+
+            List<Map<String, Object>> sallesList = new ArrayList<>();
+            for (Salle salle : salleRepo.findByEtageId(etage.getId())) {
+                Map<String, Object> sm = new LinkedHashMap<>();
+                sm.put("nom",               salle.getNom());
+                sm.put("categorie",         salle.getCategorie().name());
+                sm.put("ordreDepuisEntree", salle.getOrdreDepuisEntree());
+                sm.put("entreeReference",   salle.getEntreeReference());
+                sm.put("accessiblePmr",     salle.isAccessiblePmr());
+                sm.put("disponible",        salle.isDisponible());
+                sallesList.add(sm);
+            }
+            em.put("salles", sallesList);
+            etagesList.add(em);
+        }
+        result.put("etages", etagesList);
+        return ResponseEntity.ok(result);
+    }
+
+    @SuppressWarnings("unchecked")
+    @PostMapping("/blocs/import")
+    public ResponseEntity<?> importBloc(@RequestBody Map<String, Object> body) {
+        try {
+            String  code = (String) body.get("code");
+            String  nom  = (String) body.get("nom");
+            String  desc = (String) body.getOrDefault("description", "");
+            boolean pmr  = Boolean.TRUE.equals(body.get("accessiblePmr"));
+
+            if (code == null || code.isEmpty())
+                return ResponseEntity.badRequest().body(error("Code requis"));
+            if (nom == null || nom.isEmpty())
+                return ResponseEntity.badRequest().body(error("Nom requis"));
+            if (blocRepo.findByCode(code).isPresent())
+                return ResponseEntity.badRequest().body(error("Code déjà utilisé : " + code));
+
+            Bloc bloc = blocRepo.save(new Bloc(code, nom, desc, pmr));
+
+            List<Map<String, Object>> etages = (List<Map<String, Object>>) body.getOrDefault("etages", List.of());
+            for (Map<String, Object> em : etages) {
+                int     numero    = Integer.parseInt(em.getOrDefault("numero", 0).toString());
+                String  label     = (String) em.getOrDefault("label", "Étage " + numero);
+                boolean etPmr     = Boolean.TRUE.equals(em.get("accessiblePmr"));
+                Etage   etage     = etageRepo.save(new Etage(numero, label, etPmr, bloc));
+
+                List<Map<String, Object>> salles = (List<Map<String, Object>>) em.getOrDefault("salles", List.of());
+                for (Map<String, Object> sm : salles) {
+                    String sNom   = (String) sm.getOrDefault("nom", "");
+                    String catStr = (String) sm.getOrDefault("categorie", "SALLE_ETUDE");
+                    int    ordre  = Integer.parseInt(sm.getOrDefault("ordreDepuisEntree", 0).toString());
+                    String eRef   = (String) sm.getOrDefault("entreeReference", "");
+                    boolean sPmr  = Boolean.TRUE.equals(sm.get("accessiblePmr"));
+                    boolean disp  = !Boolean.FALSE.equals(sm.get("disponible"));
+
+                    CategorieSalle cat;
+                    try { cat = CategorieSalle.valueOf(catStr.toUpperCase()); }
+                    catch (Exception e) { cat = CategorieSalle.SALLE_ETUDE; }
+
+                    Salle salle = new Salle(sNom, cat, ordre, eRef, sPmr, etage);
+                    salle.setDisponible(disp);
+                    Salle saved = salleRepo.save(salle);
+                    poiRepo.save(new PointLocalisation(sNom, 0f, 0f, sPmr, saved));
+                }
+            }
+
+            Map<String, Object> res = new LinkedHashMap<>();
+            res.put("message", "Bloc importé avec succès");
+            res.put("blocId",  bloc.getId());
+            return ResponseEntity.ok(res);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(error("Erreur: " + e.getMessage()));
+        }
     }
 
     // ===================================================

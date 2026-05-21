@@ -1,5 +1,6 @@
 package com.fsm.navigator.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -41,6 +42,7 @@ public abstract class User {
     // ===== GETTERS =====
     public Long          getId()        { return id; }
     public String        getEmail()     { return email; }
+    @JsonIgnore
     public String        getPassword()  { return password; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 

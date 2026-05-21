@@ -1,5 +1,6 @@
 package com.fsm.navigator.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -13,9 +14,11 @@ public class Membre extends User {
     @Column
     private String prenom;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "membre", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favori> favoris;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "membre", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NavigationHistory> historique;
 

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
@@ -153,9 +154,11 @@ public class StatsController {
     // SALLES LES PLUS NAVIGUÉES / CONSULTÉES
     // ===================================================
     @GetMapping("/top-navigated")
-    public ResponseEntity<List<Map<String, Object>>> getTopNavigated() {
+    public ResponseEntity<List<Map<String, Object>>> getTopNavigated(
+            @RequestParam(defaultValue = "30") int days) {
+        LocalDateTime since = LocalDateTime.now().minusDays(days);
         List<Map<String, Object>> result = new ArrayList<>();
-        histRepo.findTopNavigated().stream().limit(10).forEach(row -> {
+        histRepo.findTopNavigatedSince(since).stream().limit(10).forEach(row -> {
             Map<String, Object> entry = new LinkedHashMap<>();
             entry.put("salleNom", row[0]);
             entry.put("blocNom",  row[1]);
@@ -166,9 +169,11 @@ public class StatsController {
     }
 
     @GetMapping("/top-viewed")
-    public ResponseEntity<List<Map<String, Object>>> getTopViewed() {
+    public ResponseEntity<List<Map<String, Object>>> getTopViewed(
+            @RequestParam(defaultValue = "30") int days) {
+        LocalDateTime since = LocalDateTime.now().minusDays(days);
         List<Map<String, Object>> result = new ArrayList<>();
-        histRepo.findTopViewed().stream().limit(10).forEach(row -> {
+        histRepo.findTopViewedSince(since).stream().limit(10).forEach(row -> {
             Map<String, Object> entry = new LinkedHashMap<>();
             entry.put("salleNom", row[0]);
             entry.put("blocNom",  row[1]);
@@ -179,12 +184,14 @@ public class StatsController {
     }
 
     // ===================================================
-    // ACTIVITÉ 7 DERNIERS JOURS
+    // ACTIVITÉ PAR JOUR — PÉRIODE PARAMÉTRABLE
     // ===================================================
     @GetMapping("/activity")
-    public ResponseEntity<List<Map<String, Object>>> getActivity() {
+    public ResponseEntity<List<Map<String, Object>>> getActivity(
+            @RequestParam(defaultValue = "7") int days) {
+        LocalDateTime since = LocalDateTime.now().minusDays(days);
         List<Map<String, Object>> result = new ArrayList<>();
-        histRepo.findActivityLast7Days().forEach(row -> {
+        histRepo.findActivitySince(since).forEach(row -> {
             Map<String, Object> entry = new LinkedHashMap<>();
             entry.put("day",   row[0].toString());
             entry.put("count", row[1]);
@@ -197,9 +204,11 @@ public class StatsController {
     // TOP UTILISATEURS
     // ===================================================
     @GetMapping("/top-users")
-    public ResponseEntity<List<Map<String, Object>>> getTopUsers() {
+    public ResponseEntity<List<Map<String, Object>>> getTopUsers(
+            @RequestParam(defaultValue = "30") int days) {
+        LocalDateTime since = LocalDateTime.now().minusDays(days);
         List<Map<String, Object>> result = new ArrayList<>();
-        histRepo.findTopUsers().stream().limit(10).forEach(row -> {
+        histRepo.findTopUsersSince(since).stream().limit(10).forEach(row -> {
             Map<String, Object> entry = new LinkedHashMap<>();
             entry.put("email", row[0]);
             entry.put("count", row[1]);

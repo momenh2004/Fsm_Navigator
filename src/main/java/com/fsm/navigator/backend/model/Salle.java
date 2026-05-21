@@ -27,6 +27,9 @@ public class Salle {
     @Column(name = "accessible_pmr")
     private boolean accessiblePmr = true;
 
+    @Column(name = "disponible", nullable = false, columnDefinition = "boolean default true")
+    private boolean disponible = true;
+
     @ManyToOne
     @JoinColumn(name = "etage_id", nullable = false)
     @JsonIgnore
@@ -52,6 +55,7 @@ public class Salle {
     public int           getOrdreDepuisEntree() { return ordreDepuisEntree; }
     public String        getEntreeReference()   { return entreeReference; }
     public boolean       isAccessiblePmr()      { return accessiblePmr; }
+    public boolean       isDisponible()         { return disponible; }
     public Etage         getEtage()             { return etage; }
 
     // ===== SETTERS =====
@@ -60,5 +64,6 @@ public class Salle {
     public void setOrdreDepuisEntree(int o)          { this.ordreDepuisEntree = o; }
     public void setEntreeReference(String e)         { this.entreeReference = e; }
     public void setAccessiblePmr(boolean p)          { this.accessiblePmr = p; }
+    public void setDisponible(boolean d)             { this.disponible = d; }
     public void setEtage(Etage e)                    { this.etage = e; }
 }

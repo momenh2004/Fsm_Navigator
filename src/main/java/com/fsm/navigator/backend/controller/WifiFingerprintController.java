@@ -41,9 +41,11 @@ public class WifiFingerprintController {
                 map.put("etageNumero", s.getEtage().getNumero());
                 map.put("blocCode",    s.getEtage().getBloc().getCode());
             } else if (poi.getEtage() != null) {
+                map.put("salleNom",    poi.getNom());
                 map.put("etageNumero", poi.getEtage().getNumero());
                 map.put("blocCode",    poi.getEtage().getBloc().getCode());
             } else if (poi.getBloc() != null) {
+                map.put("salleNom", poi.getNom());
                 map.put("blocCode", poi.getBloc().getCode());
             }
 

@@ -15,16 +15,20 @@ public interface WifiFingerprintRepository extends JpaRepository<WifiFingerprint
     // Par BSSID
     List<WifiFingerprint> findByBssid(String bssid);
 
-    // WifiFingerprints d'un bloc (via poi→salle→etage→bloc)
-    @Query("SELECT f FROM WifiFingerprint f WHERE " +
-           "(f.poi.salle IS NOT NULL AND f.poi.salle.etage.bloc.id = :blocId) OR " +
-           "(f.poi.etage IS NOT NULL AND f.poi.etage.bloc.id = :blocId) OR " +
-           "(f.poi.bloc IS NOT NULL AND f.poi.bloc.id = :blocId)")
+    // WifiFingerprints d'un bloc (via poi→salle→etage→bloc, poi→etage→bloc, ou poi→bloc)
+    @Query("SELECT DISTINCT f FROM WifiFingerprint f " +
+           "JOIN f.poi p " +
+           "LEFT JOIN p.salle s LEFT JOIN s.etage se LEFT JOIN se.bloc sb " +
+           "LEFT JOIN p.etage pe LEFT JOIN pe.bloc peb " +
+           "LEFT JOIN p.bloc pb " +
+           "WHERE sb.id = :blocId OR peb.id = :blocId OR pb.id = :blocId")
     List<WifiFingerprint> findByBlocId(@Param("blocId") Long blocId);
 
-    // WifiFingerprints d'un étage
-    @Query("SELECT f FROM WifiFingerprint f WHERE " +
-           "(f.poi.salle IS NOT NULL AND f.poi.salle.etage.id = :etageId) OR " +
-           "(f.poi.etage IS NOT NULL AND f.poi.etage.id = :etageId)")
+    // WifiFingerprints d'un étage (via poi→salle→etage ou poi→etage)
+    @Query("SELECT DISTINCT f FROM WifiFingerprint f " +
+           "JOIN f.poi p " +
+           "LEFT JOIN p.salle s LEFT JOIN s.etage se " +
+           "LEFT JOIN p.etage pe " +
+           "WHERE se.id = :etageId OR pe.id = :etageId")
     List<WifiFingerprint> findByEtageId(@Param("etageId") Long etageId);
 }

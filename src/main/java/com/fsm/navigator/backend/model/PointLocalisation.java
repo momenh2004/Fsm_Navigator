@@ -60,6 +60,7 @@ public class PointLocalisation {
     @JsonIgnore
     private Bloc bloc;       // ENTREE, SORTIE, INTERSECTION
 
+    @JsonIgnore
     @OneToMany(mappedBy = "poi", cascade = CascadeType.ALL)
     private List<WifiFingerprint> wifiFingerprints;
 

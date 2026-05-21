@@ -3,7 +3,9 @@ package com.fsm.navigator.backend;
 import com.fsm.navigator.backend.model.*;
 import com.fsm.navigator.backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
@@ -18,9 +20,22 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired private SalleRepository             salleRepo;
     @Autowired private PointLocalisationRepository poiRepo;
     @Autowired private WifiFingerprintRepository   fpRepo;
+    @Autowired private UserRepository              userRepo;
+
+    @Value("${admin.email}")
+    private String adminEmail;
+
+    private static final String ADMIN_PASSWORD = "admin1234";
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
     public void run(String... args) throws Exception {
+        // Crée le compte admin s'il n'existe pas (persiste entre les redémarrages)
+        if (userRepo.findByEmail(adminEmail).isEmpty()) {
+            userRepo.save(new Admin(adminEmail, passwordEncoder.encode(ADMIN_PASSWORD)));
+            System.out.println("✅ Compte admin créé : " + adminEmail + " / " + ADMIN_PASSWORD);
+        }
+
         if (blocRepo.count() > 0) return;
         System.out.println("Initialisation des données FSM...");
 
@@ -187,7 +202,32 @@ public class DataInitializer implements CommandLineRunner {
         // =====================================================
         // BLOCS DÉPARTEMENTS
         // =====================================================
-        saveDept("BM",  "Bloc Mathématique", "Département Mathématiques", "Département Mathématiques");
+        Bloc bm = blocRepo.save(new Bloc("BM","Bloc Mathémathique","Salles 201M,etc",true));
+        Etage bmet1 = etageRepo.save(new Etage(1,"1er Etage",false,bm));
+        Etage bmet2 = etageRepo.save(new Etage(2,"2e Etage",false,bm));
+        poiRepo.save(new PointLocalisation("Entrée Bloc Math",PointLocalisation.Type.ENTREE,0f,0f,true,bm));
+        Salle s101M = save(new Salle("Salle 101M", CategorieSalle.SALLE_ETUDE,1,"DROITE",false,bmet1),true);
+        Salle s102M = save(new Salle("Salle 102M", CategorieSalle.SALLE_ETUDE,1,"GAUCHE",false,bmet1),true);
+        Salle s107M = save(new Salle("Salle 107M", CategorieSalle.SALLE_ETUDE,2,"DROITE",false,bmet1),true);
+        Salle s201M = save(new Salle("Salle 201M", CategorieSalle.SALLE_ETUDE,1,"DROITE",false,bmet2),true);
+        Salle s202M = save(new Salle("Salle 202M", CategorieSalle.SALLE_ETUDE,1,"GAUCHE",false,bmet2),true);
+        Salle s203M = save(new Salle("Salle 203M", CategorieSalle.SALLE_ETUDE,2,"DROITE",false,bmet2),true);
+        Salle s211M = save(new Salle("Salle 211M", CategorieSalle.SALLE_ETUDE,2,"GAUCHE",false,bmet2),true);
+        Salle s212M = save(new Salle("Salle 212M", CategorieSalle.SALLE_ETUDE,3,"DROITE",false,bmet2),true);
+        Salle s213M = save(new Salle("Salle 213M", CategorieSalle.SALLE_ETUDE,3,"GAUCHE",false,bmet2),true);
+        Salle s214M = save(new Salle("Salle 214M",CategorieSalle.SALLE_ETUDE,4,"DROITE",false,bmet2),true);
+        fp("40:ed:00:90:88:ca","FSM-WiFi",-60.75,s107M);
+        fp("40:ed:00:90:88:ca","FSM-WiFi",-48.5,s101M);
+        fp("98:ba:5f:c4:48:6c","FSM-WiFi",-57,s102M);
+        fp("78:8c:b5:64:34:87","FSM-WiFi",-68.5,s212M);
+        fp("78:8c:b5:64:34:87","FSM-WiFi",-62,s203M);
+        fp("78:8c:b5:64:34:87","FSM-WiFi",-77.25,s202M);
+        fp("78:8c:b5:64:34:87","FSM-WiFi",-80.75,s213M);
+        fp("cc:b2:55:91:3c:c0","FSM-WiFi",-74.5,s214M);
+        fp("cc:b2:55:91:3c:c0","FSM-WiFi",-83.5,s201M);
+
+
+
         saveDept("BP1", "Bloc Physique 1",   "Département Physique 1",    "Département Physique 1");
         saveDept("BP2", "Bloc Physique 2",   "Département Physique 2",    "Département Physique 2");
         saveDept("BC1", "Bloc Chimie 1",     "Département Chimie 1",      "Département Chimie 1");
@@ -196,24 +236,40 @@ public class DataInitializer implements CommandLineRunner {
         // =====================================================
         // COUR ROUGE
         // =====================================================
-        Bloc cour = blocRepo.save(new Bloc("COUR ROUGE", "Amphi 1→6 • Bibliothèques", "", true));
+        Bloc cour = blocRepo.save(new Bloc("COUR", "Amphi 1→6 • Bibliothèques", "", true));
         Etage courrdc = etageRepo.save(new Etage(0, "Rez-de-chaussée", true, cour));
         poiRepo.save(new PointLocalisation("Entrée Cour Rouge", PointLocalisation.Type.ENTREE, 0f, 0f, true, cour));
         poiRepo.save(new PointLocalisation("Intersection Cour Rouge", PointLocalisation.Type.INTERSECTION, 0f, 0f, true, cour));
 
-        save(new Salle("Amphithéâtre 1",        CategorieSalle.SALLE_ETUDE, 1, "DROITE", true, courrdc), false);
-        save(new Salle("Amphithéâtre 2",        CategorieSalle.SALLE_ETUDE, 2, "CENTRE", true, courrdc), false);
-        save(new Salle("Amphithéâtre 3",        CategorieSalle.SALLE_ETUDE, 3, "GAUCHE", true, courrdc), false);
-        save(new Salle("Amphithéâtre 4",        CategorieSalle.SALLE_ETUDE, 4, "GAUCHE", true, courrdc), false);
-        save(new Salle("Bibliothèque Centrale", CategorieSalle.SALLE_ETUDE, 1, "CENTRE", true, courrdc), false);
-        save(new Salle("Bibliothèque B1",       CategorieSalle.SALLE_ETUDE, 2, "CENTRE", true, courrdc), false);
-        save(new Salle("Bibliothèque B2",       CategorieSalle.SALLE_ETUDE, 3, "CENTRE", true, courrdc), false);
-        save(new Salle("Salle C1",              CategorieSalle.SALLE_ETUDE, 1, "CENTRE", true, courrdc), false);
-        save(new Salle("Salle C2",              CategorieSalle.SALLE_ETUDE, 2, "CENTRE", true, courrdc), false);
-        save(new Salle("Salle C3",              CategorieSalle.SALLE_ETUDE, 3, "CENTRE", true, courrdc), false);
-        save(new Salle("Salle D1",              CategorieSalle.SALLE_ETUDE, 1, "CENTRE", true, courrdc), false);
-        save(new Salle("Salle D2",              CategorieSalle.SALLE_ETUDE, 2, "CENTRE", true, courrdc), false);
-        save(new Salle("Salle des thèses",      CategorieSalle.SALLE_ETUDE, 1, "CENTRE", true, courrdc), false);
+        Salle A1 = save(new Salle("Amphithéâtre 1",        CategorieSalle.SALLE_ETUDE, 1, "DROITE", true, courrdc), false);
+        Salle A2 = save(new Salle("Amphithéâtre 2",        CategorieSalle.SALLE_ETUDE, 2, "CENTRE", true, courrdc), false);
+        Salle A3 = save(new Salle("Amphithéâtre 3",        CategorieSalle.SALLE_ETUDE, 3, "GAUCHE", true, courrdc), false);
+        Salle A4 = save(new Salle("Amphithéâtre 4",        CategorieSalle.SALLE_ETUDE, 4, "GAUCHE", true, courrdc), false);
+        Salle A5 = save(new Salle("Amphithéâtre 5",        CategorieSalle.SALLE_ETUDE, 5, "CENTRE", true, courrdc), false);
+        Salle A6 = save(new Salle("Amphithéâtre 6",        CategorieSalle.SALLE_ETUDE, 6, "DROITE", true, courrdc), false);
+        Salle Bib = save(new Salle("Bibliothèque Centrale", CategorieSalle.SALLE_ETUDE, 1, "CENTRE", true, courrdc), false);
+        Salle B1 = save(new Salle("Bibliothèque B1",       CategorieSalle.SALLE_ETUDE, 2, "CENTRE", true, courrdc), false);
+        Salle B2 = save(new Salle("Bibliothèque B2",       CategorieSalle.SALLE_ETUDE, 3, "CENTRE", true, courrdc), false);
+        Salle C1 = save(new Salle("Salle C1",              CategorieSalle.SALLE_ETUDE, 1, "CENTRE", true, courrdc), false);
+        Salle C2 = save(new Salle("Salle C2",              CategorieSalle.SALLE_ETUDE, 2, "CENTRE", true, courrdc), false);
+        Salle C3 = save(new Salle("Salle C3",              CategorieSalle.SALLE_ETUDE, 3, "CENTRE", true, courrdc), false);
+        Salle D1 = save(new Salle("Salle D1",              CategorieSalle.SALLE_ETUDE, 1, "CENTRE", true, courrdc), false);
+        Salle D2 = save(new Salle("Salle D2",              CategorieSalle.SALLE_ETUDE, 2, "CENTRE", true, courrdc), false);
+        Salle th = save(new Salle("Salle des thèses",      CategorieSalle.SALLE_ETUDE, 1, "CENTRE", true, courrdc), false);
+        fp("10:be:f5:2a:9c:48","FSM-WiFi",-60.4,A1);
+        fp("10:be:f5:2a:9c:48","FSM-WiFi",-78.6,A2);
+        fp("10:be:f5:2a:9c:48","FSM-WiFi",-81.4,A3);
+        fp("78:8c:b5:64:35:44","FSM-WiFi",-78.4,A4);
+        fp("10:be:f5:2a:9c:48","FSM-WiFi",-71.2,A5);
+        fp("10:be:f5:2a:9c:48","FSM-WiFi",-73.8,A6);
+
+
+
+
+
+
+
+
 
         System.out.println("✅ Données FSM initialisées avec succès !");
     }
