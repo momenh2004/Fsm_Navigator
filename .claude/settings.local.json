@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(cmd /c \"dir \"\"C:\\\\Users\\\\Momen PC\\\\OneDrive - Ministere de l'Enseignement Superieur et de la Recherche Scientifique\\\\Desktop\\\\PFE\"\"\")",
+      "PowerShell(cmd /c \"dir \"\"C:\\\\Users\\\\Momen PC\\\\OneDrive - Ministere de l'Enseignement Superieur et de la Recherche Scientifique\\\\Desktop\\\\fsm-navigator-admin\\\\src\"\" /s /b\")"
+    ]
+  }
+}

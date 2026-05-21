@@ -11,6 +11,8 @@ import androidx.cardview.widget.CardView;
 
 import com.fsm.navigator.auth.PmrManager;
 import com.fsm.navigator.auth.TokenManager;
+import com.fsm.navigator.auth.TtsManager;
+
 
 /**
  * MainActivity.java – Page d'accueil avec Navigation Drawer
@@ -30,6 +32,7 @@ public class MainActivity extends BaseDrawerActivity {
         initViews();
         setupWelcome();
         setupDrawer();
+        announceScreenIfVisuallyImpaired();
         setupHamburger(R.id.btnHamburger);
         setupSearchBar();
         setupQuickAccessCategories();
@@ -48,6 +51,21 @@ public class MainActivity extends BaseDrawerActivity {
         catAdmin        = findViewById(R.id.catAdmin);
         catBiblio       = findViewById(R.id.catBiblio);
         catDept         = findViewById(R.id.catDept);
+    }
+
+
+
+    private void announceScreenIfVisuallyImpaired() {
+        if (PmrManager.getProfile() != PmrManager.PmrProfile.VISUALLY_IMPAIRED) return;
+        String email  = TokenManager.getEmail(this);
+        String prenom = (email != null && email.contains("@"))
+                ? email.split("@")[0] : "étudiant";
+        TtsManager.speak(
+            "Bienvenue " + prenom + " sur FSM Navigator. "
+          + "Vous êtes sur l'écran d'accueil. "
+          + "Options disponibles : Rechercher une salle, "
+          + "Carte du campus, Navigation, Profil. "
+          + "Ouvrez le menu en haut à gauche pour accéder à toutes les options.");
     }
 
     private void setupWelcome() {

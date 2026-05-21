@@ -109,10 +109,11 @@ public class BlockDetailActivity extends BaseDrawerActivity {
         // Bouton Naviguer → NavigationActivity
         if (btnNavigerSalle != null) btnNavigerSalle.setOnClickListener(v -> {
             if (selectedSalleNodeId == null) return;
+            String navBlocId = "BM".equals(blocId) ? "BMATH" : blocId;
             Intent intent = new Intent(this, NavigationActivity.class);
             intent.putExtra("TARGET_NODE_ID",  selectedSalleNodeId);
             intent.putExtra("TARGET_NOM",      selectedSalleNom);
-            intent.putExtra("TARGET_BLOC_ID",  blocId);
+            intent.putExtra("TARGET_BLOC_ID",  navBlocId);
             startActivity(intent);
         });
     }
@@ -130,6 +131,14 @@ public class BlockDetailActivity extends BaseDrawerActivity {
             if (n.contains("AMPHI D")) return "BP_AD";
             String num = salleNom.replaceAll("[^0-9]", "");
             return "BP_" + (num.isEmpty() ? salleNom.replace(" ", "_") : num);
+        }
+        if ("BM".equals(blocId) || "BMATH".equals(blocId)) {
+            String n = salleNom.toUpperCase();
+            if (n.contains("101M")) return "BMATH_101M";
+            if (n.contains("102M")) return "BMATH_102M";
+            if (n.contains("117M")) return "BMATH_117M";
+            if (n.contains("BUREAU"))  return "BMATH_BUREAU_G1";
+            return "BMATH_ENTREE";
         }
         String num = salleNom.replaceAll("[^0-9]", "");
         if (num.isEmpty()) num = salleNom.replace(" ", "_");

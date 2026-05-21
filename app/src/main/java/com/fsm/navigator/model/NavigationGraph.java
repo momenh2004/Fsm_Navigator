@@ -51,6 +51,7 @@ public class NavigationGraph {
         buildBloc3RDC();
         buildBloc3Etage1();
         buildBlocPalestineRDC();
+        buildBlocMath();
         buildCampusOutdoor();
         connectEtages();
     }
@@ -297,6 +298,62 @@ public class NavigationGraph {
         Log.d("GRAPH", "Total nodes = " + nodes.size());
         Log.d("GRAPH", "Entrée voisins = " + entree.voisins.size());
         Log.d("GRAPH", "Salle 105 voisins = " + s105.voisins.size());
+    }
+
+    // =========================================================
+    // BLOC MATH — RDC
+    // Référentiel portrait : x=largeur(0→17.21m), y=longueur(0→48.27m)
+    // Origine : coin bas-gauche (Entrée = y=0)
+    // Couloir central : x=8.59
+    // =========================================================
+    private void buildBlocMath() {
+        String bId = "BMATH";
+
+        // Coordonnées converties : y_nav = 48.27 - y_doc (y=0 en haut = sortie, y=48.27 en bas = entrée)
+        // ── Salles RDC ────────────────────────────────────────
+        NavigationNode s101M = addNode("BMATH_101M", "Salle 101M", bId, 0, 17.21f, 41.70f, NavigationNode.Type.SALLE);
+        NavigationNode s102M = addNode("BMATH_102M", "Salle 102M", bId, 0,  0.00f, 41.70f, NavigationNode.Type.SALLE);
+
+        // ── Bureaux (de bas en haut) ──────────────────────────
+        NavigationNode bureauG1 = addNode("BMATH_BUREAU_G1", "Bureau", bId, 0,  0.00f, 33.81f, NavigationNode.Type.SALLE);
+        NavigationNode bureauD1 = addNode("BMATH_BUREAU_D1", "Bureau", bId, 0, 17.21f, 33.81f, NavigationNode.Type.SALLE);
+        NavigationNode bureauG2 = addNode("BMATH_BUREAU_G2", "Bureau", bId, 0,  0.00f, 25.70f, NavigationNode.Type.SALLE);
+        NavigationNode bureauD2 = addNode("BMATH_BUREAU_D2", "Bureau", bId, 0, 17.21f, 25.70f, NavigationNode.Type.SALLE);
+        NavigationNode bureauG3 = addNode("BMATH_BUREAU_G3", "Bureau", bId, 0,  0.00f, 17.59f, NavigationNode.Type.SALLE);
+        NavigationNode bureauD3 = addNode("BMATH_BUREAU_D3", "Bureau", bId, 0, 17.21f, 17.59f, NavigationNode.Type.SALLE);
+        NavigationNode s117M    = addNode("BMATH_117M",      "Salle 117M", bId, 0, 17.21f,  7.31f, NavigationNode.Type.SALLE);
+        NavigationNode bureauG4 = addNode("BMATH_BUREAU_G4", "Bureau", bId, 0,  0.00f,  7.31f, NavigationNode.Type.SALLE);
+
+        // ── Points d'entrée/sortie ────────────────────────────
+        NavigationNode entree = addNode("BMATH_ENTREE", "Entrée",  bId, 0, 8.59f, 48.27f, NavigationNode.Type.ENTREE);
+        NavigationNode sortie = addNode("BMATH_SORTIE", "Sortie",  bId, 0, 8.59f,  0.00f, NavigationNode.Type.ENTREE);
+
+        // ── Intersections (couloir central à x=8.59) ─────────
+        NavigationNode intBas  = addNode("BMATH_INT_BAS",  "Couloir Bas",  bId, 0, 8.59f, 41.70f, NavigationNode.Type.CARREFOUR);
+        NavigationNode int1    = addNode("BMATH_INT_1",    "Couloir 1",    bId, 0, 8.59f, 33.81f, NavigationNode.Type.CARREFOUR);
+        NavigationNode int2    = addNode("BMATH_INT_2",    "Couloir 2",    bId, 0, 8.59f, 25.70f, NavigationNode.Type.CARREFOUR);
+        NavigationNode int3    = addNode("BMATH_INT_3",    "Couloir 3",    bId, 0, 8.59f, 17.59f, NavigationNode.Type.CARREFOUR);
+        NavigationNode int4    = addNode("BMATH_INT_4",    "Couloir 4",    bId, 0, 8.59f,  7.31f, NavigationNode.Type.CARREFOUR);
+
+        // ── Connexions couloir principal (vertical) ───────────
+        NavigationNode.connect(entree, intBas,  6.57f, "Continuez tout droit",       "Continuez vers l'entrée");
+        NavigationNode.connect(intBas, int1,    7.89f, "Continuez tout droit",       "Continuez tout droit");
+        NavigationNode.connect(int1,   int2,    8.11f, "Continuez tout droit",       "Continuez tout droit");
+        NavigationNode.connect(int2,   int3,    8.11f, "Continuez tout droit",       "Continuez tout droit");
+        NavigationNode.connect(int3,   int4,   10.28f, "Continuez tout droit",       "Continuez tout droit");
+        NavigationNode.connect(int4,   sortie,  7.31f, "Continuez vers la sortie",   "Continuez vers l'entrée");
+
+        // ── Connexions salles ↔ intersections (horizontal) ───
+        NavigationNode.connect(intBas, s101M,    8.62f, "Tournez à droite vers 101M",   "Sortez vers le couloir");
+        NavigationNode.connect(intBas, s102M,    8.59f, "Tournez à gauche vers 102M",   "Sortez vers le couloir");
+        NavigationNode.connect(int1,   bureauD1, 8.62f, "Tournez à droite vers Bureau", "Sortez vers le couloir");
+        NavigationNode.connect(int1,   bureauG1, 8.59f, "Tournez à gauche vers Bureau", "Sortez vers le couloir");
+        NavigationNode.connect(int2,   bureauD2, 8.62f, "Tournez à droite vers Bureau", "Sortez vers le couloir");
+        NavigationNode.connect(int2,   bureauG2, 8.59f, "Tournez à gauche vers Bureau", "Sortez vers le couloir");
+        NavigationNode.connect(int3,   bureauD3, 8.62f, "Tournez à droite vers Bureau", "Sortez vers le couloir");
+        NavigationNode.connect(int3,   bureauG3, 8.59f, "Tournez à gauche vers Bureau", "Sortez vers le couloir");
+        NavigationNode.connect(int4,   s117M,    8.62f, "Tournez à droite vers 117M",   "Sortez vers le couloir");
+        NavigationNode.connect(int4,   bureauG4, 8.59f, "Tournez à gauche vers Bureau", "Sortez vers le couloir");
     }
 
     // =========================================================

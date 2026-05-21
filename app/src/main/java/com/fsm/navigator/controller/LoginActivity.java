@@ -17,9 +17,11 @@ import android.text.method.HideReturnsTransformationMethod;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.fsm.navigator.auth.AuthService;
-import com.fsm.navigator.auth.TokenManager;
-import androidx.appcompat.widget.SwitchCompat;
+import com.fsm.navigator.auth.PmrDialogHelper;
 import com.fsm.navigator.auth.PmrManager;
+import com.fsm.navigator.auth.TokenManager;
+import com.fsm.navigator.auth.TtsManager;
+import androidx.appcompat.widget.SwitchCompat;
 
 //Handles User Login and navigation to the main app
 
@@ -75,13 +77,19 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(new Intent(this, RegisterActivity.class));
         });
 
-        // Visiteur → MainActivity
-        tvGuest.setOnClickListener(v -> goToMain());
-
-        // Enable/disable PMR
-        switchPmr.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            PmrManager.setEnabled(isChecked);
+        // Visiteur → MainActivity (avec dialog PMR si switch activé)
+        tvGuest.setOnClickListener(v -> {
+            if (switchPmr.isChecked()) {
+                TtsManager.init(this);
+                PmrManager.setEnabled(true);
+                PmrDialogHelper.showProfileDialog(this, this::goToMain);
+            } else {
+                PmrManager.reset();
+                goToMain();
+            }
         });
+
+        // PMR switch state is read at login time — no immediate side effect needed here.
     }
 
     private void attemptLogin() {
@@ -110,8 +118,13 @@ public class LoginActivity extends AppCompatActivity {
                 TokenManager.saveRole(LoginActivity.this, role);
 
                 setLoading(false);
-                PmrManager.setEnabled(switchPmr.isChecked());
-                goToMain();
+                if (switchPmr.isChecked()) {
+                    TtsManager.init(LoginActivity.this);
+                    PmrDialogHelper.showProfileDialog(LoginActivity.this, LoginActivity.this::goToMain);
+                } else {
+                    PmrManager.reset();
+                    goToMain();
+                }
             }
 
             @Override

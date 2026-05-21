@@ -20,6 +20,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fsm.navigator.AppConfig;
+import com.fsm.navigator.auth.PmrDialogHelper;
+import com.fsm.navigator.auth.TtsManager;
 import com.fsm.navigator.model.NavigationGraph;
 import com.fsm.navigator.model.NavigationNode;
 import com.fsm.navigator.model.PointInteret;
@@ -332,6 +334,12 @@ public class NavigationActivity extends AppCompatActivity {
     // LANCER LA NAVIGATION VERS UN POI
     // =========================================================
     private void navigateTo(PointInteret poi) {
+        boolean blocked = PmrDialogHelper.checkAndShow(this, poi, () -> doNavigateTo(poi));
+        if (blocked) return;
+        doNavigateTo(poi);
+    }
+
+    private void doNavigateTo(PointInteret poi) {
         ProfileActivity.addToHistory(this, poi.getNom());
 
         String blocCode = poi.getBlocId() != null ? poi.getBlocId() : "B3";
@@ -363,11 +371,23 @@ public class NavigationActivity extends AppCompatActivity {
             }
             blocCode = "BPAL";
             Log.d("NAV_ACT", "Palestine détecté → nodeId = " + nodeId);
-        } else if ("COUR".equals(blocCode) && poi.getNom().toLowerCase().contains("amphi")) {
-            // Amphis 1→6 (bloc "COUR" dans le backend = bâtiment A1-6)
+        } else if (("COUR".equals(blocCode) || "A1-6".equals(blocCode))
+                && poi.getNom().toLowerCase().contains("amphi")) {
+            // Amphis 1→6
             nodeId   = "A16_AMPHI_" + num;
             blocCode = "A1-6";
             Log.d("NAV_ACT", "Amphi 1→6 détecté → nodeId = " + nodeId);
+        } else if ("BMATH".equals(blocCode)
+                || (batiment != null && batiment.toLowerCase().contains("math"))) {
+            // Bloc Math
+            String n = poi.getNom().toUpperCase().trim();
+            if (n.contains("101M"))   nodeId = "BMATH_101M";
+            else if (n.contains("102M")) nodeId = "BMATH_102M";
+            else if (n.contains("117M")) nodeId = "BMATH_117M";
+            else if (n.contains("BUREAU")) nodeId = "BMATH_BUREAU_G1";
+            else nodeId = "BMATH_ENTREE";
+            blocCode = "BMATH";
+            Log.d("NAV_ACT", "Bloc Math détecté → nodeId = " + nodeId);
         } else {
             // Bloc 3 ou autre
             nodeId = blocCode + "_" + etageCode + "_" + num;
@@ -426,10 +446,12 @@ public class NavigationActivity extends AppCompatActivity {
                 navView.setBlocId(path.nodes.get(0).blocId);
                 navView.setNavigationData(navManager.getGraph(), path, current, destNode);
                 if (path != null && !path.instructions.isEmpty()) {
-                    if (tvInstruction != null) tvInstruction.setText(path.instructions.get(0));
+                    String instruction = path.instructions.get(0);
+                    if (tvInstruction != null) tvInstruction.setText(instruction);
                     if (tvDistance    != null) tvDistance.setText(
                             String.format("%.0f m restants", path.totalDistance));
                     if (cardInstruction != null) cardInstruction.setVisibility(View.VISIBLE);
+                    TtsManager.speak(instruction);
                 }
                 if (tvStatus != null) tvStatus.setText("📍 " + current.nom);
             }
@@ -437,12 +459,13 @@ public class NavigationActivity extends AppCompatActivity {
             @Override
             public void onArrived(String destination) {
                 if (progressNav     != null) progressNav.setVisibility(View.GONE);
-                if (tvInstruction   != null) tvInstruction.setText("🎉 Vous êtes arrivé à " + destination + " !");
+                if (tvInstruction   != null) tvInstruction.setText("Vous êtes arrivé à " + destination + " !");
                 if (tvDistance      != null) tvDistance.setText("0 m");
                 if (tvStatus        != null) tvStatus.setText("Destination atteinte");
                 if (cardInstruction != null) cardInstruction.setVisibility(View.VISIBLE);
+                TtsManager.speak("Vous êtes arrivé à " + destination + " !");
                 Toast.makeText(getApplicationContext(),
-                        "🎉 Vous êtes arrivé à " + destination, Toast.LENGTH_LONG).show();
+                        "Vous êtes arrivé à " + destination, Toast.LENGTH_LONG).show();
             }
 
             @Override

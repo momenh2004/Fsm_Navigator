@@ -21,6 +21,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.fsm.navigator.AppConfig;
 import com.fsm.navigator.adapter.SearchResultAdapter;
+import com.fsm.navigator.auth.PmrDialogHelper;
+import com.fsm.navigator.auth.PmrManager;
+import com.fsm.navigator.auth.TtsManager;
 import com.fsm.navigator.model.PointInteret;
 
 import org.json.JSONArray;
@@ -115,6 +118,7 @@ public class SearchActivity extends BaseDrawerActivity
                     filteredPoi = new ArrayList<>(allPoi);
                     adapter.updateList(filteredPoi);
                     showHistory();
+                    announceResultsIfVisuallyImpaired(filteredPoi, null);
                 });
 
             } catch (Exception e) {
@@ -288,6 +292,7 @@ public class SearchActivity extends BaseDrawerActivity
 
         int count = filteredPoi.size();
         tvResultCount.setText(count + (count > 1 ? " résultats" : " résultat"));
+        announceResultsIfVisuallyImpaired(filteredPoi, query.isEmpty() ? activeFilter : query);
 
         layoutHistory.setVisibility(View.GONE);
         if (count == 0) {
@@ -318,20 +323,63 @@ public class SearchActivity extends BaseDrawerActivity
     }
 
     // =========================================================
+    private void announceResultsIfVisuallyImpaired(List<PointInteret> results, String context) {
+        if (PmrManager.getProfile() != PmrManager.PmrProfile.VISUALLY_IMPAIRED) return;
+        int count = results.size();
+        if (count == 0) {
+            TtsManager.speak("Aucun résultat trouvé.");
+            return;
+        }
+        StringBuilder sb = new StringBuilder();
+        if (context != null && !context.equals("Tous")) {
+            sb.append(context).append(". ");
+        }
+        sb.append(count).append(count > 1 ? " résultats. " : " résultat. ");
+        int max = Math.min(3, count);
+        for (int i = 0; i < max; i++) {
+            sb.append(results.get(i).getNom())
+              .append(", ").append(results.get(i).getBatiment()).append(". ");
+        }
+        if (count > 3) sb.append("Et ").append(count - 3).append(" autres.");
+        TtsManager.speak(sb.toString());
+    }
+
     @Override
     public void onNavigateClick(PointInteret poi) {
+        // Bloquer si PMR actif et salle non accessible
+        boolean blocked = PmrDialogHelper.checkAndShow(this, poi, () -> launchNav(poi));
+        if (blocked) return;
+        launchNav(poi);
+    }
+
+    private void launchNav(PointInteret poi) {
+        TtsManager.speak("Navigation vers " + poi.getNom()
+                + ", " + poi.getBatiment() + ", " + poi.getEtage() + ".");
         ProfileActivity.addToHistory(this, poi.getNom());
         String nodeId = buildNodeId(poi);
+        String blocId = poi.getBlocId() != null ? poi.getBlocId() : "B3";
+        if (nodeId.startsWith("A16_"))   blocId = "A1-6";
+        if (nodeId.startsWith("BMATH_")) blocId = "BMATH";
+        if (nodeId.startsWith("BP_"))    blocId = "BPAL";
         Intent intent = new Intent(this, NavigationActivity.class);
         intent.putExtra("TARGET_NODE_ID",  nodeId);
         intent.putExtra("TARGET_NOM",      poi.getNom());
-        intent.putExtra("TARGET_BLOC_ID",  poi.getBlocId());
+        intent.putExtra("TARGET_BLOC_ID",  blocId);
         startActivity(intent);
     }
+
 
     private String buildNodeId(PointInteret poi) {
         String blocId   = poi.getBlocId() != null ? poi.getBlocId() : "B3";
         String batiment = poi.getBatiment();
+
+        // Amphis 1→6
+        boolean isA16 = "COUR".equals(blocId) || "A1-6".equals(blocId)
+                || (batiment != null && batiment.toLowerCase().contains("a1-6"));
+        if (isA16 && poi.getNom().toLowerCase().contains("amphi")) {
+            String num = poi.getNom().replaceAll("[^0-9]", "");
+            if (!num.isEmpty()) return "A16_AMPHI_" + num;
+        }
 
         boolean isPalestine = "B1".equals(blocId) || "BPAL".equals(blocId)
                 || (batiment != null && batiment.toLowerCase().contains("palestine"));
@@ -346,6 +394,17 @@ public class SearchActivity extends BaseDrawerActivity
                 if (n.endsWith(" D") || n.equals("AMPHI D")) return "BP_AD";
             }
             return "BPAL_RDC_ENTREE";
+        }
+
+        boolean isBmath = "BMATH".equals(blocId)
+                || (batiment != null && batiment.toLowerCase().contains("math"));
+        if (isBmath) {
+            String n = poi.getNom().toUpperCase().trim();
+            if (n.contains("101M") || n.equals("SALLE 101M")) return "BMATH_101M";
+            if (n.contains("102M") || n.equals("SALLE 102M")) return "BMATH_102M";
+            if (n.contains("117M") || n.equals("SALLE 117M")) return "BMATH_117M";
+            if (n.contains("BUREAU")) return "BMATH_BUREAU_G1";
+            return "BMATH_ENTREE";
         }
 
         String etage     = poi.getEtage();

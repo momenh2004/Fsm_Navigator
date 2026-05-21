@@ -129,7 +129,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
                             }
                         });
             } else {
-                FavoriService.addFavori(context, "SALLE", poi.getNom(),
+                FavoriService.addFavori(context.getApplicationContext(), "SALLE", poi.getNom(),
                         salleId, -1,
                         new FavoriService.SimpleCallback() {
                             @Override

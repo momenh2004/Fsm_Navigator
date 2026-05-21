@@ -18,6 +18,8 @@ import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.fsm.navigator.auth.PmrManager;
+import com.fsm.navigator.auth.TtsManager;
 import com.fsm.navigator.location.LocationManager;
 import com.fsm.navigator.location.WeightedKNN;
 import com.fsm.navigator.view.FsmMapView;
@@ -105,6 +107,8 @@ public class MapActivity extends BaseDrawerActivity {
             cardBlocInfo.setVisibility(View.VISIBLE);
             if (btnVoirPlan != null)
                 btnVoirPlan.setVisibility(hasPlan(bloc.id) ? View.VISIBLE : View.GONE);
+            TtsManager.speak(bloc.nom.replace("\n", " ")
+                    + ". " + getBlocDetails(bloc.id));
         });
     }
 

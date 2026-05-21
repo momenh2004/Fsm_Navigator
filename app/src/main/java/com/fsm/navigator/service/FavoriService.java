@@ -44,7 +44,7 @@ public class FavoriService {
     // ── Modèle ────────────────────────────────────────────────
     public static class FavoriItem {
         public long   id;
-        public String type;    // "SALLE" ou "BLOC"
+        public String type;
         public String nom;
         public long   salleId;
         public long   blocId;
@@ -56,28 +56,28 @@ public class FavoriService {
     public static void checkFavori(Context ctx, String type,
                                    long salleId, long blocId,
                                    FavoriCallback cb) {
-        String email = TokenManager.getEmail(ctx);
-        if (email == null) { cb.onError("Non connecté"); return; }
+        String token = TokenManager.getToken(ctx);
+        if (token == null) { cb.onError("Non connecté"); return; }
 
         new Thread(() -> {
             try {
-                String params = "?email=" + email + "&type=" + type;
-                if ("SALLE".equals(type)) params += "&salleId=" + salleId;
-                else                       params += "&blocId="  + blocId;
+                String params = "?salleId=" + salleId;
 
                 URL url = new URL(BASE_URL + "/check" + params);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
+                conn.setRequestProperty("Authorization", "Bearer " + token);
                 conn.setConnectTimeout(8000);
 
-                if (conn.getResponseCode() == 200) {
+                int code = conn.getResponseCode();
+                if (code >= 200 && code < 300) {
                     String resp = readResponse(conn);
                     JSONObject json = new JSONObject(resp);
                     boolean is = json.optBoolean("isFavori", false);
                     long    fid= json.optLong("favoriId", -1);
                     new Handler(Looper.getMainLooper()).post(() -> cb.onSuccess(is, fid));
                 } else {
-                    new Handler(Looper.getMainLooper()).post(() -> cb.onError("Erreur serveur"));
+                    new Handler(Looper.getMainLooper()).post(() -> cb.onError("Erreur serveur (" + code + ")"));
                 }
             } catch (Exception e) {
                 new Handler(Looper.getMainLooper()).post(() -> cb.onError(e.getMessage()));
@@ -89,15 +89,12 @@ public class FavoriService {
     public static void addFavori(Context ctx, String type, String nom,
                                  long salleId, long blocId,
                                  SimpleCallback cb) {
-        String email = TokenManager.getEmail(ctx);
-        if (email == null) { cb.onError("Non connecté"); return; }
+        String token = TokenManager.getToken(ctx);
+        if (token == null) { cb.onError("Non connecté"); return; }
 
         new Thread(() -> {
             try {
                 JSONObject body = new JSONObject();
-                body.put("email", email);
-                body.put("type",  type);
-                body.put("nom",   nom);
                 if ("SALLE".equals(type)) body.put("salleId", salleId);
                 else                       body.put("blocId",  blocId);
 
@@ -105,6 +102,7 @@ public class FavoriService {
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Authorization", "Bearer " + token);
                 conn.setDoOutput(true);
                 conn.setConnectTimeout(8000);
 
@@ -112,10 +110,11 @@ public class FavoriService {
                 os.write(body.toString().getBytes("UTF-8"));
                 os.close();
 
-                if (conn.getResponseCode() == 200) {
+                int code = conn.getResponseCode();
+                if (code >= 200 && code < 300) {
                     new Handler(Looper.getMainLooper()).post(() -> cb.onSuccess("Ajouté aux favoris"));
                 } else {
-                    new Handler(Looper.getMainLooper()).post(() -> cb.onError("Erreur serveur"));
+                    new Handler(Looper.getMainLooper()).post(() -> cb.onError("Erreur serveur (" + code + ")"));
                 }
             } catch (Exception e) {
                 new Handler(Looper.getMainLooper()).post(() -> cb.onError(e.getMessage()));
@@ -125,20 +124,22 @@ public class FavoriService {
 
     // ── Supprimer favori ──────────────────────────────────────
     public static void deleteFavori(Context ctx, long favoriId, SimpleCallback cb) {
-        String email = TokenManager.getEmail(ctx);
-        if (email == null) { cb.onError("Non connecté"); return; }
+        String token = TokenManager.getToken(ctx);
+        if (token == null) { cb.onError("Non connecté"); return; }
 
         new Thread(() -> {
             try {
-                URL url = new URL(BASE_URL + "/" + favoriId + "?email=" + email);
+                URL url = new URL(BASE_URL + "/" + favoriId);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("DELETE");
+                conn.setRequestProperty("Authorization", "Bearer " + token);
                 conn.setConnectTimeout(8000);
 
-                if (conn.getResponseCode() == 200) {
+                int code = conn.getResponseCode();
+                if (code >= 200 && code < 300) {
                     new Handler(Looper.getMainLooper()).post(() -> cb.onSuccess("Supprimé des favoris"));
                 } else {
-                    new Handler(Looper.getMainLooper()).post(() -> cb.onError("Erreur serveur"));
+                    new Handler(Looper.getMainLooper()).post(() -> cb.onError("Erreur serveur (" + code + ")"));
                 }
             } catch (Exception e) {
                 new Handler(Looper.getMainLooper()).post(() -> cb.onError(e.getMessage()));
@@ -148,17 +149,19 @@ public class FavoriService {
 
     // ── Liste des favoris ─────────────────────────────────────
     public static void getFavoris(Context ctx, ListCallback cb) {
-        String email = TokenManager.getEmail(ctx);
-        if (email == null) { cb.onError("Non connecté"); return; }
+        String token = TokenManager.getToken(ctx);
+        if (token == null) { cb.onError("Non connecté"); return; }
 
         new Thread(() -> {
             try {
-                URL url = new URL(BASE_URL + "?email=" + email);
+                URL url = new URL(BASE_URL);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
+                conn.setRequestProperty("Authorization", "Bearer " + token);
                 conn.setConnectTimeout(8000);
 
-                if (conn.getResponseCode() == 200) {
+                int code = conn.getResponseCode();
+                if (code >= 200 && code < 300) {
                     String resp = readResponse(conn);
                     JSONArray arr = new JSONArray(resp);
                     List<FavoriItem> list = new ArrayList<>();
@@ -166,17 +169,15 @@ public class FavoriService {
                         JSONObject obj = arr.getJSONObject(i);
                         FavoriItem item = new FavoriItem();
                         item.id       = obj.optLong("id");
-                        item.type     = obj.optString("type");
-                        item.nom      = obj.optString("nom");
+                        item.nom      = obj.optString("salleNom");
                         item.salleId  = obj.optLong("salleId", -1);
-                        item.blocId   = obj.optLong("blocId", -1);
                         item.blocCode = obj.optString("blocCode");
                         item.blocNom  = obj.optString("blocNom");
                         list.add(item);
                     }
                     new Handler(Looper.getMainLooper()).post(() -> cb.onSuccess(list));
                 } else {
-                    new Handler(Looper.getMainLooper()).post(() -> cb.onError("Erreur serveur"));
+                    new Handler(Looper.getMainLooper()).post(() -> cb.onError("Erreur serveur (" + code + ")"));
                 }
             } catch (Exception e) {
                 new Handler(Looper.getMainLooper()).post(() -> cb.onError(e.getMessage()));

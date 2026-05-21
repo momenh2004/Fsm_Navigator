@@ -153,6 +153,8 @@ public class BlocDetailView extends View {
                 break;
             case "B1":    drawBlocPalestine(canvas); break;
             case "A1-6":  drawAmphis16(canvas);      break;
+            case "BM":
+            case "BMATH": drawBlocMath(canvas);       break;
             default:      drawGeneric(canvas);        break;
         }
     }
@@ -428,6 +430,59 @@ public class BlocDetailView extends View {
         // Zone de clic (RectF centré sur le point, rayon 2.5× dotR)
         float hr = dotR * 2.5f;
         salleRects.add(new SalleRect(nom, new RectF(cx - hr, cy - hr, cx + hr, cy + hr), 0));
+    }
+
+    // =========================================================
+    // BLOC MATH — RDC (17.21m × 48.27m, couloir central x=7→10.5)
+    // Sortie en haut, Entrée en bas
+    // =========================================================
+    private void drawBlocMath(Canvas canvas) {
+        int w = getWidth(), h = getHeight();
+        float mL = w * 0.08f, mT = h * 0.05f;
+        float dW = w - 2 * mL, dH = h - mT - h * 0.12f;
+        float sx = dW / 17.21f, sy = dH / 48.27f;
+
+        // Structure extérieure
+        canvas.drawRect(mL, mT, mL + dW, mT + dH, pWallFill);
+        canvas.drawRect(mL, mT, mL + dW, mT + dH, pWall);
+
+        // Couloir central
+        canvas.drawRect(mL + 7.0f * sx, mT, mL + 10.5f * sx, mT + dH, pCour);
+
+        // Rangée 1 — 102M (gauche), 101M (droite)  y≈[38.7, 44.7]
+        drawRoom(canvas, mL, mT, sx, sy, new float[]{ 0.0f, 38.7f,  7.0f, 44.7f}, "102M", 0);
+        drawRoom(canvas, mL, mT, sx, sy, new float[]{10.5f, 38.7f, 17.21f, 44.7f}, "101M", 0);
+
+        // Rangée 2 — Bureaux  y≈[30.8, 36.8]
+        drawAmphiRoom(canvas, mL, mT, sx, sy,  0.0f, 30.8f,  7.0f, 36.8f, "Bureau");
+        drawAmphiRoom(canvas, mL, mT, sx, sy, 10.5f, 30.8f, 17.21f, 36.8f, "Bureau");
+
+        // Rangée 3 — Bureaux  y≈[22.7, 28.7]
+        drawAmphiRoom(canvas, mL, mT, sx, sy,  0.0f, 22.7f,  7.0f, 28.7f, "Bureau");
+        drawAmphiRoom(canvas, mL, mT, sx, sy, 10.5f, 22.7f, 17.21f, 28.7f, "Bureau");
+
+        // Rangée 4 — Bureaux  y≈[14.6, 20.6]
+        drawAmphiRoom(canvas, mL, mT, sx, sy,  0.0f, 14.6f,  7.0f, 20.6f, "Bureau");
+        drawAmphiRoom(canvas, mL, mT, sx, sy, 10.5f, 14.6f, 17.21f, 20.6f, "Bureau");
+
+        // Rangée 5 — Bureau (gauche), 117M (droite)  y≈[4.3, 10.3]
+        drawAmphiRoom(canvas, mL, mT, sx, sy,  0.0f,  4.3f,  7.0f, 10.3f, "Bureau");
+        drawRoom(canvas, mL, mT, sx, sy, new float[]{10.5f,  4.3f, 17.21f, 10.3f}, "117M", 0);
+
+        // Sortie (haut)
+        float cxS = mL + 7.0f * sx;
+        canvas.drawRoundRect(new RectF(cxS, mT, cxS + 3.5f * sx, mT + 2.0f * sy), 6f, 6f, pSortie);
+        pText.setTextSize(sy * 1.1f);
+        canvas.drawText("SORTIE", cxS + 1.75f * sx, mT + 1.35f * sy, pText);
+
+        // Entrée (bas)
+        canvas.drawRoundRect(new RectF(cxS, mT + 46.0f * sy, cxS + 3.5f * sx, mT + dH), 6f, 6f, pEntree);
+        canvas.drawText("ENTRÉE", cxS + 1.75f * sx, mT + 47.3f * sy, pText);
+
+        drawLegend(canvas, w, h);
+        pText.setColor(Color.WHITE);
+        pText.setTextSize(h * 0.03f);
+        canvas.drawText("Bloc Math — RDC", w / 2f, h * 0.97f, pText);
     }
 
     // =========================================================

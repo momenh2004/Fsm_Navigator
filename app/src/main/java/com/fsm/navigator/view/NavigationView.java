@@ -58,10 +58,15 @@ public class NavigationView extends View {
 
     public void setBlocId(String blocId) {
         this.currentBlocId = blocId;
-        // Palestine : accepter "B1" ou "BPAL"
         if ("B1".equals(blocId) || "BPAL".equals(blocId)) {
             this.REAL_W = 25.53f;
             this.REAL_H = 26.32f;
+        } else if ("A1-6".equals(blocId)) {
+            this.REAL_W = 21.65f;
+            this.REAL_H = 41.65f;
+        } else if ("BMATH".equals(blocId)) {
+            this.REAL_W = 17.21f;
+            this.REAL_H = 48.27f;
         } else {
             this.REAL_W = 17.76f;
             this.REAL_H = 30.74f;
@@ -199,6 +204,12 @@ public class NavigationView extends View {
         } else if ("B1".equals(currentBlocId) || "BPAL".equals(currentBlocId)) {
             drawBlocPalestinePlan(canvas);
             planExiste = true;
+        } else if ("A1-6".equals(currentBlocId)) {
+            drawAmphis16Plan(canvas);
+            planExiste = true;
+        } else if ("BMATH".equals(currentBlocId)) {
+            drawBlocMathPlan(canvas);
+            planExiste = true;
         }
 
 // 2. Si le plan n'existe pas, on affiche "À venir" et on ARRÊTE le dessin
@@ -213,6 +224,98 @@ public class NavigationView extends View {
 
         drawLegend(canvas, w, h);
     }
+    // =========================================================
+    // AMPHIS 1→6  (21.65m × 41.65m)
+    // Grille 2 colonnes × 3 rangées, entrées sur murs latéraux
+    // =========================================================
+    private void drawAmphis16Plan(Canvas canvas) {
+        final float W    = 21.65f;
+        final float H    = 41.65f;
+        final float midX = W / 2f;          // 10.825 m
+        final float row1 = H / 3f;          // 13.883 m
+        final float row2 = 2f * H / 3f;     // 27.767 m
+
+        // Structure extérieure
+        canvas.drawRect(wx(0), wy(0), wx(W), wy(H), pWallFill);
+        canvas.drawRect(wx(0), wy(0), wx(W), wy(H), pWall);
+
+        // Séparateur vertical
+        canvas.drawLine(wx(midX), wy(0), wx(midX), wy(H), pWall);
+        // Séparateurs horizontaux
+        canvas.drawLine(wx(0), wy(row1), wx(W), wy(row1), pWall);
+        canvas.drawLine(wx(0), wy(row2), wx(W), wy(row2), pWall);
+
+        // Labels des 6 amphis (centrés dans chaque cellule)
+        float ts = scale * 0.7f;
+        pText.setTextSize(ts);
+        float cxL = wx(midX / 2f);
+        float cxR = wx(midX + midX / 2f);
+        float cy1 = wy(row1 / 2f)              + ts / 3f;
+        float cy2 = wy((row1 + row2) / 2f)     + ts / 3f;
+        float cy3 = wy((row2 + H) / 2f)        + ts / 3f;
+        canvas.drawText("Amphi 6", cxL, cy1, pText);
+        canvas.drawText("Amphi 1", cxR, cy1, pText);
+        canvas.drawText("Amphi 5", cxL, cy2, pText);
+        canvas.drawText("Amphi 2", cxR, cy2, pText);
+        canvas.drawText("Amphi 4", cxL, cy3, pText);
+        canvas.drawText("Amphi 3", cxR, cy3, pText);
+
+        // Points d'entrée : mur gauche (Amphis 6, 5, 4)
+        float dotR = scale * 0.4f;
+        Paint pEnt = makeFill("#00C853");
+        canvas.drawCircle(wx(0), wy( 6.94f), dotR, pEnt);
+        canvas.drawCircle(wx(0), wy(20.83f), dotR, pEnt);
+        canvas.drawCircle(wx(0), wy(34.72f), dotR, pEnt);
+        // Points d'entrée : mur droit (Amphis 1, 2, 3)
+        canvas.drawCircle(wx(W), wy( 6.94f), dotR, pEnt);
+        canvas.drawCircle(wx(W), wy(20.83f), dotR, pEnt);
+        canvas.drawCircle(wx(W), wy(34.72f), dotR, pEnt);
+
+        // Titre
+        pText.setTextSize(getHeight() * 0.03f);
+        canvas.drawText("Amphis 1→6", getWidth() / 2f, getHeight() * 0.97f, pText);
+    }
+
+    // =========================================================
+    // BLOC MATH — RDC (17.21m × 48.27m)
+    // Couloir central vertical à x=8.59
+    // Sortie en haut (y=0), Entrée en bas (y=48.27)
+    // =========================================================
+    private void drawBlocMathPlan(Canvas canvas) {
+        // Structure extérieure
+        canvas.drawRect(wx(0), wy(0), wx(17.21f), wy(48.27f), pWallFill);
+        canvas.drawRect(wx(0), wy(0), wx(17.21f), wy(48.27f), pWall);
+
+        // Couloir central (x = 7.0 → 10.5)
+        canvas.drawRect(wx(7.0f), wy(0), wx(10.5f), wy(48.27f), pCorridor);
+
+        // Rangée 1 : Salle 101M (droite) + 102M (gauche)  — y ≈ 41.70
+        drawWorldRoom(canvas,  0.0f, 38.7f,  7.0f, 44.7f, "102M");
+        drawWorldRoom(canvas, 10.5f, 38.7f, 17.21f, 44.7f, "101M");
+
+        // Rangée 2 : Bureaux  — y ≈ 33.81
+        drawWorldRoom(canvas,  0.0f, 30.8f,  7.0f, 36.8f, "Bureau");
+        drawWorldRoom(canvas, 10.5f, 30.8f, 17.21f, 36.8f, "Bureau");
+
+        // Rangée 3 : Bureaux  — y ≈ 25.70
+        drawWorldRoom(canvas,  0.0f, 22.7f,  7.0f, 28.7f, "Bureau");
+        drawWorldRoom(canvas, 10.5f, 22.7f, 17.21f, 28.7f, "Bureau");
+
+        // Rangée 4 : Bureaux  — y ≈ 17.59
+        drawWorldRoom(canvas,  0.0f, 14.6f,  7.0f, 20.6f, "Bureau");
+        drawWorldRoom(canvas, 10.5f, 14.6f, 17.21f, 20.6f, "Bureau");
+
+        // Rangée 5 : Bureau G4 (gauche) + 117M (droite)  — y ≈ 7.31
+        drawWorldRoom(canvas,  0.0f,  4.3f,  7.0f, 10.3f, "Bureau");
+        drawWorldRoom(canvas, 10.5f,  4.3f, 17.21f, 10.3f, "117M");
+
+        // Sortie (haut)
+        drawWorldRect(canvas, 7.0f,  0.0f, 10.5f,  2.0f, makeFill("#8B3A00"), "SORTIE");
+
+        // Entrée (bas)
+        drawWorldRect(canvas, 7.0f, 46.3f, 10.5f, 48.27f, makeFill("#00694A"), "ENTRÉE");
+    }
+
     private void drawComingSoon(Canvas canvas) {
         pText.setTextSize(getHeight() * 0.04f);
         pText.setColor(Color.parseColor("#4A90D9"));

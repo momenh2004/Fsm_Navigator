@@ -14,7 +14,10 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.fsm.navigator.auth.PmrDialogHelper;
+import com.fsm.navigator.auth.PmrManager;
 import com.fsm.navigator.auth.TokenManager;
+import com.fsm.navigator.auth.TtsManager;
 
 public abstract class BaseDrawerActivity extends AppCompatActivity {
 
@@ -66,6 +69,16 @@ public abstract class BaseDrawerActivity extends AppCompatActivity {
                     drawerProfile.postDelayed(() -> navigateTo(ProfileActivity.class), 200);
                 });
             }
+        }
+
+        // Mode PMR
+        LinearLayout drawerPmr = findViewById(R.id.drawerPmr);
+        if (drawerPmr != null) {
+            updatePmrDrawerLabel(drawerPmr);
+            drawerPmr.setOnClickListener(v -> {
+                closeDrawer();
+                drawerPmr.postDelayed(() -> onPmrToggleClicked(drawerPmr), 200);
+            });
         }
 
         // Déconnexion / Se connecter
@@ -125,6 +138,44 @@ public abstract class BaseDrawerActivity extends AppCompatActivity {
     private void navigateTo(Class<?> activityClass) {
         if (activityClass == getClass()) { closeDrawer(); return; }
         startActivity(new Intent(this, activityClass));
+    }
+
+    // =========================================================
+    // MODE PMR
+    // =========================================================
+    private void onPmrToggleClicked(LinearLayout drawerPmr) {
+        if (PmrManager.isEnabled()) {
+            PmrManager.reset();
+            TtsManager.speakForce("Mode accessibilité désactivé.");
+            updatePmrDrawerLabel(drawerPmr);
+        } else {
+            // Init TTS lazily — only when the user actually enables PMR,
+            // to avoid triggering the system voice-data download dialog on startup.
+            TtsManager.init(this);
+            TtsManager.speakForce(
+                "Mode accessibilité activé. "
+              + "Veuillez sélectionner votre profil de mobilité.");
+            showPmrProfileDialog(drawerPmr);
+        }
+    }
+
+    private void showPmrProfileDialog(LinearLayout drawerPmr) {
+        PmrDialogHelper.showProfileDialog(this, () -> {
+            if (drawerPmr != null) updatePmrDrawerLabel(drawerPmr);
+        });
+    }
+
+    private void updatePmrDrawerLabel(LinearLayout drawerPmr) {
+        for (int i = 0; i < drawerPmr.getChildCount(); i++) {
+            View child = drawerPmr.getChildAt(i);
+            if (child instanceof TextView) {
+                String label = PmrManager.isEnabled()
+                    ? "♿ Accessibilité ON"
+                    : "♿ Accessibilité OFF";
+                ((TextView) child).setText(label);
+                break;
+            }
+        }
     }
 
     private void showLogoutDialog() {
