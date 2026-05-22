@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .icon { filter: brightness(0) invert(1); }
+}
+
+@layer base {
+  body { background: #070C18; @apply text-slate-100 font-sans; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #0D1530; }
+  ::-webkit-scrollbar-thumb { background: #1e3a6e; border-radius: 9999px; }
+}
+
+@layer components {
+  .card { background: #0D1530; border: 1px solid #1a2845; @apply rounded-xl p-5; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+  .card:hover { border-color: rgba(255,255,255,0.2); box-shadow: 0 0 0 1px rgba(255,255,255,0.05); }
+  .card-hover { transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+  .card-hover:hover { border-color: rgba(255,255,255,0.2) !important; box-shadow: 0 0 0 1px rgba(255,255,255,0.05); }
+  .btn-primary { @apply bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-medium transition-colors; }
+  .btn-ghost { @apply text-blue-300 hover:text-white px-3 py-2 rounded-lg transition-colors; }
+  .btn-ghost:hover { background: #162040; }
+  .input { background: #0D1530; border: 1px solid #1a2845; @apply text-white rounded-lg px-3 py-2 w-full focus:outline-none focus:border-blue-500; }
+  .badge-green  { background: rgba(59,130,246,0.15);  color: #60a5fa; @apply text-xs px-2 py-0.5 rounded-full; }
+  .badge-blue   { background: rgba(99,102,241,0.15);  color: #818cf8; @apply text-xs px-2 py-0.5 rounded-full; }
+  .badge-red    { background: rgba(239,68,68,0.15);   color: #f87171; @apply text-xs px-2 py-0.5 rounded-full; }
+  .badge-yellow { background: rgba(139,92,246,0.15);  color: #a78bfa; @apply text-xs px-2 py-0.5 rounded-full; }
+}
