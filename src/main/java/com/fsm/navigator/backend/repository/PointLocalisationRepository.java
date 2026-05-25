@@ -16,10 +16,11 @@ public interface PointLocalisationRepository extends JpaRepository<PointLocalisa
 
     List<PointLocalisation> findByBloc_Id(Long blocId);
 
-    @Query("SELECT p FROM PointLocalisation p WHERE " +
-           "(p.salle IS NOT NULL AND p.salle.etage.bloc.id = :blocId) OR " +
-           "(p.etage IS NOT NULL AND p.etage.bloc.id = :blocId) OR " +
-           "(p.bloc IS NOT NULL AND p.bloc.id = :blocId)")
+    @Query("SELECT DISTINCT p FROM PointLocalisation p " +
+           "LEFT JOIN p.salle s LEFT JOIN s.etage se LEFT JOIN se.bloc sb " +
+           "LEFT JOIN p.etage e LEFT JOIN e.bloc eb " +
+           "LEFT JOIN p.bloc pb " +
+           "WHERE sb.id = :blocId OR eb.id = :blocId OR pb.id = :blocId")
     List<PointLocalisation> findByBlocIdAll(@Param("blocId") Long blocId);
 
     @Query("SELECT p FROM PointLocalisation p WHERE " +

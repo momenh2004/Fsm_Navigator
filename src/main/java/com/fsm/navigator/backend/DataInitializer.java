@@ -1,4 +1,4 @@
-package com.fsm.navigator.backend;
+﻿package com.fsm.navigator.backend;
 
 import com.fsm.navigator.backend.model.*;
 import com.fsm.navigator.backend.repository.*;
@@ -49,26 +49,26 @@ public class DataInitializer implements CommandLineRunner {
         Etage b3et1 = etageRepo.save(new Etage(1, "1er étage",       false, b3));
 
         // RDC — Côté DROITE
-        Salle s301 = save(new Salle("Salle 301", CategorieSalle.SALLE_ETUDE, 1, "DROITE", true,  b3rdc), true);
-        Salle s302 = save(new Salle("Salle 302", CategorieSalle.SALLE_ETUDE, 2, "DROITE", true,  b3rdc), true);
-        Salle s303 = save(new Salle("Salle 303", CategorieSalle.SALLE_ETUDE, 3, "DROITE", true,  b3rdc), true);
-        Salle s304 = save(new Salle("Salle 304", CategorieSalle.SALLE_ETUDE, 4, "DROITE", true,  b3rdc), true);
+        Salle s301 = save(new Salle("Salle 301", CategorieSalle.SALLE_ETUDE, true,  b3rdc), true);
+        Salle s302 = save(new Salle("Salle 302", CategorieSalle.SALLE_ETUDE, true,  b3rdc), true);
+        Salle s303 = save(new Salle("Salle 303", CategorieSalle.SALLE_ETUDE, true,  b3rdc), true);
+        Salle s304 = save(new Salle("Salle 304", CategorieSalle.SALLE_ETUDE, true,  b3rdc), true);
 
         // RDC — Côté GAUCHE
-        Salle s308 = save(new Salle("Salle 308", CategorieSalle.SALLE_ETUDE, 1, "GAUCHE", true,  b3rdc), true);
-        Salle s307 = save(new Salle("Salle 307", CategorieSalle.SALLE_ETUDE, 2, "GAUCHE", true,  b3rdc), true);
-        Salle s306 = save(new Salle("Salle 306", CategorieSalle.SALLE_ETUDE, 3, "GAUCHE", true,  b3rdc), true);
-        Salle s305 = save(new Salle("Salle 305", CategorieSalle.SALLE_ETUDE, 4, "GAUCHE", true,  b3rdc), true);
+        Salle s308 = save(new Salle("Salle 308", CategorieSalle.SALLE_ETUDE, true,  b3rdc), true);
+        Salle s307 = save(new Salle("Salle 307", CategorieSalle.SALLE_ETUDE, true,  b3rdc), true);
+        Salle s306 = save(new Salle("Salle 306", CategorieSalle.SALLE_ETUDE, true,  b3rdc), true);
+        Salle s305 = save(new Salle("Salle 305", CategorieSalle.SALLE_ETUDE, true,  b3rdc), true);
 
         // 1er étage
-        Salle s309 = save(new Salle("Salle 309", CategorieSalle.SALLE_ETUDE, 1, "DROITE", false, b3et1), true);
-        Salle s310 = save(new Salle("Salle 310", CategorieSalle.SALLE_ETUDE, 2, "DROITE", false, b3et1), true);
-        Salle s311 = save(new Salle("Salle 311", CategorieSalle.SALLE_ETUDE, 3, "DROITE", false, b3et1), true);
-        Salle s312 = save(new Salle("Salle 312", CategorieSalle.SALLE_ETUDE, 4, "DROITE", false, b3et1), true);
-        Salle s313 = save(new Salle("Salle 313", CategorieSalle.SALLE_ETUDE, 1, "GAUCHE", false, b3et1), true);
-        Salle s314 = save(new Salle("Salle 314", CategorieSalle.SALLE_ETUDE, 2, "GAUCHE", false, b3et1), true);
-        Salle s315 = save(new Salle("Salle 315", CategorieSalle.SALLE_ETUDE, 3, "GAUCHE", false, b3et1), true);
-        Salle s316 = save(new Salle("Salle 316", CategorieSalle.SALLE_ETUDE, 4, "GAUCHE", false, b3et1), true);
+        Salle s309 = save(new Salle("Salle 309", CategorieSalle.SALLE_ETUDE, false, b3et1), true);
+        Salle s310 = save(new Salle("Salle 310", CategorieSalle.SALLE_ETUDE, false, b3et1), true);
+        Salle s311 = save(new Salle("Salle 311", CategorieSalle.SALLE_ETUDE, false, b3et1), true);
+        Salle s312 = save(new Salle("Salle 312", CategorieSalle.SALLE_ETUDE, false, b3et1), true);
+        Salle s313 = save(new Salle("Salle 313", CategorieSalle.SALLE_ETUDE, false, b3et1), true);
+        Salle s314 = save(new Salle("Salle 314", CategorieSalle.SALLE_ETUDE, false, b3et1), true);
+        Salle s315 = save(new Salle("Salle 315", CategorieSalle.SALLE_ETUDE, false, b3et1), true);
+        Salle s316 = save(new Salle("Salle 316", CategorieSalle.SALLE_ETUDE, false, b3et1), true);
 
         // POI de passage Bloc 3 RDC
         poiRepo.save(new PointLocalisation("Entrée Bloc 3",   PointLocalisation.Type.ENTREE,   8.5f, 15f,   true,  b3));
@@ -110,26 +110,26 @@ public class DataInitializer implements CommandLineRunner {
         poiRepo.save(new PointLocalisation("Entrée Bloc 1", PointLocalisation.Type.ENTREE,   0f, 0f, true, b1));
         poiRepo.save(new PointLocalisation("Escalier B1",   PointLocalisation.Type.ESCALIER, 0f, 0f, true, b1rdc));
 
-        Salle AA  = save(new Salle("Amphithéâtre A", CategorieSalle.SALLE_ETUDE, 1, "DROITE", true, b1rdc), true);
-        Salle AB  = save(new Salle("Amphithéâtre B", CategorieSalle.SALLE_ETUDE, 2, "DROITE", true, b1rdc), true);
-        Salle AC  = save(new Salle("Amphithéâtre C", CategorieSalle.SALLE_ETUDE, 3, "GAUCHE", true, b1rdc), true);
-        Salle AD  = save(new Salle("Amphithéâtre D", CategorieSalle.SALLE_ETUDE, 4, "GAUCHE", true, b1rdc), true);
+        Salle AA  = save(new Salle("Amphithéâtre A", CategorieSalle.SALLE_ETUDE, true, b1rdc), true);
+        Salle AB  = save(new Salle("Amphithéâtre B", CategorieSalle.SALLE_ETUDE, true, b1rdc), true);
+        Salle AC  = save(new Salle("Amphithéâtre C", CategorieSalle.SALLE_ETUDE, true, b1rdc), true);
+        Salle AD  = save(new Salle("Amphithéâtre D", CategorieSalle.SALLE_ETUDE, true, b1rdc), true);
 
-        Salle s101 = save(new Salle("Salle 101", CategorieSalle.SALLE_ETUDE, 1, "DROITE", true, b1rdc), true);
-        Salle s102 = save(new Salle("Salle 102", CategorieSalle.SALLE_ETUDE, 2, "DROITE", true, b1rdc), true);
-        Salle s103 = save(new Salle("Salle 103", CategorieSalle.SALLE_ETUDE, 3, "DROITE", true, b1rdc), true);
-        Salle s104 = save(new Salle("Salle 104", CategorieSalle.SALLE_ETUDE, 4, "DROITE", true, b1rdc), true);
-        Salle s105 = save(new Salle("Salle 105", CategorieSalle.SALLE_ETUDE, 1, "GAUCHE", true, b1rdc), true);
-        Salle s106 = save(new Salle("Salle 106", CategorieSalle.SALLE_ETUDE, 2, "GAUCHE", true, b1rdc), true);
-        Salle s107 = save(new Salle("Salle 107", CategorieSalle.SALLE_ETUDE, 3, "GAUCHE", true, b1rdc), true);
+        Salle s101 = save(new Salle("Salle 101", CategorieSalle.SALLE_ETUDE, true, b1rdc), true);
+        Salle s102 = save(new Salle("Salle 102", CategorieSalle.SALLE_ETUDE, true, b1rdc), true);
+        Salle s103 = save(new Salle("Salle 103", CategorieSalle.SALLE_ETUDE, true, b1rdc), true);
+        Salle s104 = save(new Salle("Salle 104", CategorieSalle.SALLE_ETUDE, true, b1rdc), true);
+        Salle s105 = save(new Salle("Salle 105", CategorieSalle.SALLE_ETUDE, true, b1rdc), true);
+        Salle s106 = save(new Salle("Salle 106", CategorieSalle.SALLE_ETUDE, true, b1rdc), true);
+        Salle s107 = save(new Salle("Salle 107", CategorieSalle.SALLE_ETUDE, true, b1rdc), true);
 
-        Salle s111 = save(new Salle("Salle 111", CategorieSalle.SALLE_ETUDE, 1, "DROITE", true, b1et1), true);
-        Salle s112 = save(new Salle("Salle 112", CategorieSalle.SALLE_ETUDE, 2, "DROITE", true, b1et1), true);
-        Salle s113 = save(new Salle("Salle 113", CategorieSalle.SALLE_ETUDE, 3, "DROITE", true, b1et1), true);
-        Salle s114 = save(new Salle("Salle 114", CategorieSalle.SALLE_ETUDE, 4, "DROITE", true, b1et1), true);
-        Salle s115 = save(new Salle("Salle 115", CategorieSalle.SALLE_ETUDE, 1, "GAUCHE", true, b1et1), true);
-        Salle s116 = save(new Salle("Salle 116", CategorieSalle.SALLE_ETUDE, 2, "GAUCHE", true, b1et1), true);
-        Salle s117 = save(new Salle("Salle 117", CategorieSalle.SALLE_ETUDE, 3, "GAUCHE", true, b1et1), true);
+        Salle s111 = save(new Salle("Salle 111", CategorieSalle.SALLE_ETUDE, true, b1et1), true);
+        Salle s112 = save(new Salle("Salle 112", CategorieSalle.SALLE_ETUDE, true, b1et1), true);
+        Salle s113 = save(new Salle("Salle 113", CategorieSalle.SALLE_ETUDE, true, b1et1), true);
+        Salle s114 = save(new Salle("Salle 114", CategorieSalle.SALLE_ETUDE, true, b1et1), true);
+        Salle s115 = save(new Salle("Salle 115", CategorieSalle.SALLE_ETUDE, true, b1et1), true);
+        Salle s116 = save(new Salle("Salle 116", CategorieSalle.SALLE_ETUDE, true, b1et1), true);
+        Salle s117 = save(new Salle("Salle 117", CategorieSalle.SALLE_ETUDE, true, b1et1), true);
 
         fp("cc:b2:55:91:3c:c0", "FSM-WiFi", -72.50, AA);
         fp("cc:b2:55:91:3c:c0", "FSM-WiFi", -45.75, AB);
@@ -160,20 +160,20 @@ public class DataInitializer implements CommandLineRunner {
 
         poiRepo.save(new PointLocalisation("Entrée Bloc 2", PointLocalisation.Type.ENTREE, 0f, 0f, true, b2));
 
-        Salle s201 = save(new Salle("Salle 201", CategorieSalle.SALLE_ETUDE, 1, "DROITE", true, b2rdc), true);
-        Salle s202 = save(new Salle("Salle 202", CategorieSalle.SALLE_ETUDE, 2, "DROITE", true, b2rdc), true);
-        Salle s203 = save(new Salle("Salle 203", CategorieSalle.SALLE_ETUDE, 3, "DROITE", true, b2rdc), true);
-        Salle s204 = save(new Salle("Salle 204", CategorieSalle.SALLE_ETUDE, 1, "GAUCHE", true, b2rdc), true);
-        Salle s205 = save(new Salle("Salle 205", CategorieSalle.SALLE_ETUDE, 2, "GAUCHE", true, b2rdc), true);
-        Salle s206 = save(new Salle("Salle 206", CategorieSalle.SALLE_ETUDE, 3, "GAUCHE", true, b2rdc), true);
-        Salle s211 = save(new Salle("Salle 211", CategorieSalle.SALLE_ETUDE, 1, "DROITE", true, b2et1), true);
-        Salle s212 = save(new Salle("Salle 212", CategorieSalle.SALLE_ETUDE, 2, "DROITE", true, b2et1), true);
-        Salle s213 = save(new Salle("Salle 213", CategorieSalle.SALLE_ETUDE, 3, "DROITE", true, b2et1), true);
-        Salle s214 = save(new Salle("Salle 214", CategorieSalle.SALLE_ETUDE, 4, "DROITE", true, b2et1), true);
-        Salle s215 = save(new Salle("Salle 215", CategorieSalle.SALLE_ETUDE, 1, "GAUCHE", true, b2et1), true);
-        Salle s216 = save(new Salle("Salle 216", CategorieSalle.SALLE_ETUDE, 2, "GAUCHE", true, b2et1), true);
-        Salle s217 = save(new Salle("Salle 217", CategorieSalle.SALLE_ETUDE, 3, "GAUCHE", true, b2et1), true);
-        Salle s218 = save(new Salle("Salle 218", CategorieSalle.SALLE_ETUDE, 4, "GAUCHE", true, b2et1), true);
+        Salle s201 = save(new Salle("Salle 201", CategorieSalle.SALLE_ETUDE, true, b2rdc), true);
+        Salle s202 = save(new Salle("Salle 202", CategorieSalle.SALLE_ETUDE, true, b2rdc), true);
+        Salle s203 = save(new Salle("Salle 203", CategorieSalle.SALLE_ETUDE, true, b2rdc), true);
+        Salle s204 = save(new Salle("Salle 204", CategorieSalle.SALLE_ETUDE, true, b2rdc), true);
+        Salle s205 = save(new Salle("Salle 205", CategorieSalle.SALLE_ETUDE, true, b2rdc), true);
+        Salle s206 = save(new Salle("Salle 206", CategorieSalle.SALLE_ETUDE, true, b2rdc), true);
+        Salle s211 = save(new Salle("Salle 211", CategorieSalle.SALLE_ETUDE, true, b2et1), true);
+        Salle s212 = save(new Salle("Salle 212", CategorieSalle.SALLE_ETUDE, true, b2et1), true);
+        Salle s213 = save(new Salle("Salle 213", CategorieSalle.SALLE_ETUDE, true, b2et1), true);
+        Salle s214 = save(new Salle("Salle 214", CategorieSalle.SALLE_ETUDE, true, b2et1), true);
+        Salle s215 = save(new Salle("Salle 215", CategorieSalle.SALLE_ETUDE, true, b2et1), true);
+        Salle s216 = save(new Salle("Salle 216", CategorieSalle.SALLE_ETUDE, true, b2et1), true);
+        Salle s217 = save(new Salle("Salle 217", CategorieSalle.SALLE_ETUDE, true, b2et1), true);
+        Salle s218 = save(new Salle("Salle 218", CategorieSalle.SALLE_ETUDE, true, b2et1), true);
 
         fp("78:8c:b5:64:34:87", "FSM-WiFi", -59.25, s201);
         fp("78:8c:b5:64:34:87", "FSM-WiFi", -54.25, s202);
@@ -197,25 +197,25 @@ public class DataInitializer implements CommandLineRunner {
         Etage b4et1 = etageRepo.save(new Etage(0, "1er Etage", false, b4));
         poiRepo.save(new PointLocalisation("Entrée Bloc 4", PointLocalisation.Type.ENTREE, 0f, 0f, false, b4));
         for (int i = 401; i <= 409; i++)
-            save(new Salle("Salle " + i, CategorieSalle.SALLE_ETUDE, i - 400, "DROITE", true, b4et1), false);
+            save(new Salle("Salle " + i, CategorieSalle.SALLE_ETUDE, true, b4et1), false);
 
         // =====================================================
-        // BLOCS DÉPARTEMENTS
+        // BLOC Math
         // =====================================================
         Bloc bm = blocRepo.save(new Bloc("BM","Bloc Mathémathique","Salles 201M,etc",true));
         Etage bmet1 = etageRepo.save(new Etage(1,"1er Etage",false,bm));
         Etage bmet2 = etageRepo.save(new Etage(2,"2e Etage",false,bm));
         poiRepo.save(new PointLocalisation("Entrée Bloc Math",PointLocalisation.Type.ENTREE,0f,0f,true,bm));
-        Salle s101M = save(new Salle("Salle 101M", CategorieSalle.SALLE_ETUDE,1,"DROITE",false,bmet1),true);
-        Salle s102M = save(new Salle("Salle 102M", CategorieSalle.SALLE_ETUDE,1,"GAUCHE",false,bmet1),true);
-        Salle s107M = save(new Salle("Salle 107M", CategorieSalle.SALLE_ETUDE,2,"DROITE",false,bmet1),true);
-        Salle s201M = save(new Salle("Salle 201M", CategorieSalle.SALLE_ETUDE,1,"DROITE",false,bmet2),true);
-        Salle s202M = save(new Salle("Salle 202M", CategorieSalle.SALLE_ETUDE,1,"GAUCHE",false,bmet2),true);
-        Salle s203M = save(new Salle("Salle 203M", CategorieSalle.SALLE_ETUDE,2,"DROITE",false,bmet2),true);
-        Salle s211M = save(new Salle("Salle 211M", CategorieSalle.SALLE_ETUDE,2,"GAUCHE",false,bmet2),true);
-        Salle s212M = save(new Salle("Salle 212M", CategorieSalle.SALLE_ETUDE,3,"DROITE",false,bmet2),true);
-        Salle s213M = save(new Salle("Salle 213M", CategorieSalle.SALLE_ETUDE,3,"GAUCHE",false,bmet2),true);
-        Salle s214M = save(new Salle("Salle 214M",CategorieSalle.SALLE_ETUDE,4,"DROITE",false,bmet2),true);
+        Salle s101M = save(new Salle("Salle 101M", CategorieSalle.SALLE_ETUDE, false,bmet1),true);
+        Salle s102M = save(new Salle("Salle 102M", CategorieSalle.SALLE_ETUDE, false,bmet1),true);
+        Salle s107M = save(new Salle("Salle 107M", CategorieSalle.SALLE_ETUDE, false,bmet1),true);
+        Salle s201M = save(new Salle("Salle 201M", CategorieSalle.SALLE_ETUDE, false,bmet2),true);
+        Salle s202M = save(new Salle("Salle 202M", CategorieSalle.SALLE_ETUDE, false,bmet2),true);
+        Salle s203M = save(new Salle("Salle 203M", CategorieSalle.SALLE_ETUDE, false,bmet2),true);
+        Salle s211M = save(new Salle("Salle 211M", CategorieSalle.SALLE_ETUDE, false,bmet2),true);
+        Salle s212M = save(new Salle("Salle 212M", CategorieSalle.SALLE_ETUDE, false,bmet2),true);
+        Salle s213M = save(new Salle("Salle 213M", CategorieSalle.SALLE_ETUDE, false,bmet2),true);
+        Salle s214M = save(new Salle("Salle 214M",CategorieSalle.SALLE_ETUDE, false,bmet2),true);
         fp("40:ed:00:90:88:ca","FSM-WiFi",-60.75,s107M);
         fp("40:ed:00:90:88:ca","FSM-WiFi",-48.5,s101M);
         fp("98:ba:5f:c4:48:6c","FSM-WiFi",-57,s102M);
@@ -241,21 +241,21 @@ public class DataInitializer implements CommandLineRunner {
         poiRepo.save(new PointLocalisation("Entrée Cour Rouge", PointLocalisation.Type.ENTREE, 0f, 0f, true, cour));
         poiRepo.save(new PointLocalisation("Intersection Cour Rouge", PointLocalisation.Type.INTERSECTION, 0f, 0f, true, cour));
 
-        Salle A1 = save(new Salle("Amphithéâtre 1",        CategorieSalle.SALLE_ETUDE, 1, "DROITE", true, courrdc), false);
-        Salle A2 = save(new Salle("Amphithéâtre 2",        CategorieSalle.SALLE_ETUDE, 2, "CENTRE", true, courrdc), false);
-        Salle A3 = save(new Salle("Amphithéâtre 3",        CategorieSalle.SALLE_ETUDE, 3, "GAUCHE", true, courrdc), false);
-        Salle A4 = save(new Salle("Amphithéâtre 4",        CategorieSalle.SALLE_ETUDE, 4, "GAUCHE", true, courrdc), false);
-        Salle A5 = save(new Salle("Amphithéâtre 5",        CategorieSalle.SALLE_ETUDE, 5, "CENTRE", true, courrdc), false);
-        Salle A6 = save(new Salle("Amphithéâtre 6",        CategorieSalle.SALLE_ETUDE, 6, "DROITE", true, courrdc), false);
-        Salle Bib = save(new Salle("Bibliothèque Centrale", CategorieSalle.SALLE_ETUDE, 1, "CENTRE", true, courrdc), false);
-        Salle B1 = save(new Salle("Bibliothèque B1",       CategorieSalle.SALLE_ETUDE, 2, "CENTRE", true, courrdc), false);
-        Salle B2 = save(new Salle("Bibliothèque B2",       CategorieSalle.SALLE_ETUDE, 3, "CENTRE", true, courrdc), false);
-        Salle C1 = save(new Salle("Salle C1",              CategorieSalle.SALLE_ETUDE, 1, "CENTRE", true, courrdc), false);
-        Salle C2 = save(new Salle("Salle C2",              CategorieSalle.SALLE_ETUDE, 2, "CENTRE", true, courrdc), false);
-        Salle C3 = save(new Salle("Salle C3",              CategorieSalle.SALLE_ETUDE, 3, "CENTRE", true, courrdc), false);
-        Salle D1 = save(new Salle("Salle D1",              CategorieSalle.SALLE_ETUDE, 1, "CENTRE", true, courrdc), false);
-        Salle D2 = save(new Salle("Salle D2",              CategorieSalle.SALLE_ETUDE, 2, "CENTRE", true, courrdc), false);
-        Salle th = save(new Salle("Salle des thèses",      CategorieSalle.SALLE_ETUDE, 1, "CENTRE", true, courrdc), false);
+        Salle A1 = save(new Salle("Amphithéâtre 1",        CategorieSalle.SALLE_ETUDE, true, courrdc), false);
+        Salle A2 = save(new Salle("Amphithéâtre 2",        CategorieSalle.SALLE_ETUDE, true, courrdc), false);
+        Salle A3 = save(new Salle("Amphithéâtre 3",        CategorieSalle.SALLE_ETUDE, true, courrdc), false);
+        Salle A4 = save(new Salle("Amphithéâtre 4",        CategorieSalle.SALLE_ETUDE, true, courrdc), false);
+        Salle A5 = save(new Salle("Amphithéâtre 5",        CategorieSalle.SALLE_ETUDE, true, courrdc), false);
+        Salle A6 = save(new Salle("Amphithéâtre 6",        CategorieSalle.SALLE_ETUDE, true, courrdc), false);
+        Salle Bib = save(new Salle("Bibliothèque Centrale", CategorieSalle.SALLE_ETUDE, true, courrdc), false);
+        Salle B1 = save(new Salle("Bibliothèque B1",       CategorieSalle.SALLE_ETUDE, true, courrdc), false);
+        Salle B2 = save(new Salle("Bibliothèque B2",       CategorieSalle.SALLE_ETUDE, true, courrdc), false);
+        Salle C1 = save(new Salle("Salle C1",              CategorieSalle.SALLE_ETUDE, true, courrdc), false);
+        Salle C2 = save(new Salle("Salle C2",              CategorieSalle.SALLE_ETUDE, true, courrdc), false);
+        Salle C3 = save(new Salle("Salle C3",              CategorieSalle.SALLE_ETUDE, true, courrdc), false);
+        Salle D1 = save(new Salle("Salle D1",              CategorieSalle.SALLE_ETUDE, true, courrdc), false);
+        Salle D2 = save(new Salle("Salle D2",              CategorieSalle.SALLE_ETUDE, true, courrdc), false);
+        Salle th = save(new Salle("Salle des thèses",      CategorieSalle.SALLE_ETUDE, true, courrdc), false);
         fp("10:be:f5:2a:9c:48","FSM-WiFi",-60.4,A1);
         fp("10:be:f5:2a:9c:48","FSM-WiFi",-78.6,A2);
         fp("10:be:f5:2a:9c:48","FSM-WiFi",-81.4,A3);
@@ -300,6 +300,6 @@ public class DataInitializer implements CommandLineRunner {
         Bloc bloc   = blocRepo.save(new Bloc(code, nom, desc, false));
         Etage etage = etageRepo.save(new Etage(0, "Rez-de-chaussée", true, bloc));
         poiRepo.save(new PointLocalisation("Entrée " + nom, PointLocalisation.Type.ENTREE, 0f, 0f, false, bloc));
-        save(new Salle(salleName, CategorieSalle.BUREAU, 1, "DROITE", true, etage), false);
+        save(new Salle(salleName, CategorieSalle.BUREAU, true, etage), false);
     }
 }

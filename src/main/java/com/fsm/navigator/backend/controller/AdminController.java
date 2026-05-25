@@ -262,9 +262,6 @@ public class AdminController {
             String  nom       = (String) body.get("nom");
             String  catStr    = (String) body.getOrDefault("categorie", "SALLE_ETUDE");
             boolean pmr       = Boolean.TRUE.equals(body.get("accessiblePmr"));
-            int     ordre     = body.containsKey("ordreDepuisEntree")
-                    ? Integer.parseInt(body.get("ordreDepuisEntree").toString()) : 0;
-            String  entreeRef = (String) body.getOrDefault("entreeReference", "");
             Long    etageId   = Long.parseLong(body.get("etageId").toString());
 
             if (nom == null || nom.isEmpty())
@@ -278,7 +275,7 @@ public class AdminController {
             try { categorie = CategorieSalle.valueOf(catStr.toUpperCase()); }
             catch (Exception e) { categorie = CategorieSalle.SALLE_ETUDE; }
 
-            Salle salle = new Salle(nom, categorie, ordre, entreeRef, pmr, etage);
+            Salle salle = new Salle(nom, categorie, pmr, etage);
             if (body.containsKey("disponible"))
                 salle.setDisponible(Boolean.TRUE.equals(body.get("disponible")));
             Salle saved = salleRepo.save(salle);
@@ -377,7 +374,7 @@ public class AdminController {
                     if (etage == null) return ResponseEntity.badRequest().body(error("Étage introuvable"));
                     poi.setEtage(etage);
                 }
-                case ENTREE, SORTIE -> {
+                case ENTREE, SORTIE, INTERSECTION -> {
                     Long blocId = Long.parseLong(body.get("blocId").toString());
                     Bloc bloc = blocRepo.findById(blocId).orElse(null);
                     if (bloc == null) return ResponseEntity.badRequest().body(error("Bloc introuvable"));
@@ -417,6 +414,11 @@ public class AdminController {
     @GetMapping("/fingerprints")
     public ResponseEntity<List<WifiFingerprint>> getAllFingerprints() {
         return ResponseEntity.ok(fpRepo.findAll());
+    }
+
+    @GetMapping("/fingerprints/bloc/{blocId}")
+    public ResponseEntity<List<WifiFingerprint>> getFingerprintsByBloc(@PathVariable Long blocId) {
+        return ResponseEntity.ok(fpRepo.findByBlocId(blocId));
     }
 
     @PostMapping("/fingerprints")
@@ -489,8 +491,6 @@ public class AdminController {
                 Map<String, Object> sm = new LinkedHashMap<>();
                 sm.put("nom",               salle.getNom());
                 sm.put("categorie",         salle.getCategorie().name());
-                sm.put("ordreDepuisEntree", salle.getOrdreDepuisEntree());
-                sm.put("entreeReference",   salle.getEntreeReference());
                 sm.put("accessiblePmr",     salle.isAccessiblePmr());
                 sm.put("disponible",        salle.isDisponible());
                 sallesList.add(sm);
@@ -531,8 +531,6 @@ public class AdminController {
                 for (Map<String, Object> sm : salles) {
                     String sNom   = (String) sm.getOrDefault("nom", "");
                     String catStr = (String) sm.getOrDefault("categorie", "SALLE_ETUDE");
-                    int    ordre  = Integer.parseInt(sm.getOrDefault("ordreDepuisEntree", 0).toString());
-                    String eRef   = (String) sm.getOrDefault("entreeReference", "");
                     boolean sPmr  = Boolean.TRUE.equals(sm.get("accessiblePmr"));
                     boolean disp  = !Boolean.FALSE.equals(sm.get("disponible"));
 
@@ -540,7 +538,7 @@ public class AdminController {
                     try { cat = CategorieSalle.valueOf(catStr.toUpperCase()); }
                     catch (Exception e) { cat = CategorieSalle.SALLE_ETUDE; }
 
-                    Salle salle = new Salle(sNom, cat, ordre, eRef, sPmr, etage);
+                    Salle salle = new Salle(sNom, cat, sPmr, etage);
                     salle.setDisponible(disp);
                     Salle saved = salleRepo.save(salle);
                     poiRepo.save(new PointLocalisation(sNom, 0f, 0f, sPmr, saved));

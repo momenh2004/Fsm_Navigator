@@ -32,10 +32,10 @@ public interface NavigationHistoryRepository extends JpaRepository<NavigationHis
                    "GROUP BY DATE(created_at) ORDER BY day", nativeQuery = true)
     List<Object[]> findActivityLast7Days();
 
-    // Activité par jour — période paramétrable
+    // Navigations par jour — période paramétrable
     @Query(value = "SELECT DATE(created_at) as day, COUNT(*) as cnt " +
                    "FROM navigation_history " +
-                   "WHERE created_at >= :since " +
+                   "WHERE created_at >= :since AND type = 'NAVIGATION' " +
                    "GROUP BY DATE(created_at) ORDER BY day", nativeQuery = true)
     List<Object[]> findActivitySince(@Param("since") LocalDateTime since);
 
