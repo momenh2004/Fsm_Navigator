@@ -18,8 +18,11 @@ import java.util.stream.Collectors;
  */
 public class WeightedKNN {
 
-    private static final int    K             = 3;     // nombre de voisins
-    private static final double PENALTY_RSSI  = -100.0; // pénalité si BSSID absent
+    private static final int    K                   = 3;      // nombre de voisins
+    private static final double PENALTY_RSSI        = -100.0; // pénalité si BSSID absent
+    private static final double WEAK_FP_THRESHOLD   = -87.0;  // rssiMoyen trop faible
+    private static final double WEAK_FP_PENALTY     = 13.0;   // pénalité additive (distance)
+    private static final double STRONG_SIGNAL_FLOOR = -83.0;  // max scan pour être "en zone couverte"
 
     // ===== MODÈLES =====
 
@@ -47,17 +50,19 @@ public class WeightedKNN {
         public String  salleId;
         public String  salleNom;
         public String  blocId;
-        public float   x, y;        // position interpolée
-        public double  confidence;  // 0.0 → 1.0
+        public float   x, y;               // position interpolée
+        public double  confidence;         // 0.0 → 1.0
+        public double  secondBestDistance; // distance du 2e candidat (pour ratio)
 
         public LocationResult(String salleId, String salleNom, String blocId,
-                              float x, float y, double confidence) {
-            this.salleId    = salleId;
-            this.salleNom   = salleNom;
-            this.blocId     = blocId;
-            this.x          = x;
-            this.y          = y;
-            this.confidence = confidence;
+                              float x, float y, double confidence, double secondBestDistance) {
+            this.salleId            = salleId;
+            this.salleNom           = salleNom;
+            this.blocId             = blocId;
+            this.x                  = x;
+            this.y                  = y;
+            this.confidence         = confidence;
+            this.secondBestDistance = secondBestDistance;
         }
     }
 
@@ -72,17 +77,16 @@ public class WeightedKNN {
 
     // ===== ALGORITHME PRINCIPAL =====
 
-    /**
-     * Localise l'utilisateur via Weighted k-NN.
-     *
-     * @param filteredScan  RSSI filtrés par Kalman { bssid → rssi }
-     * @param fingerprints  Base de fingerprints du serveur
-     * @return              Résultat de localisation
-     */
+    // Localise l'utilisateur via Weighted k-NN (distance RSSI + poids inversé).
     public static LocationResult locate(Map<String, Double> filteredScan,
                                         List<Fingerprint> fingerprints) {
 
         if (filteredScan.isEmpty() || fingerprints.isEmpty()) return null;
+
+        // max RSSI détecté → indique si l'utilisateur est dans une zone bien couverte
+        double maxDetectedRssi = filteredScan.values().stream()
+                .mapToDouble(Double::doubleValue).max().orElse(-100.0);
+        boolean userInStrongArea = maxDetectedRssi > STRONG_SIGNAL_FLOOR;
 
         // 1. Grouper les fingerprints par salle
         Map<String, List<Fingerprint>> bySalle = fingerprints.stream()
@@ -108,6 +112,13 @@ public class WeightedKNN {
             double distance = count > 0
                     ? Math.sqrt(sumSq / count)
                     : Double.MAX_VALUE;
+
+            // Pénalité additive si tous les fingerprints de la salle sont faibles
+            // ET que l'utilisateur est dans une zone bien couverte (signal fort détecté)
+            boolean allWeak = fps.stream().allMatch(fp -> fp.rssiMoyen < WEAK_FP_THRESHOLD);
+            if (allWeak && userInStrongArea) {
+                distance += WEAK_FP_PENALTY;
+            }
 
             Candidate c = new Candidate();
             c.salleId  = salleId;
@@ -149,9 +160,10 @@ public class WeightedKNN {
         float interpY = (float)(wy / totalWeight);
 
         // 6. Score de confiance basé sur la distance du meilleur voisin
-        double bestDist    = kNearest.get(0).distance;
-        double confidence  = Math.max(0, 1.0 - bestDist / 30.0);
-        confidence         = Math.min(1.0, confidence);
+        double bestDist       = kNearest.get(0).distance;
+        double secondBestDist = kNearest.size() > 1 ? kNearest.get(1).distance : bestDist * 2;
+        double confidence     = Math.max(0, 1.0 - bestDist / 30.0);
+        confidence            = Math.min(1.0, confidence);
 
         // 7. Récupérer les infos de la salle gagnante
         Candidate winner = kNearest.stream()
@@ -161,7 +173,7 @@ public class WeightedKNN {
 
         return new LocationResult(
                 winner.salleId, winner.salleNom, winner.blocId,
-                interpX, interpY, confidence
+                interpX, interpY, confidence, secondBestDist
         );
     }
 }

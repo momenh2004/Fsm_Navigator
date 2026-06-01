@@ -47,13 +47,20 @@ public class NavigationGraph {
         }
     }
 
+    // Constructeur vide (graphe rempli dynamiquement par NavigationGraphLoader).
     public NavigationGraph() {
-        buildBloc3RDC();
-        buildBloc3Etage1();
-        buildBlocPalestineRDC();
-        buildBlocMath();
-        buildCampusOutdoor();
-        connectEtages();
+    }
+
+    // Construit le graphe complet embarqué (fallback hors ligne).
+    public static NavigationGraph buildFallback() {
+        NavigationGraph g = new NavigationGraph();
+        g.buildBloc3RDC();
+        g.buildBloc3Etage1();
+        g.buildBlocPalestineRDC();
+        g.buildBlocMath();
+        g.buildCampusOutdoor();
+        g.connectEtages();
+        return g;
     }
 
     // =========================================================
@@ -454,7 +461,7 @@ public class NavigationGraph {
 
     // =========================================================
     // ALGORITHME A*
-    // =========================================================
+    // Calcule le chemin optimal via A* (ignore escaliers si même étage).
     public NavPath findPath(String startId, String goalId) {
         NavigationNode start = nodes.get(startId);
         NavigationNode goal  = nodes.get(goalId);
@@ -562,15 +569,27 @@ public class NavigationGraph {
         return n;
     }
 
-    public NavigationNode getNode(String id)            { return nodes.get(id); }
-    public Map<String, NavigationNode> getAllNodes()     { return nodes; }
+    // Ajoute un nœud au graphe (wrapper public).
+    public NavigationNode addNodePublic(String id, String nom, String blocId,
+                                        int etage, float x, float y,
+                                        NavigationNode.Type type) {
+        return addNode(id, nom, blocId, etage, x, y, type);
+    }
 
+    // Récupère un nœud par son identifiant.
+    public NavigationNode getNode(String id) { return nodes.get(id); }
+
+    // Retourne tous les nœuds du graphe.
+    public Map<String, NavigationNode> getAllNodes() { return nodes; }
+
+    // Trouve une salle par nom.
     public NavigationNode findBySalleNom(String nom) {
         for (NavigationNode n : nodes.values())
             if (n.nom.equals(nom) && n.type == NavigationNode.Type.SALLE) return n;
         return null;
     }
 
+    // Trouve le nœud le plus proche des coordonnées (x, y) sur l'étage donné.
     public NavigationNode findNearest(float x, float y, String blocId, int etage) {
         NavigationNode best = null;
         float minDist = Float.MAX_VALUE;
@@ -582,6 +601,7 @@ public class NavigationGraph {
         return best;
     }
 
+    // Trouve l'entrée d'un bloc (fallback: premier nœud contenant "entrée").
     public NavigationNode findEntree(String blocId) {
         // Lookup direct : B3 → "B3_RDC_ENTREE", A1-6 → "A1-6_ENTREE"
         NavigationNode n = nodes.get(blocId + "_RDC_ENTREE");
@@ -599,6 +619,7 @@ public class NavigationGraph {
         return null;
     }
 
+    // Retourne le premier nœud trouvé dans un bloc (fallback si entrée manquante).
     public NavigationNode findAnyNodeInBloc(String blocId) {
         for (NavigationNode n : nodes.values())
             if (n.id.startsWith(blocId)) return n;

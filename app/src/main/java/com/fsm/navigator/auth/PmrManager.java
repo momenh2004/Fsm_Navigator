@@ -16,28 +16,31 @@ public class PmrManager {
     private static boolean    pmrEnabled = false;
     private static PmrProfile pmrProfile = PmrProfile.NONE;
 
-    // ===== ACTIVER / DÉSACTIVER =====
+    // Active/désactive le mode PMR.
     public static void setEnabled(boolean enabled) {
         pmrEnabled = enabled;
         if (!enabled) pmrProfile = PmrProfile.NONE;
     }
 
+    // Vérifie si le mode PMR est activé.
     public static boolean isEnabled() { return pmrEnabled; }
 
+    // Bascule le mode PMR.
     public static void toggle() {
         pmrEnabled = !pmrEnabled;
         if (!pmrEnabled) pmrProfile = PmrProfile.NONE;
     }
 
-    // ===== PROFIL =====
+    // Définit le profil PMR (réactive le mode si différent de NONE).
     public static void setProfile(PmrProfile profile) {
         pmrProfile = profile;
         pmrEnabled = (profile != PmrProfile.NONE);
     }
 
+    // Retourne le profil PMR actif (type de handicap).
     public static PmrProfile getProfile() { return pmrProfile; }
 
-    // ===== TTS AUTORISÉ pour ce profil ? =====
+    // Vérifie si la synthèse vocale est autorisée pour le profil courant.
     public static boolean ttsEnabled() {
         switch (pmrProfile) {
             case WHEELCHAIR:
@@ -49,13 +52,13 @@ public class PmrManager {
         }
     }
 
-    // ===== ÉVITER LES ESCALIERS ? =====
+    // Vérifie si le profil doit éviter les escaliers (fauteuil roulant ou béquilles).
     public static boolean avoidsStairs() {
         return pmrProfile == PmrProfile.WHEELCHAIR
             || pmrProfile == PmrProfile.CRUTCHES;
     }
 
-    // ===== RÉINITIALISER (à la déconnexion) =====
+    // Réinitialise le mode PMR (à la déconnexion).
     public static void reset() {
         pmrEnabled = false;
         pmrProfile = PmrProfile.NONE;

@@ -48,6 +48,7 @@ public class ImuHelper implements SensorEventListener {
     private float[] gravity     = new float[3];
     private float[] geomagnetic = new float[3];
 
+    // Initialise l'accès aux capteurs (accéléromètre, gyroscope, boussole).
     public ImuHelper(Context context) {
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         accelSensor   = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -63,6 +64,7 @@ public class ImuHelper implements SensorEventListener {
         if (magnetSensor != null) sensorManager.registerListener(this, magnetSensor, SensorManager.SENSOR_DELAY_GAME);
     }
 
+    // Arrête la lecture des capteurs.
     public void stop() {
         sensorManager.unregisterListener(this);
     }
@@ -95,10 +97,7 @@ public class ImuHelper implements SensorEventListener {
 
     // ===== DÉTECTION DE PAS =====
 
-    /**
-     * Détecte un pas en analysant la magnitude de l'accélération.
-     * Algorithme simple de seuillage.
-     */
+    // Détecte un pas par seuillage de l'accélération (franchissement de STEP_THRESHOLD).
     private void detectStep(float[] accel) {
         float mag = (float) Math.sqrt(
                 accel[0]*accel[0] +
@@ -116,9 +115,7 @@ public class ImuHelper implements SensorEventListener {
 
     // ===== MISE À JOUR DE L'ORIENTATION =====
 
-    /**
-     * Calcule l'azimut (direction de marche) à partir de la boussole.
-     */
+    // Calcule l'azimut (direction de marche en degrés) via la matrice de rotation boussole/gravité.
     private void updateAzimuth() {
         float[] R = new float[9];
         float[] I = new float[9];
@@ -134,10 +131,7 @@ public class ImuHelper implements SensorEventListener {
 
     // ===== MISE À JOUR POSITION PDR =====
 
-    /**
-     * Estime le déplacement à partir d'un pas dans la direction azimuth.
-     * Coordonnées : x = Est, y = Nord
-     */
+    // Estime le déplacement (x=Est, y=Nord) en avançant d'un pas vers l'azimut.
     private void updatePdrPosition() {
         double rad = Math.toRadians(azimuth);
         pdrX += STEP_LENGTH * (float) Math.sin(rad);
@@ -146,14 +140,7 @@ public class ImuHelper implements SensorEventListener {
 
     // ===== API PUBLIQUE =====
 
-    /**
-     * Retourne le déplacement estimé depuis la dernière position WiFi connue.
-     * À appeler quand le signal WiFi est trop faible.
-     *
-     * @param lastKnownX  Dernière position X connue (WiFi)
-     * @param lastKnownY  Dernière position Y connue (WiFi)
-     * @return            Position estimée { x, y }
-     */
+    // Retourne la position estimée par PDR (dernière pos WiFi + déplacement pas/azimut).
     public float[] getEstimatedPosition(float lastKnownX, float lastKnownY) {
         return new float[]{
                 lastKnownX + pdrX,
@@ -161,17 +148,22 @@ public class ImuHelper implements SensorEventListener {
         };
     }
 
-    /**
-     * Réinitialise le PDR quand une nouvelle position WiFi est confirmée.
-     */
+    // Réinitialise le PDR quand une nouvelle position WiFi est confirmée.
     public void resetPdr() {
         pdrX = 0f;
         pdrY = 0f;
         stepCount = 0;
     }
 
-    public float getAzimuth()   { return azimuth; }
-    public int   getStepCount() { return stepCount; }
-    public float getPdrX()      { return pdrX; }
-    public float getPdrY()      { return pdrY; }
+    // Retourne l'azimut (direction de marche en degrés).
+    public float getAzimuth() { return azimuth; }
+
+    // Retourne le nombre de pas détectés.
+    public int getStepCount() { return stepCount; }
+
+    // Retourne le déplacement estimé en X (Est).
+    public float getPdrX() { return pdrX; }
+
+    // Retourne le déplacement estimé en Y (Nord).
+    public float getPdrY() { return pdrY; }
 }

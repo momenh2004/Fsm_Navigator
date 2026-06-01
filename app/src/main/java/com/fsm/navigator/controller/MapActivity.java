@@ -9,12 +9,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -41,10 +39,10 @@ public class MapActivity extends BaseDrawerActivity {
     private static final int PERMISSION_CODE = 100;
 
     private FsmMapView  fsmMapView;
-    private CardView    cardBlocInfo;
+    private android.view.View cardBlocInfo;
     private TextView    tvBlocNom, tvBlocDesc;
-    private LinearLayout btnVoirPlan, btnNavigerBloc, btnLocate;
-    private ImageButton btnHamburger, btnResetZoom;
+    private android.view.View btnVoirPlan, btnNavigerBloc, btnLocate;
+    private ImageButton btnHamburger;
     private ImageButton btnZoomIn, btnZoomOut;
     private ProgressBar progressLocate;
 
@@ -84,17 +82,16 @@ public class MapActivity extends BaseDrawerActivity {
 
     // =========================================================
     private void initViews() {
-        fsmMapView    = findViewById(R.id.mapView);
-        cardBlocInfo  = findViewById(R.id.cardBlocInfo);
-        tvBlocNom     = findViewById(R.id.tvBlocNom);
-        tvBlocDesc    = findViewById(R.id.tvBlocDesc);
-        btnVoirPlan   = findViewById(R.id.btnVoirPlan);
-        btnNavigerBloc= findViewById(R.id.btnNavigerBloc);
-        btnLocate     = findViewById(R.id.btnLocate);
-        btnHamburger  = findViewById(R.id.btnHamburger);
-        btnResetZoom  = findViewById(R.id.btnResetZoom);
-        btnZoomIn     = findViewById(R.id.btnZoomIn);
-        btnZoomOut    = findViewById(R.id.btnZoomOut);
+        fsmMapView     = findViewById(R.id.mapView);
+        cardBlocInfo   = findViewById(R.id.cardBlocInfo);
+        tvBlocNom      = findViewById(R.id.tvBlocNom);
+        tvBlocDesc     = findViewById(R.id.tvBlocDesc);
+        btnVoirPlan    = findViewById(R.id.btnVoirPlan);
+        btnNavigerBloc = findViewById(R.id.btnNavigerBloc);
+        btnLocate      = findViewById(R.id.btnLocate);
+        btnHamburger   = findViewById(R.id.btnHamburger);
+        btnZoomIn      = findViewById(R.id.btnZoomIn);
+        btnZoomOut     = findViewById(R.id.btnZoomOut);
     }
 
     // =========================================================
@@ -105,7 +102,7 @@ public class MapActivity extends BaseDrawerActivity {
             tvBlocNom.setText(bloc.nom.replace("\n", " "));
             tvBlocDesc.setText(getBlocDetails(bloc.id));
             cardBlocInfo.setVisibility(View.VISIBLE);
-            if (btnVoirPlan != null)
+                if (btnVoirPlan != null)
                 btnVoirPlan.setVisibility(hasPlan(bloc.id) ? View.VISIBLE : View.GONE);
             TtsManager.speak(bloc.nom.replace("\n", " ")
                     + ". " + getBlocDetails(bloc.id));
@@ -129,11 +126,12 @@ public class MapActivity extends BaseDrawerActivity {
     // =========================================================
     private void setupListeners() {
         // Zoom
-        if (btnZoomIn    != null) btnZoomIn.setOnClickListener(v    -> fsmMapView.zoomIn());
-        if (btnZoomOut   != null) btnZoomOut.setOnClickListener(v   -> fsmMapView.zoomOut());
-        if (btnResetZoom != null) btnResetZoom.setOnClickListener(v -> fsmMapView.resetZoom());
+        if (btnZoomIn  != null) btnZoomIn.setOnClickListener(v  -> fsmMapView.zoomIn());
+        if (btnZoomOut != null) btnZoomOut.setOnClickListener(v -> fsmMapView.zoomOut());
 
-        // Voir plan interne du bloc
+        setupSheetSwipe(cardBlocInfo);
+
+        // Voir plan intérieur
         if (btnVoirPlan != null) btnVoirPlan.setOnClickListener(v -> {
             if (selectedBloc != null) {
                 Intent intent = new Intent(this, BlockDetailActivity.class);
@@ -162,11 +160,15 @@ public class MapActivity extends BaseDrawerActivity {
             else requestPermissions();
         });
 
-        // Localisation au clic sur la carte
+        // Taper sur la carte : ferme la sheet si ouverte, sinon localise
         if (fsmMapView != null) {
             fsmMapView.setOnClickListener(v -> {
-                if (checkPermissions()) startLocalization();
-                else requestPermissions();
+                if (cardBlocInfo != null && cardBlocInfo.getVisibility() == View.VISIBLE) {
+                    cardBlocInfo.setVisibility(View.GONE);
+                } else {
+                    if (checkPermissions()) startLocalization();
+                    else requestPermissions();
+                }
             });
         }
     }
@@ -176,7 +178,8 @@ public class MapActivity extends BaseDrawerActivity {
     // =========================================================
     private void startLocalization() {
         if (cardBlocInfo != null) cardBlocInfo.setVisibility(View.VISIBLE);
-        if (tvBlocDesc   != null) tvBlocDesc.setText("Localisation en cours...");
+        if (tvBlocNom    != null) tvBlocNom.setText("Recherche de position...");
+        if (tvBlocDesc   != null) tvBlocDesc.setText("");
 
         locationManager.locate(new LocationManager.LocationCallback() {
 
@@ -218,14 +221,8 @@ public class MapActivity extends BaseDrawerActivity {
 
                     switch (reason) {
                         case "NOT_FSM_WIFI":
-                            // Afficher AlertDialog comme dans NavigationActivity
-                            new android.app.AlertDialog.Builder(MapActivity.this)
-                                    .setTitle("⚠️ WiFi FSM non détecté")
-                                    .setMessage("Vous n'êtes pas connecté au WiFi FSM.\n\n" +
-                                            "Connectez-vous au réseau WiFi de la faculté " +
-                                            "pour utiliser la localisation en temps réel.")
-                                    .setPositiveButton("OK", null)
-                                    .show();
+                            Toast.makeText(getApplicationContext(),
+                                    "WiFi FSM non détecté", Toast.LENGTH_SHORT).show();
                             break;
 
                         case "NO_FINGERPRINTS":

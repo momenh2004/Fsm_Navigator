@@ -9,14 +9,12 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.fsm.navigator.model.PointInteret;
 
+// Affiche les dialogs de sélection de profil PMR et gère l'accessibilité.
 public class PmrDialogHelper {
 
     private static final String ADMIN_EMAIL = "administration@fsm.rnu.tn";
 
-    /**
-     * Affiche le dialog de sélection du profil PMR.
-     * onComplete est appelé après sélection (ou annulation).
-     */
+    // Montre le dialog de sélection du profil PMR (appelle onComplete après).
     public static void showProfileDialog(Context context, Runnable onComplete) {
         String[] options = {
             "♿  Fauteuil roulant",
@@ -51,6 +49,7 @@ public class PmrDialogHelper {
             .show();
     }
 
+    // Suggère d'activer TalkBack pour les utilisateurs malvoyants.
     public static void showTalkBackSuggestion(Context context, Runnable onComplete) {
         TtsManager.speakForce(
             "Conseil accessibilité. Pour une meilleure expérience, "
@@ -75,10 +74,7 @@ public class PmrDialogHelper {
             .show();
     }
 
-    /**
-     * Vérifie si le dialog doit s'afficher et le montre si nécessaire.
-     * Retourne true si le dialog est affiché (navigation à bloquer).
-     */
+    // Vérifie l'accessibilité PMR du POI et affiche le dialog si inaccessible (retourne true si bloqué).
     public static boolean checkAndShow(Context context, PointInteret poi,
                                        Runnable onProceed) {
         if (!PmrManager.isEnabled()) return false;
@@ -89,9 +85,7 @@ public class PmrDialogHelper {
         return true;
     }
 
-    /**
-     * Surcharge directe avec le nom de la salle et le flag PMR.
-     */
+    // Surcharge : vérifie l'accessibilité PMR avec le nom de salle et le flag booléen.
     public static boolean checkAndShow(Context context, String salleNom,
                                        boolean accessiblePmr, Runnable onProceed) {
         if (!PmrManager.isEnabled()) return false;
@@ -102,6 +96,7 @@ public class PmrDialogHelper {
         return true;
     }
 
+    // Affiche l'alerte "salle non accessible" avec option de contact admin.
     private static void show(Context context, String salleNom, Runnable onProceed) {
         String message =
             "Cette salle n'est pas accessible aux personnes à mobilité réduite.\n\n" +

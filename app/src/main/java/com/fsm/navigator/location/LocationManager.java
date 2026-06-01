@@ -38,6 +38,7 @@ public class LocationManager {
     private final KalmanFilter    kalmanFilter;
     private final StabilityFilter stabilityFilter;
     private final ImuHelper       imuHelper;
+    private final WifiManager     wifiManager;
 
     private float  lastX       = 0f;
     private float  lastY       = 0f;
@@ -51,19 +52,23 @@ public class LocationManager {
         void onLocationFailed(String reason);
     }
 
-    // ===== CONSTRUCTEUR =====
+    // Initialise le gestionnaire de localisation avec capteurs et filtres.
     public LocationManager(Context context) {
         this.context         = context;
         this.kalmanFilter    = new KalmanFilter();
         this.stabilityFilter = new StabilityFilter();
         this.imuHelper       = new ImuHelper(context);
+        this.wifiManager     = (WifiManager) context.getApplicationContext()
+                .getSystemService(Context.WIFI_SERVICE);
     }
 
-    // ===== CAPTEURS IMU =====
+    // Démarre la fusion IMU (capteurs).
     public void start() { imuHelper.start(); }
-    public void stop()  { imuHelper.stop();  }
 
-    // ===== LOCALISATION PRINCIPALE =====
+    // Arrête la fusion IMU.
+    public void stop() { imuHelper.stop(); }
+
+    // Lance la localisation WiFi asynchrone (Kalman → k-NN → Stabilité ou fallback IMU).
     public void locate(LocationCallback callback) {
         android.os.Handler mainHandler = new android.os.Handler(
                 android.os.Looper.getMainLooper());
@@ -99,9 +104,21 @@ public class LocationManager {
                             if (knnResult == null) {
                                 result = "KNN_FAILED";
                             } else {
-                                // 7. Stabilité
-                                String stable = stabilityFilter.update(knnResult.salleId);
+                                // 7. Ratio de confiance relatif (meilleur vs 2e meilleur)
+                                double secondConf = Math.max(0, 1.0 - knnResult.secondBestDistance / 30.0);
+                                double ratio = secondConf > 0.01
+                                        ? knnResult.confidence / secondConf
+                                        : 2.0;
+
+                                // 8. Stabilité (scoring cumulatif)
+                                String stable = stabilityFilter.update(knnResult.salleId, knnResult.confidence);
                                 knnResult.salleId = stable;
+
+                                // 9. Si trop incertain → afficher le bloc au lieu de la salle
+                                if (ratio < 1.25) {
+                                    knnResult.salleNom = "Zone " + knnResult.blocId;
+                                }
+
                                 lastX = knnResult.x;
                                 lastY = knnResult.y;
                                 lastSalleId = stable;
@@ -126,7 +143,7 @@ public class LocationManager {
                     WeightedKNN.LocationResult imuResult = new WeightedKNN.LocationResult(
                             lastSalleId != null ? lastSalleId : "INCONNU",
                             lastSalleId != null ? "Dernière position connue" : "Position inconnue",
-                            "", estimated[0], estimated[1], 0.4
+                            "", estimated[0], estimated[1], 0.4, Double.MAX_VALUE
                     );
                     callback.onLocationFound(imuResult, false);
 
@@ -138,36 +155,28 @@ public class LocationManager {
         }).start();
     }
 
-    // ===== VÉRIFIER CONNEXION WIFI FSM =====
     private boolean isConnectedToFsmWifi() {
-        WifiManager wm = (WifiManager) context.getApplicationContext()
-                .getSystemService(Context.WIFI_SERVICE);
-        if (wm == null || !wm.isWifiEnabled()) return false;
-
-        WifiInfo info = wm.getConnectionInfo();
+        if (wifiManager == null || !wifiManager.isWifiEnabled()) return false;
+        android.net.wifi.WifiInfo info = wifiManager.getConnectionInfo();
         if (info == null) return false;
-
         String ssid = info.getSSID();
-        // Android entoure le SSID de guillemets : "FSM-WiFi"
-        return ssid != null && (ssid.contains("FSM") || ssid.contains("fsm"));
+        // Android wraps the SSID in quotes on some versions: "\"Wifi-FSM\""
+        return AppConfig.FSM_WIFI_SSID.equals(ssid)
+            || ("\"" + AppConfig.FSM_WIFI_SSID + "\"").equals(ssid);
     }
 
-    // ===== SCAN WIFI =====
+    // Scanne les points d'accès WiFi visibles et récupère les RSSI bruts.
     private Map<String, Integer> scanWifi() {
         Map<String, Integer> result = new HashMap<>();
-        WifiManager wm = (WifiManager) context.getApplicationContext()
-                .getSystemService(Context.WIFI_SERVICE);
-
-        if (wm == null || !wm.isWifiEnabled()) return result;
-
-        wm.startScan();
-        for (ScanResult sr : wm.getScanResults()) {
+        if (wifiManager == null || !wifiManager.isWifiEnabled()) return result;
+        wifiManager.startScan();
+        for (ScanResult sr : wifiManager.getScanResults()) {
             result.put(sr.BSSID.toLowerCase(), sr.level);
         }
         return result;
     }
 
-    // ===== RÉCUPÉRER FINGERPRINTS DEPUIS LE BACKEND =====
+    // Récupère la base de fingerprints depuis le serveur (GET /api/fingerprints).
     private List<WeightedKNN.Fingerprint> fetchFingerprints() throws Exception {
         List<WeightedKNN.Fingerprint> list = new ArrayList<>();
 
@@ -204,10 +213,12 @@ public class LocationManager {
         return list;
     }
 
-    // ===== INVALIDER LE CACHE =====
+    // Invalide le cache des fingerprints (force un rechargement au prochain scan).
     public void invalidateCache() { cachedFingerprints = null; }
 
-    // ===== GETTERS =====
-    public ImuHelper       getImuHelper()       { return imuHelper; }
+    // Retourne l'instance IMU (accès pour PDR/pas/azimut).
+    public ImuHelper getImuHelper() { return imuHelper; }
+
+    // Retourne le filtre de stabilité (confirmation de salle).
     public StabilityFilter getStabilityFilter() { return stabilityFilter; }
 }

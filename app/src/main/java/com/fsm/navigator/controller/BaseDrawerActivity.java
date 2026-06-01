@@ -118,6 +118,34 @@ public abstract class BaseDrawerActivity extends AppCompatActivity {
         }
     }
 
+    protected void setupSheetSwipe(View sheet) {
+        if (sheet == null) return;
+        View handle = sheet.findViewById(R.id.handleDismiss);
+        if (handle == null) return;
+        final float[] startY = {0};
+        handle.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case android.view.MotionEvent.ACTION_DOWN:
+                    startY[0] = event.getRawY();
+                    return true;
+                case android.view.MotionEvent.ACTION_MOVE:
+                    float dy = event.getRawY() - startY[0];
+                    if (dy > 0) sheet.setTranslationY(dy);
+                    return true;
+                case android.view.MotionEvent.ACTION_UP:
+                    float total = event.getRawY() - startY[0];
+                    if (total > 150) {
+                        sheet.setTranslationY(0);
+                        sheet.setVisibility(View.GONE);
+                    } else {
+                        sheet.animate().translationY(0).setDuration(150).start();
+                    }
+                    return true;
+            }
+            return false;
+        });
+    }
+
     protected void setupHamburger(int btnId) {
         ImageButton btn = findViewById(btnId);
         if (btn != null) btn.setOnClickListener(v -> toggleDrawer());

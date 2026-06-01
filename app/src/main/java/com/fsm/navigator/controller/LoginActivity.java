@@ -4,15 +4,10 @@ import com.fsm.navigator.R;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.method.PasswordTransformationMethod;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.util.Patterns;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.text.method.HideReturnsTransformationMethod;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -21,20 +16,19 @@ import com.fsm.navigator.auth.PmrDialogHelper;
 import com.fsm.navigator.auth.PmrManager;
 import com.fsm.navigator.auth.TokenManager;
 import com.fsm.navigator.auth.TtsManager;
-import androidx.appcompat.widget.SwitchCompat;
-
-//Handles User Login and navigation to the main app
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.materialswitch.MaterialSwitch;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 public class LoginActivity extends AppCompatActivity {
 
-    // Vues
-    private EditText   etEmail, etPassword;
-    private Button     btnLogin;
-    private TextView   tvError, tvRegister, tvGuest;
+    private TextInputEditText etEmail, etPassword;
+    private TextInputLayout emailLayout, pwLayout;
+    private MaterialButton btnLogin;
+    private TextView tvError;
     private ProgressBar progressLogin;
-    private ImageButton btnTogglePassword;
-    private boolean passwordVisible = false;
-    private SwitchCompat switchPmr;
+    private MaterialSwitch switchPmr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,37 +42,25 @@ public class LoginActivity extends AppCompatActivity {
         initViews();
         setupListeners();
     }
+
     private void initViews() {
-        etEmail          = findViewById(R.id.etEmail);
-        etPassword       = findViewById(R.id.etPassword);
-        btnLogin         = findViewById(R.id.btnLogin);
-        tvError          = findViewById(R.id.tvError);
-        tvRegister       = findViewById(R.id.tvRegister);
-        tvGuest          = findViewById(R.id.tvGuest);
-        progressLogin    = findViewById(R.id.progressLogin);
-        btnTogglePassword= findViewById(R.id.btnTogglePassword);
-        switchPmr = findViewById(R.id.switchPmr);
+        emailLayout   = findViewById(R.id.emailLayout);
+        pwLayout      = findViewById(R.id.pwLayout);
+        etEmail       = findViewById(R.id.etEmail);
+        etPassword    = findViewById(R.id.etPassword);
+        btnLogin      = findViewById(R.id.btnLogin);
+        tvError       = findViewById(R.id.tvError);
+        progressLogin = findViewById(R.id.progressLogin);
+        switchPmr     = findViewById(R.id.switchPmr);
     }
+
     private void setupListeners() {
-        // Login
         btnLogin.setOnClickListener(v -> attemptLogin());
 
-        // Toggle password visibility
-        btnTogglePassword.setOnClickListener(v -> {
-            passwordVisible = !passwordVisible;
-            etPassword.setTransformationMethod(passwordVisible
-                ? HideReturnsTransformationMethod.getInstance()
-                : PasswordTransformationMethod.getInstance());
-            etPassword.setSelection(etPassword.getText().length());
-        });
+        ((MaterialButton) findViewById(R.id.tvRegister)).setOnClickListener(v ->
+                startActivity(new Intent(this, RegisterActivity.class)));
 
-        // Créer un compte → RegisterActivity
-        tvRegister.setOnClickListener(v -> {
-            startActivity(new Intent(this, RegisterActivity.class));
-        });
-
-        // Visiteur → MainActivity (avec dialog PMR si switch activé)
-        tvGuest.setOnClickListener(v -> {
+        ((MaterialButton) findViewById(R.id.tvGuest)).setOnClickListener(v -> {
             if (switchPmr.isChecked()) {
                 TtsManager.init(this);
                 PmrManager.setEnabled(true);
@@ -88,35 +70,35 @@ public class LoginActivity extends AppCompatActivity {
                 goToMain();
             }
         });
-
-        // PMR switch state is read at login time — no immediate side effect needed here.
     }
 
     private void attemptLogin() {
-        String email = etEmail.getText().toString().trim();
-        String password = etPassword.getText().toString().trim();
+        String email = text(etEmail);
+        String password = text(etPassword);
 
-        // Vérifier les champs
-        if (email.isEmpty()) showError("Veuillez entrer votre email");
-        else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) showError("Adresse email invalide");
-        else if (password.isEmpty()) showError("Veuillez entrer votre mot de passe");
+        emailLayout.setError(null);
+        pwLayout.setError(null);
+        tvError.setVisibility(View.GONE);
 
-        if (tvError.getVisibility() == View.VISIBLE) {
-            return;
+        boolean ok = true;
+        if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            emailLayout.setError("Adresse e-mail invalide");
+            ok = false;
         }
+        if (password.length() < 6) {
+            pwLayout.setError("Au moins 6 caractères");
+            ok = false;
+        }
+        if (!ok) return;
 
-        // Afficher le chargement
         setLoading(true);
 
-        // Appel API
         AuthService.login(email, password, new AuthService.AuthCallback() {
             @Override
             public void onSuccess(String token, String userEmail, String role) {
-                // Sauvegarder le token et les infos
                 TokenManager.saveToken(LoginActivity.this, token);
                 TokenManager.saveEmail(LoginActivity.this, userEmail);
                 TokenManager.saveRole(LoginActivity.this, role);
-
                 setLoading(false);
                 if (switchPmr.isChecked()) {
                     TtsManager.init(LoginActivity.this);
@@ -136,6 +118,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
     private void showError(String message) {
         tvError.setText(message);
         tvError.setVisibility(View.VISIBLE);
@@ -152,5 +135,9 @@ public class LoginActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    private static String text(TextInputEditText e) {
+        return e.getText() == null ? "" : e.getText().toString().trim();
     }
 }

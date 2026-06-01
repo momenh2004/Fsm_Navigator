@@ -2,7 +2,11 @@ package com.fsm.navigator.controller;
 
 import com.fsm.navigator.R;
 
+import android.Manifest;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -15,7 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,6 +41,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -47,15 +54,38 @@ import java.util.List;
  */
 public class NavigationActivity extends AppCompatActivity {
 
-    private static final String BASE_URL = AppConfig.BASE_URL;
+    private static final String BASE_URL            = AppConfig.BASE_URL;
+    private static final int    PERMISSION_REQUEST_NAV = 102;
+
+    private static final java.util.Map<String, String> BLOC_NAMES =
+            new java.util.HashMap<String, String>() {{
+        put("PCOUR", "Portail principal");     put("COUR",  "Cour centrale");
+        put("B1",    "Bloc 1 (Palestine)");    put("B2",    "Bloc 2");
+        put("B3",    "Bloc 3 (Informatique)"); put("B4",    "Bloc 4");
+        put("BM",    "Bloc Mathématiques");    put("BP1",   "Bât. Physique 1");
+        put("BP2",   "Bât. Physique 2");       put("BC1",   "Bât. Chimie 1");
+        put("BC2",   "Bât. Chimie 2");         put("BIB",   "Bibliothèque");
+        put("ADM",   "Administration");        put("INF",   "Infirmerie");
+        put("STH",   "STH");                   put("D1",    "Département 1");
+        put("D2",    "Département 2");         put("BC",    "Bât. Central");
+        put("A1-6",  "Amphithéâtres 1-6");
+    }};
 
     // ── Mode navigation ──────────────────────────────────────
     private NavigationView    navView;
     private NavigationManager navManager;
     private ImageButton       btnBack, btnStop;
     private TextView          tvDestination, tvInstruction, tvDistance, tvStatus;
-    private CardView          cardInstruction;
+    private View              cardInstruction;
     private View              progressNav;
+
+    // ── Mode extérieur ──────────────────────────────────────
+    private View                        layoutOutdoor;
+    private com.fsm.navigator.view.FsmMapView mapViewOutdoor;
+    private TextView                    tvOutdoorDestination;
+    private LinearLayout                layoutOutdoorSteps;
+    private com.google.android.material.button.MaterialButton btnArrive;
+    private View                        btnStopOutdoor;
 
     // ── Mode recherche ───────────────────────────────────────
     private LinearLayout      layoutSearch, layoutNavigation;
@@ -64,12 +94,16 @@ public class NavigationActivity extends AppCompatActivity {
     private TextView          tvSearchEmpty;
     private View              progressSearch;
 
-    private String targetNodeId;
-    private String targetNom;
-    private String targetBlocId;
+    private String  targetNodeId;
+    private String  targetNom;
+    private String  targetBlocId;
+    private boolean isOfflineMode = false;
 
     private List<PointInteret> allPoi      = new ArrayList<>();
     private List<PointInteret> filteredPoi = new ArrayList<>();
+
+    private final Handler   safetyHandler  = new Handler(Looper.getMainLooper());
+    private       Runnable  safetyRunnable = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,7 +139,8 @@ public class NavigationActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (navManager != null) navManager.stopNavigation();
+        if (navManager    != null) navManager.stopNavigation();
+        if (safetyRunnable != null) safetyHandler.removeCallbacks(safetyRunnable);
     }
 
     // =========================================================
@@ -121,6 +156,14 @@ public class NavigationActivity extends AppCompatActivity {
         cardInstruction = findViewById(R.id.cardNavInstruction);
         progressNav     = findViewById(R.id.progressNav);
 
+        // Extérieur
+        layoutOutdoor       = findViewById(R.id.layoutOutdoor);
+        mapViewOutdoor      = findViewById(R.id.mapViewOutdoor);
+        tvOutdoorDestination= findViewById(R.id.tvOutdoorDestination);
+        layoutOutdoorSteps  = findViewById(R.id.layoutOutdoorSteps);
+        btnArrive           = findViewById(R.id.btnArrive);
+        btnStopOutdoor      = findViewById(R.id.btnStopOutdoor);
+
         // Recherche
         layoutSearch    = findViewById(R.id.layoutSearch);
         layoutNavigation= findViewById(R.id.layoutNavigation);
@@ -134,7 +177,10 @@ public class NavigationActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
-        if (btnBack != null) btnBack.setOnClickListener(v -> finish());
+        setupSheetSwipe(cardInstruction);
+        if (btnBack        != null) btnBack.setOnClickListener(v -> finish());
+        if (btnStopOutdoor != null) btnStopOutdoor.setOnClickListener(v -> finish());
+        if (btnArrive      != null) btnArrive.setOnClickListener(v -> startIndoorOfflineNavigation());
         if (btnStop != null) btnStop.setOnClickListener(v -> {
             if (navManager != null) navManager.stopNavigation();
             // Retour à la recherche
@@ -398,17 +444,13 @@ public class NavigationActivity extends AppCompatActivity {
         targetNom = poi.getNom();
         targetBlocId = blocCode;
 
-        // Important : informer la vue du bon bloc
         navView.setBlocId(blocCode);
-
-        // Vérification rapide
-        NavigationGraph testGraph = new NavigationGraph();
-        boolean exists = testGraph.getNode(nodeId) != null;
-        Log.d("NAV_ACT", "Node existe dans graphe ? " + exists);
-        Toast.makeText(this, "Navigation vers " + nodeId + (exists ? "" : " (inexistant)"), Toast.LENGTH_SHORT).show();
-
         showNavigationMode();
+
         navManager = new NavigationManager(this);
+        Log.d("NAV_ACT", "Node existe dans graphe ? " + (navManager.getGraph().getNode(nodeId) != null)
+                + " (" + nodeId + ")");
+
         if (!navManager.isConnectedToFsmWifi()) {
             showOfflineDialog();
         } else {
@@ -419,19 +461,155 @@ public class NavigationActivity extends AppCompatActivity {
     // =========================================================
     // NAVIGATION
     // =========================================================
+    private boolean hasLocationPermission() {
+        return ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
     private void startNavigation() {
+        if (!hasLocationPermission()) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSION_REQUEST_NAV);
+            return;
+        }
         if (progressNav != null) progressNav.setVisibility(View.VISIBLE);
         if (tvStatus    != null) tvStatus.setText("Localisation en cours...");
 
-        navManager = new NavigationManager(this);
+        // Safety net: if the server doesn't respond within 5 s, jump to offline mode.
+        // This fires regardless of what the network stack does (timeouts, hangs, etc.).
+        if (safetyRunnable != null) safetyHandler.removeCallbacks(safetyRunnable);
+        safetyRunnable = () -> {
+            if (progressNav != null && progressNav.getVisibility() == View.VISIBLE) {
+                if (navManager != null) navManager.stopNavigation();
+                showOfflineDialog();
+            }
+        };
+        safetyHandler.postDelayed(safetyRunnable, 5000);
+
         navManager.startNavigation(targetNodeId, targetNom, buildCallback());
     }
 
+    @Override
+    public void onRequestPermissionsResult(int code, String[] perms, int[] results) {
+        super.onRequestPermissionsResult(code, perms, results);
+        if (code == PERMISSION_REQUEST_NAV) {
+            if (results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED) {
+                startNavigation();
+            } else {
+                showOfflineDialog();
+            }
+        }
+    }
+
     private void startOfflineNavigation() {
-        if (progressNav != null) progressNav.setVisibility(View.VISIBLE);
-        if (tvStatus    != null) tvStatus.setText("Mode hors ligne...");
-        navManager = new NavigationManager(this);
+        isOfflineMode = true;
+        // Si le bloc cible n'est pas l'entrée principale, montrer le trajet extérieur d'abord
+        if (targetBlocId != null && !targetBlocId.equals("PCOUR") && !targetBlocId.equals("COUR")) {
+            List<String> campusPath = buildCampusPath("PCOUR", targetBlocId);
+            if (campusPath != null && campusPath.size() > 1) {
+                showOutdoorPhase(campusPath);
+                return;
+            }
+        }
+        startIndoorOfflineNavigation();
+    }
+
+    private void startIndoorOfflineNavigation() {
+        if (layoutOutdoor    != null) layoutOutdoor.setVisibility(View.GONE);
+        if (layoutNavigation != null) layoutNavigation.setVisibility(View.VISIBLE);
+        if (progressNav      != null) progressNav.setVisibility(View.VISIBLE);
+        if (tvStatus         != null) tvStatus.setText("Phase 2 — Navigation intérieure...");
         navManager.startOfflineNavigation(targetNodeId, targetNom, buildCallback());
+    }
+
+    private void showOutdoorPhase(List<String> path) {
+        String blocName = BLOC_NAMES.getOrDefault(targetBlocId, targetBlocId);
+
+        // Carte avec chemin surligné
+        if (mapViewOutdoor != null) mapViewOutdoor.setNavigationPath(path);
+
+        // Texte destination
+        if (tvOutdoorDestination != null) tvOutdoorDestination.setText(blocName);
+
+        // Bouton arrivée
+        if (btnArrive != null) btnArrive.setText("Je suis arrivé au " + blocName);
+
+        // Générer les étapes textuelles
+        buildOutdoorStepViews(path);
+
+        // Afficher le mode extérieur
+        if (layoutSearch     != null) layoutSearch.setVisibility(View.GONE);
+        if (layoutNavigation != null) layoutNavigation.setVisibility(View.GONE);
+        if (layoutOutdoor    != null) layoutOutdoor.setVisibility(View.VISIBLE);
+    }
+
+    private void buildOutdoorStepViews(List<String> path) {
+        if (layoutOutdoorSteps == null) return;
+        layoutOutdoorSteps.removeAllViews();
+        android.graphics.Typeface tf = androidx.core.content.res.ResourcesCompat.getFont(this, R.font.plex_sans);
+
+        for (int i = 0; i < path.size() - 1; i++) {
+            String from = BLOC_NAMES.getOrDefault(path.get(i),   path.get(i));
+            String to   = BLOC_NAMES.getOrDefault(path.get(i+1), path.get(i+1));
+
+            android.widget.TextView tv = new android.widget.TextView(this);
+            tv.setText((i + 1) + ".  " + from + "  →  " + to);
+            tv.setTextColor(getColor(R.color.text_secondary));
+            tv.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 14);
+            tv.setLineSpacing(0, 1.4f);
+            if (tf != null) tv.setTypeface(tf);
+            android.widget.LinearLayout.LayoutParams lp =
+                    new android.widget.LinearLayout.LayoutParams(
+                            android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+            lp.bottomMargin = dp(8);
+            tv.setLayoutParams(lp);
+            layoutOutdoorSteps.addView(tv);
+        }
+    }
+
+    // BFS sur le graphe campus (même logique que MapActivity)
+    private List<String> buildCampusPath(String from, String to) {
+        if (from.equals(to)) return java.util.Collections.singletonList(from);
+        java.util.Map<String, List<String>> adj = new java.util.HashMap<>();
+        adj.put("PCOUR", java.util.Arrays.asList("COUR", "ADM", "B1"));
+        adj.put("COUR",  java.util.Arrays.asList("PCOUR", "A1-6", "BIB", "BP1"));
+        adj.put("A1-6",  java.util.Arrays.asList("COUR", "B2", "BM", "BC1"));
+        adj.put("B2",    java.util.Arrays.asList("A1-6", "BC1", "BM"));
+        adj.put("BM",    java.util.Arrays.asList("COUR", "BIB", "A1-6", "BC"));
+        adj.put("BIB",   java.util.Arrays.asList("BM", "COUR", "BC"));
+        adj.put("BC1",   java.util.Arrays.asList("A1-6", "B2", "BP1", "BC2"));
+        adj.put("BP1",   java.util.Arrays.asList("COUR", "BC1", "BP2"));
+        adj.put("BC2",   java.util.Arrays.asList("BC1", "BP2", "B3"));
+        adj.put("BP2",   java.util.Arrays.asList("BP1", "BC2", "B1", "B4"));
+        adj.put("B3",    java.util.Arrays.asList("B2", "BC2", "B4"));
+        adj.put("B4",    java.util.Arrays.asList("B3", "BP2", "BC2"));
+        adj.put("B1",    java.util.Arrays.asList("PCOUR", "BP2"));
+        adj.put("ADM",   java.util.Arrays.asList("PCOUR", "INF"));
+        adj.put("INF",   java.util.Arrays.asList("ADM", "STH"));
+        adj.put("STH",   java.util.Arrays.asList("INF", "D1", "D2"));
+        adj.put("D1",    java.util.Arrays.asList("STH", "D2", "BC"));
+        adj.put("D2",    java.util.Arrays.asList("STH", "D1", "BC"));
+        adj.put("BC",    java.util.Arrays.asList("D1", "D2", "BIB", "BM"));
+
+        java.util.Map<String, String> parent = new java.util.HashMap<>();
+        java.util.Queue<String> queue = new java.util.LinkedList<>();
+        queue.add(from);
+        parent.put(from, null);
+        while (!queue.isEmpty()) {
+            String cur = queue.poll();
+            if (cur.equals(to)) {
+                List<String> path = new java.util.ArrayList<>();
+                String node = to;
+                while (node != null) { path.add(0, node); node = parent.get(node); }
+                return path;
+            }
+            for (String n : adj.getOrDefault(cur, java.util.Collections.emptyList())) {
+                if (!parent.containsKey(n)) { parent.put(n, cur); queue.add(n); }
+            }
+        }
+        return null;
     }
 
     private NavigationManager.NavigationCallback buildCallback() {
@@ -440,38 +618,54 @@ public class NavigationActivity extends AppCompatActivity {
             @Override
             public void onPositionUpdated(NavigationNode current,
                                           NavigationGraph.NavPath path) {
-                Log.d("CALLBACK", "onPositionUpdated called, path=" + (path != null ? path.nodes.size() : "null"));
-                if (progressNav != null) progressNav.setVisibility(View.GONE);
-                NavigationNode destNode = navManager.getGraph().getNode(targetNodeId);
-                navView.setBlocId(path.nodes.get(0).blocId);
-                navView.setNavigationData(navManager.getGraph(), path, current, destNode);
-                if (path != null && !path.instructions.isEmpty()) {
-                    String instruction = path.instructions.get(0);
-                    if (tvInstruction != null) tvInstruction.setText(instruction);
-                    if (tvDistance    != null) tvDistance.setText(
-                            String.format("%.0f m restants", path.totalDistance));
+                Log.d("CALLBACK", "onPositionUpdated: " + path.nodes.size() + " nœuds");
+                try {
+                    if (progressNav != null) progressNav.setVisibility(View.GONE);
+                    NavigationNode destNode = navManager.getGraph().getNode(targetNodeId);
+
+                    if (navView != null && !path.nodes.isEmpty()) {
+                        navView.setBlocId(path.nodes.get(0).blocId);
+                        navView.setNavigationData(navManager.getGraph(), path, current, destNode);
+                    }
+
                     if (cardInstruction != null) cardInstruction.setVisibility(View.VISIBLE);
-                    TtsManager.speak(instruction);
+                    if (tvStatus        != null) tvStatus.setText("📍 " + current.nom);
+
+                    if (isOfflineMode) {
+                        if (tvInstruction != null) tvInstruction.setText(
+                                "Voici l'itinéraire hors ligne vers " + targetNom);
+                        if (tvDistance != null) tvDistance.setText(
+                                String.format("%.0f m", path.totalDistance));
+                    } else if (!path.instructions.isEmpty()) {
+                        String instruction = path.instructions.get(0);
+                        if (tvInstruction != null) tvInstruction.setText(instruction);
+                        if (tvDistance    != null) tvDistance.setText(
+                                String.format("%.0f m restants", path.totalDistance));
+                        try { TtsManager.speak(instruction); } catch (Exception ignored) {}
+                    }
+                } catch (Exception e) {
+                    Log.e("CALLBACK", "Erreur onPositionUpdated", e);
+                    showError("Erreur d'affichage : " + e.getMessage());
                 }
-                if (tvStatus != null) tvStatus.setText("📍 " + current.nom);
             }
 
             @Override
             public void onArrived(String destination) {
                 if (progressNav     != null) progressNav.setVisibility(View.GONE);
+                if (cardInstruction != null) cardInstruction.setVisibility(View.VISIBLE);
                 if (tvInstruction   != null) tvInstruction.setText("Vous êtes arrivé à " + destination + " !");
                 if (tvDistance      != null) tvDistance.setText("0 m");
                 if (tvStatus        != null) tvStatus.setText("Destination atteinte");
-                if (cardInstruction != null) cardInstruction.setVisibility(View.VISIBLE);
-                TtsManager.speak("Vous êtes arrivé à " + destination + " !");
+                try { TtsManager.speak("Vous êtes arrivé à " + destination + " !"); }
+                catch (Exception ignored) {}
                 Toast.makeText(getApplicationContext(),
                         "Vous êtes arrivé à " + destination, Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onError(String message) {
-                if (progressNav != null) progressNav.setVisibility(View.GONE);
-                if (tvStatus    != null) tvStatus.setText("⚠️ " + message);
+                Log.e("CALLBACK", "onError: " + message);
+                showError(message);
             }
 
             @Override
@@ -479,31 +673,66 @@ public class NavigationActivity extends AppCompatActivity {
                 if (progressNav != null) progressNav.setVisibility(View.GONE);
                 showOfflineDialog();
             }
-
         };
+    }
 
+    private void showError(String message) {
+        if (progressNav     != null) progressNav.setVisibility(View.GONE);
+        if (cardInstruction != null) cardInstruction.setVisibility(View.VISIBLE);
+        if (tvStatus        != null) tvStatus.setText("⚠️ " + message);
+        if (tvInstruction   != null) tvInstruction.setText(message);
+        if (tvDistance      != null) tvDistance.setText("");
     }
 
     private void showOfflineDialog() {
+        if (isFinishing() || isDestroyed()) return;
         new android.app.AlertDialog.Builder(this)
-                .setTitle("⚠️ WiFi FSM non détecté")
+                .setTitle("WiFi FSM non détecté")
                 .setMessage("Vous n'êtes pas connecté au WiFi FSM.\n\nVoulez-vous voir le chemin hors ligne ?")
                 .setPositiveButton("Voir le chemin", (d, w) -> {
                     showNavigationMode();
                     startOfflineNavigation();
                 })
                 .setNegativeButton("Annuler", (d, w) -> {
-                    if (tvStatus != null)
-                        tvStatus.setText("Connectez-vous au WiFi FSM et réessayez");
-                    if (cardInstruction != null) {
-                        cardInstruction.setVisibility(View.VISIBLE);
-                        if (tvInstruction != null)
-                            tvInstruction.setText("📶 Connectez-vous au WiFi FSM et réessayez");
-                        if (tvDistance != null) tvDistance.setText("");
-                    }
+                    showError("Connectez-vous au WiFi FSM et réessayez");
                 })
-                .setCancelable(false)
+                .setCancelable(true)
                 .show();
+    }
+
+    private void setupSheetSwipe(View sheet) {
+        if (sheet == null) return;
+        final float[] startY = {0};
+        android.view.View.OnTouchListener swipe = (v, event) -> {
+            switch (event.getAction()) {
+                case android.view.MotionEvent.ACTION_DOWN:
+                    startY[0] = event.getRawY();
+                    return true;
+                case android.view.MotionEvent.ACTION_MOVE:
+                    float dy = event.getRawY() - startY[0];
+                    sheet.setTranslationY(dy);
+                    return true;
+                case android.view.MotionEvent.ACTION_UP:
+                    float total = event.getRawY() - startY[0];
+                    if (Math.abs(total) > 150) {
+                        sheet.animate()
+                                .translationY(total > 0 ? sheet.getHeight() : -sheet.getHeight())
+                                .setDuration(200)
+                                .withEndAction(() -> {
+                                    sheet.setVisibility(View.GONE);
+                                    sheet.setTranslationY(0);
+                                })
+                                .start();
+                    } else {
+                        sheet.animate().translationY(0).setDuration(150).start();
+                    }
+                    return true;
+            }
+            return false;
+        };
+        sheet.setOnTouchListener(swipe);
+        View handle = sheet.findViewById(R.id.handleDismiss);
+        if (handle != null) handle.setOnTouchListener(swipe);
     }
 
     private int dp(int v) {

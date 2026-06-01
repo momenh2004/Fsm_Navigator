@@ -32,6 +32,7 @@ public class ProfileActivity extends BaseDrawerActivity {
     private TextView     tvClearHistory, tvHistoryEmpty;
     private LinearLayout layoutHistoryItems;
     private LinearLayout btnChangePassword, btnLogout, btnDeleteAccount;
+    private LinearLayout btnToggleFavoris, btnToggleHistory;
 
     // Favoris
     private LinearLayout layoutFavorisItems;
@@ -75,6 +76,8 @@ public class ProfileActivity extends BaseDrawerActivity {
         layoutFavorisItems= findViewById(R.id.layoutFavorisItems);
         tvFavorisEmpty    = findViewById(R.id.tvFavorisEmpty);
         progressFavoris   = findViewById(R.id.progressFavoris);
+        btnToggleFavoris  = findViewById(R.id.btnToggleFavoris);
+        btnToggleHistory  = findViewById(R.id.btnToggleHistory);
     }
 
     private void loadUserData() {
@@ -253,6 +256,24 @@ public class ProfileActivity extends BaseDrawerActivity {
     }
 
     private void setupListeners() {
+        // Toggle sections dépliables
+        if (btnToggleFavoris != null && layoutFavorisItems != null) {
+            btnToggleFavoris.setOnClickListener(v -> {
+                boolean visible = layoutFavorisItems.getVisibility() == View.VISIBLE;
+                layoutFavorisItems.setVisibility(visible ? View.GONE : View.VISIBLE);
+                View chevron = btnToggleFavoris.findViewById(R.id.chevronFavoris);
+                if (chevron != null) chevron.setRotation(visible ? 0 : 90);
+            });
+        }
+        if (btnToggleHistory != null && layoutHistoryItems != null) {
+            btnToggleHistory.setOnClickListener(v -> {
+                boolean visible = layoutHistoryItems.getVisibility() == View.VISIBLE;
+                layoutHistoryItems.setVisibility(visible ? View.GONE : View.VISIBLE);
+                View chevron = btnToggleHistory.findViewById(R.id.chevronHistory);
+                if (chevron != null) chevron.setRotation(visible ? 0 : 90);
+            });
+        }
+
         if (tvClearHistory != null) tvClearHistory.setOnClickListener(v -> {
             clearHistory(this);
             layoutHistoryItems.removeAllViews();

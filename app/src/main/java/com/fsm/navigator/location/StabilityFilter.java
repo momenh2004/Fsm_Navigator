@@ -17,46 +17,45 @@ package com.fsm.navigator.location;
  */
 public class StabilityFilter {
 
-    private static final int CONFIRM_THRESHOLD = 3;
+    // Somme de confidences nécessaire pour confirmer un changement de salle.
+    // Équivalent à ~2 scans à haute confiance (0.8+) ou ~3 scans moyens (0.55+).
+    private static final double CONFIRM_SCORE_THRESHOLD = 1.5;
 
     private String currentSalle   = null;
     private String candidateSalle = null;
-    private int    confirmCount   = 0;
+    private double confirmScore   = 0.0;
 
-    /**
-     * Met à jour le filtre avec la nouvelle salle détectée.
-     * @param detected  Salle détectée par le Weighted k-NN
-     * @return          Salle stable (après filtrage)
-     */
-    public String update(String detected) {
+    // Met à jour le filtre avec la salle détectée (confirme changement si score ≥ seuil).
+    public String update(String detected, double confidence) {
         if (detected == null) return currentSalle;
 
         // Déjà dans la salle actuelle → pas de changement
         if (detected.equals(currentSalle)) {
-            confirmCount  = 0;
+            confirmScore   = 0.0;
             candidateSalle = null;
             return currentSalle;
         }
 
-        // Même candidat qu'avant → incrémenter le compteur
+        // Même candidat → accumuler le score de confiance
         if (detected.equals(candidateSalle)) {
-            confirmCount++;
-            if (confirmCount >= CONFIRM_THRESHOLD) {
-                // Changement confirmé
+            confirmScore += confidence;
+            if (confirmScore >= CONFIRM_SCORE_THRESHOLD) {
                 currentSalle   = detected;
                 candidateSalle = null;
-                confirmCount   = 0;
+                confirmScore   = 0.0;
             }
         } else {
-            // Nouveau candidat → réinitialiser
+            // Nouveau candidat → réinitialiser avec la confiance du premier scan
             candidateSalle = detected;
-            confirmCount   = 1;
+            confirmScore   = confidence;
         }
 
-        // Retourner la salle actuelle stable
         return currentSalle != null ? currentSalle : detected;
     }
 
-    public String getCurrentSalle()   { return currentSalle; }
-    public void   reset()             { currentSalle = null; candidateSalle = null; confirmCount = 0; }
+    // Retourne la salle stable (confirmée).
+    public String getCurrentSalle() { return currentSalle; }
+
+    // Réinitialise le filtre de stabilité.
+    public void reset() { currentSalle = null; candidateSalle = null; confirmScore = 0.0; }
 }

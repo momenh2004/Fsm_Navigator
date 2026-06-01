@@ -35,9 +35,7 @@ public class AuthService {
         void onError(String message);
     }
 
-    // =========================================================
-    // LOGIN
-    // =========================================================
+    // Authentifie l'utilisateur et récupère le token JWT (POST /api/auth/login).
     public static void login(String email, String password, AuthCallback callback) {
         new AsyncTask<Void, Void, String[]>() {
             @Override
@@ -85,9 +83,7 @@ public class AuthService {
         }.execute();
     }
 
-    // =========================================================
-    // REGISTER
-    // =========================================================
+    // Crée un compte utilisateur (POST /api/auth/register).
     public static void register(String email, String password, AuthCallback callback) {
         new AsyncTask<Void, Void, String[]>() {
             @Override
@@ -136,9 +132,7 @@ public class AuthService {
         }.execute();
     }
 
-    // =========================================================
-    // CHANGE PASSWORD
-    // =========================================================
+    // Change le mot de passe utilisateur (POST /api/auth/change-password avec JWT).
     public static void changePassword(String token, String oldPassword,
                                       String newPassword, SimpleCallback callback) {
         new AsyncTask<Void, Void, String[]>() {
@@ -183,17 +177,7 @@ public class AuthService {
         }.execute();
     }
 
-    // =========================================================
-    // HELPER
-    // =========================================================
-    private static String readResponse(java.io.InputStream stream) throws Exception {
-        BufferedReader br = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
-        StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = br.readLine()) != null) sb.append(line);
-        br.close();
-        return sb.toString();
-    }
+    // Supprime le compte utilisateur (DELETE /api/auth/account avec JWT).
     public static void deleteAccount(String token, SimpleCallback callback) {
         new AsyncTask<Void, Void, String[]>() {
             @Override
@@ -225,5 +209,15 @@ public class AuthService {
                 else callback.onError(result[1]);
             }
         }.execute();
+    }
+
+    // Lit la réponse HTTP en UTF-8.
+    private static String readResponse(java.io.InputStream stream) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = br.readLine()) != null) sb.append(line);
+        br.close();
+        return sb.toString();
     }
 }

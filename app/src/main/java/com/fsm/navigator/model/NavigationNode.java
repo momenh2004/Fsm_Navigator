@@ -25,6 +25,7 @@ public class NavigationNode {
     public Type   type;
     public List<Edge> voisins = new ArrayList<>();
 
+    // Constructeur du nœud avec ses coordonnées et étage.
     public NavigationNode(String id, String nom, String blocId,
                           int etage, float x, float y, Type type) {
         this.id     = id;
@@ -36,7 +37,7 @@ public class NavigationNode {
         this.type   = type;
     }
 
-    // ===== ARÊTE =====
+    // Représente une arête vers un voisin (destination + coût + instruction).
     public static class Edge {
         public NavigationNode destination;
         public float          cost;       // distance en mètres
@@ -49,20 +50,20 @@ public class NavigationNode {
         }
     }
 
-    // Ajouter un voisin bidirectionnel
+    // Crée une arête bidirectionnelle entre deux nœuds (a↔b).
     public static void connect(NavigationNode a, NavigationNode b,
                                float cost, String instrAB, String instrBA) {
         a.voisins.add(new Edge(b, cost, instrAB));
         b.voisins.add(new Edge(a, cost, instrBA));
     }
 
-    // Ajouter un voisin UNIDIRECTIONNEL (a → b seulement)
+    // Crée une arête unidirectionnelle (a→b seulement).
     public static void connectOne(NavigationNode a, NavigationNode b,
                                   float cost, String instrAB) {
         a.voisins.add(new Edge(b, cost, instrAB));
     }
 
-    // Distance euclidienne (heuristique A*)
+    // Calcule la distance euclidienne (heuristique h() pour A*).
     public float distanceTo(NavigationNode other) {
         float dx = this.x - other.x;
         float dy = this.y - other.y;

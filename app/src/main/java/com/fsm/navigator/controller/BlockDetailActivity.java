@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import androidx.cardview.widget.CardView;
 
 import com.fsm.navigator.model.NavigationGraph;
 import com.fsm.navigator.view.BlocDetailView;
@@ -23,8 +22,8 @@ public class BlockDetailActivity extends BaseDrawerActivity {
     private TextView       tvBlocTitle, tvBlocSubtitle, tvSalleNom, tvSalleDetails;
     private ImageButton    btnBack, btnHamburger;
     private BlocDetailView blocDetailView;
-    private LinearLayout   btnNavigerSalle;
-    private CardView cardSalleInfo;
+    private android.view.View btnNavigerSalle;
+    private android.view.View cardSalleInfo;
     private TextView       btnRDC, btnEtage1;
 
     private String blocId, blocNom;
@@ -82,26 +81,28 @@ public class BlockDetailActivity extends BaseDrawerActivity {
 
     // =========================================================
     private void setupListeners() {
+        setupSheetSwipe(cardSalleInfo);
+
         // Bouton retour
         if (btnBack != null) btnBack.setOnClickListener(v -> finish());
 
         // Sélecteur d'étage
         if (btnRDC != null) btnRDC.setOnClickListener(v -> {
             blocDetailView.setEtage(0);
-            btnRDC.setBackgroundResource(R.drawable.bg_filter_selected);
-            btnRDC.setTextColor(getResources().getColor(R.color.accent_cyan, null));
+            btnRDC.setBackgroundResource(R.drawable.bg_chip_active);
+            btnRDC.setTextColor(getResources().getColor(R.color.on_accent, null));
             if (btnEtage1 != null) {
-                btnEtage1.setBackgroundResource(R.drawable.bg_filter_unselected);
+                btnEtage1.setBackgroundResource(R.drawable.bg_chip_inactive);
                 btnEtage1.setTextColor(getResources().getColor(R.color.text_secondary, null));
             }
         });
 
         if (btnEtage1 != null) btnEtage1.setOnClickListener(v -> {
             blocDetailView.setEtage(1);
-            btnEtage1.setBackgroundResource(R.drawable.bg_filter_selected);
-            btnEtage1.setTextColor(getResources().getColor(R.color.accent_cyan, null));
+            btnEtage1.setBackgroundResource(R.drawable.bg_chip_active);
+            btnEtage1.setTextColor(getResources().getColor(R.color.on_accent, null));
             if (btnRDC != null) {
-                btnRDC.setBackgroundResource(R.drawable.bg_filter_unselected);
+                btnRDC.setBackgroundResource(R.drawable.bg_chip_inactive);
                 btnRDC.setTextColor(getResources().getColor(R.color.text_secondary, null));
             }
         });

@@ -5,8 +5,6 @@ import com.fsm.navigator.R;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -14,17 +12,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.fsm.navigator.auth.AuthService;
 import com.fsm.navigator.auth.TokenManager;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Random;
 
-/**
- * RegisterActivity.java – Inscription avec captcha mathématique
- */
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText    etEmail, etPassword, etConfirmPassword, etCaptcha;
-    private Button      btnRegister;
-    private TextView    tvError, tvBackToLogin, tvCaptchaQuestion;
+    private TextInputEditText etEmail, etPassword, etConfirmPassword, etCaptcha;
+    private MaterialButton    btnRegister, tvBackToLogin;
+    private TextView          tvError, tvCaptchaQuestion;
     private ProgressBar progressRegister;
 
     private int captchaAnswer;

@@ -4,17 +4,12 @@ import com.fsm.navigator.AppConfig;
 import com.fsm.navigator.model.NavigationGraph;
 import com.fsm.navigator.model.NavigationNode;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.net.wifi.ScanResult;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-
-import androidx.core.app.ActivityCompat;
 
 import com.fsm.navigator.location.KalmanFilter;
 import com.fsm.navigator.location.WeightedKNN;
@@ -44,15 +39,11 @@ public class NavigationManager {
     private static final String  BASE_URL      = AppConfig.BASE_URL + "/api/fingerprints";
     private static final int     SCAN_INTERVAL = 4000;
 
-    // SSIDs reconnus comme étant le WiFi FSM
-    private static final String[] FSM_SSIDS = {
-            "FSM-WiFi", "FSM_WiFi", "fsm-wifi", "fsm_wifi",
-            "Universite-Monastir", "UM-WiFi", "FSM"
-    };
 
     private final Context         context;
-    private final NavigationGraph graph;
+    private       NavigationGraph graph;
     private final KalmanFilter    kalman;
+    private final WifiManager     wifiManager;
 
     private Handler  handler   = new Handler(Looper.getMainLooper());
     private Runnable scanRunnable;
@@ -63,7 +54,6 @@ public class NavigationManager {
 
     private NavigationNode currentNode = null;
     private List<WeightedKNN.Fingerprint> fingerprints = null;
-    private static final int PERMISSION_REQUEST_CODE = 100;
 
     // ===== CALLBACK =====
     public interface NavigationCallback {
@@ -75,15 +65,32 @@ public class NavigationManager {
 
     private NavigationCallback callback;
 
+    // Initialise le gestionnaire de navigation (graphe cache + rafraîchissement réseau).
     public NavigationManager(Context context) {
-        this.context = context;
-        this.graph   = new NavigationGraph();
-        this.kalman  = new KalmanFilter();
+        this.context     = context;
+        this.kalman      = new KalmanFilter();
+        this.wifiManager = (WifiManager) context.getApplicationContext()
+                .getSystemService(Context.WIFI_SERVICE);
+
+        NavigationGraphLoader loader = new NavigationGraphLoader();
+
+        // Chargement synchrone depuis le cache (instantané si disponible)
+        this.graph = loader.loadFromCache(context);
+        Log.d("NAV_MANAGER", "Cache : " + this.graph.getAllNodes().size() + " noeuds");
+
+        // Rafraîchissement en background depuis le réseau
+        new Thread(() -> {
+            try {
+                NavigationGraph loaded = loader.loadFromNetwork(context);
+                this.graph = loaded;
+                Log.d("NAV_MANAGER", "Graphe mis à jour depuis réseau : " + loaded.getAllNodes().size() + " noeuds");
+            } catch (Exception e) {
+                Log.w("NAV_MANAGER", "Réseau KO, graphe cache conservé");
+            }
+        }).start();
     }
 
-    // =========================================================
-    // DÉMARRER
-    // =========================================================
+    // Lance la navigation en ligne (localisation WiFi → A* → suivi temps réel).
     public void startNavigation(String targetNodeId, String targetNom,
                                 NavigationCallback callback) {
         this.targetNodeId = targetNodeId;
@@ -100,109 +107,88 @@ public class NavigationManager {
         new Thread(() -> {
             try {
                 if (fingerprints == null) fingerprints = fetchFingerprints();
+                if (fingerprints.isEmpty()) {
+                    // Server reachable but no fingerprint data → offer offline mode
+                    handler.post(() -> callback.onNotOnFsmWifi());
+                    return;
+                }
                 startScanLoop();
             } catch (Exception e) {
-                handler.post(() -> callback.onError("Impossible de charger les données"));
+                // Server unreachable (timeout, refused, wrong network) → offer offline mode
+                handler.post(() -> callback.onNotOnFsmWifi());
             }
         }).start();
     }
 
-    /**
-     * Mode hors ligne : calcule directement le chemin A* sans localisation WiFi.
-     * Utilise le nœud d'entrée du bloc comme position de départ.
-     */
+    // Lance la navigation hors ligne (A* direct depuis entrée du bloc, sans WiFi).
     public void startOfflineNavigation(String targetNodeId, String targetNom,
                                        NavigationCallback callback) {
-        Log.d("OFFLINE", "startOfflineNavigation appelé, targetNodeId=" + targetNodeId);
         this.targetNodeId = targetNodeId;
         this.targetNom    = targetNom;
         this.callback     = callback;
         this.isRunning    = false;
 
-        // 1. Récupérer le nœud destination
+        if (graph == null || graph.getAllNodes().isEmpty()) {
+            graph = NavigationGraph.buildFallback();
+        }
+        computeOfflinePath(targetNodeId, targetNom, callback);
+    }
+
+    private void computeOfflinePath(String targetNodeId, String targetNom,
+                                    NavigationCallback callback) {
+        Log.d("OFFLINE", "computeOfflinePath, targetNodeId=" + targetNodeId);
+
         NavigationNode targetNode = graph.getNode(targetNodeId);
         Log.d("OFFLINE", "targetNode = " + (targetNode != null ? targetNode.nom : "null"));
         if (targetNode == null) {
-            handler.post(() -> callback.onError("Destination inconnue : " + targetNodeId));
+            callback.onError("Destination inconnue : " + targetNodeId);
             return;
         }
 
-        // 2. Utiliser son blocId réel (ex: "BPAL")
         String blocId = targetNode.blocId;
-        Log.d("OFFLINE", "blocId = " + blocId);
-
-        // 3. Trouver l'entrée du bloc
-        NavigationNode entree = graph.findEntree(blocId);
-        Log.d("OFFLINE", "entree = " + (entree != null ? entree.id : "null"));
-        if (entree == null) {
-            entree = graph.findAnyNodeInBloc(blocId);
-            Log.d("OFFLINE", "findAnyNodeInBloc = " + (entree != null ? entree.id : "null"));
+        if (blocId == null || blocId.isEmpty()) {
+            callback.onError("Bloc introuvable pour : " + targetNodeId);
+            return;
         }
+        NavigationNode entree = graph.findEntree(blocId);
+        if (entree == null) entree = graph.findAnyNodeInBloc(blocId);
         if (entree == null) {
-            handler.post(() -> callback.onError("Point de départ introuvable pour " + blocId));
+            callback.onError("Point de départ introuvable pour " + blocId);
             return;
         }
 
         final NavigationNode startNode = entree;
-        Log.d("OFFLINE", "startNode.id = " + startNode.id + ", targetNode.id = " + targetNode.id);
+        Log.d("OFFLINE", "startNode=" + startNode.id + " → target=" + targetNode.id);
 
-
-        // 4. Calcul du chemin A*
         NavigationGraph.NavPath path = graph.findPath(startNode.id, targetNodeId);
-        Log.d("OFFLINE", "findPath retourne " + (path != null ? path.nodes.size() + " nœuds" : "null"));
+        Log.d("OFFLINE", "path = " + (path != null ? path.nodes.size() + " nœuds" : "null"));
 
-        handler.post(() -> {
-            currentNode = startNode;
-            if (path == null) {
-                Log.e("OFFLINE", "path est null, on appelle onError");
-                callback.onError("Chemin introuvable");
-                return;
-            }
-            Log.d("OFFLINE", "path OK, on appelle onPositionUpdated");
-            callback.onPositionUpdated(startNode, path);
-        });
-
+        currentNode = startNode;
+        if (path == null) {
+            callback.onError("Chemin introuvable");
+            return;
+        }
+        callback.onPositionUpdated(startNode, path);
     }
 
-    // =========================================================
-    // ARRÊTER
-    // =========================================================
+    // Arrête la boucle de scan et la navigation en cours.
     public void stopNavigation() {
         isRunning = false;
         if (scanRunnable != null) handler.removeCallbacks(scanRunnable);
     }
 
-    // =========================================================
-    // VÉRIFICATION WIFI FSM
-    // =========================================================
+    // Vérifie si l'appareil est connecté au WiFi FSM.
     public boolean isConnectedToFsmWifi() {
-        try {
-            WifiManager wm = (WifiManager) context.getApplicationContext()
-                    .getSystemService(Context.WIFI_SERVICE);
-            if (wm == null || !wm.isWifiEnabled()) return false;
-
-            WifiInfo info = wm.getConnectionInfo();
-            if (info == null) return false;
-
-            String ssid = info.getSSID();
-            if (ssid == null) return false;
-
-            ssid = ssid.replace("\"", "").trim();
-
-            for (String fsmSsid : FSM_SSIDS) {
-                if (ssid.equalsIgnoreCase(fsmSsid)) return true;
-            }
-            return false;
-
-        } catch (SecurityException e) {
-            // Permission non accordée → considérer comme non connecté
-            return false;
-        }
+        if (wifiManager == null || !wifiManager.isWifiEnabled()) return false;
+        android.net.wifi.WifiInfo info = wifiManager.getConnectionInfo();
+        if (info == null) return false;
+        String ssid = info.getSSID();
+        // Android wraps the SSID in quotes on some versions: "\"Wifi-FSM\""
+        return AppConfig.FSM_WIFI_SSID.equals(ssid)
+            || ("\"" + AppConfig.FSM_WIFI_SSID + "\"").equals(ssid);
     }
 
-    // =========================================================
-    // BOUCLE DE SCAN
-    // =========================================================
+    // Démarre la boucle de scan WiFi périodique (tous les 4 secondes).
     private void startScanLoop() {
         scanRunnable = new Runnable() {
             @Override
@@ -230,10 +216,16 @@ public class NavigationManager {
                     return;
                 }
 
-                if (fingerprints == null || fingerprints.isEmpty()) return;
+                if (fingerprints == null || fingerprints.isEmpty()) {
+                    handler.post(() -> callback.onError("Données de localisation indisponibles"));
+                    return;
+                }
 
                 WeightedKNN.LocationResult loc = WeightedKNN.locate(filtered, fingerprints);
-                if (loc == null) return;
+                if (loc == null) {
+                    handler.post(() -> callback.onError("Signal insuffisant, réessai..."));
+                    return;
+                }
 
                 NavigationNode detected = graph.findBySalleNom(loc.salleNom);
                 if (detected == null)
@@ -259,36 +251,32 @@ public class NavigationManager {
         }).start();
     }
 
-    // =========================================================
-    // SCAN WIFI
-    // =========================================================
+    // Scanne le WiFi et retourne les RSSI détectés (gère les erreurs de permission).
     private Map<String, Integer> scanWifi() {
         Map<String, Integer> result = new HashMap<>();
+        if (wifiManager == null || !wifiManager.isWifiEnabled()) return result;
         try {
-            WifiManager wm = (WifiManager) context.getApplicationContext()
-                    .getSystemService(Context.WIFI_SERVICE);
-            if (wm == null || !wm.isWifiEnabled()) return result;
-            wm.startScan();
-            for (ScanResult sr : wm.getScanResults()) {
+            // On Android 9+, startScan() is throttled — use system scan results directly
+            for (ScanResult sr : wifiManager.getScanResults()) {
                 result.put(sr.BSSID.toLowerCase(), sr.level);
             }
         } catch (SecurityException e) {
-            // Permission non accordée → retourner liste vide
-            android.util.Log.w("NavManager", "WiFi scan permission denied: " + e.getMessage());
+            // Location permission not granted → stop online mode and offer offline
+            Log.w("NavManager", "Location permission denied, switching to offline");
+            isRunning = false;
+            handler.post(() -> { if (callback != null) callback.onNotOnFsmWifi(); });
         }
         return result;
     }
 
-    // =========================================================
-    // FETCH FINGERPRINTS
-    // =========================================================
+    // Récupère la base de fingerprints depuis le serveur (GET /api/fingerprints).
     private List<WeightedKNN.Fingerprint> fetchFingerprints() throws Exception {
         List<WeightedKNN.Fingerprint> list = new ArrayList<>();
         URL url = new URL(BASE_URL);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
-        conn.setConnectTimeout(10000);
-        conn.setReadTimeout(10000);
+        conn.setConnectTimeout(3000);
+        conn.setReadTimeout(3000);
         if (conn.getResponseCode() != 200) return list;
 
         BufferedReader br = new BufferedReader(
@@ -316,9 +304,9 @@ public class NavigationManager {
         return list;
     }
 
-    // =========================================================
-    // GETTERS
-    // =========================================================
-    public NavigationGraph getGraph()       { return graph; }
-    public NavigationNode  getCurrentNode() { return currentNode; }
+    // Retourne le graphe de navigation (nœuds et arêtes).
+    public NavigationGraph getGraph() { return graph; }
+
+    // Retourne le nœud actuel détecté par localisation.
+    public NavigationNode getCurrentNode() { return currentNode; }
 }

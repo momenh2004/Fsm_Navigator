@@ -27,11 +27,7 @@ public class KalmanFilter {
 
     private final Map<String, KalmanState> states = new HashMap<>();
 
-    /**
-     * Filtre un scan WiFi brut via Kalman.
-     * @param rawScan Map { bssid → rssi mesuré }
-     * @return        Map { bssid → rssi filtré }
-     */
+    // Filtre un scan WiFi brut via Kalman (prédiction + correction).
     public Map<String, Double> filter(Map<String, Integer> rawScan) {
         Map<String, Double> filtered = new HashMap<>();
 
@@ -63,10 +59,12 @@ public class KalmanFilter {
         return filtered;
     }
 
+    // Vérifie si le signal WiFi est trop faible (max RSSI < -85 dBm) pour une localisation fiable.
     public static boolean isSignalWeak(Map<String, Double> scan) {
         if (scan == null || scan.isEmpty()) return true;
         return scan.values().stream().mapToDouble(d -> d).max().orElse(-100) < -85.0;
     }
 
+    // Réinitialise les états des filtres Kalman.
     public void reset() { states.clear(); }
 }
