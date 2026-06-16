@@ -1,0 +1,7 @@
+Pour mener ce projet de manière rigoureuse, nous avons adopté la méthodologie du Cycle en V, qui nous a permis d'associer chaque phase de conception à une phase de validation correspondante.
+
+Sur le versant descendant, nous avons commencé par la spécification des besoins — navigation intérieure, gestion PMR, recherche de salles — puis la conception de l'architecture en trois composantes : l'application Android, le backend Spring Boot et le dashboard React. Enfin, la conception détaillée a défini les algorithmes clés : A* pour le routage, KNN pour la localisation Wi-Fi et le filtre de Kalman pour le lissage de position, avant l'implémentation de l'ensemble du système.
+
+Sur le versant ascendant, les tests unitaires ont validé les algorithmes, les tests d'intégration ont vérifié la communication entre les composantes, et les tests de validation ont confronté le comportement réel aux spécifications initiales.
+
+Ce cadre nous a garanti une traçabilité totale et une détection précoce des anomalies tout au long du développement.

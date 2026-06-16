@@ -19,7 +19,7 @@ import androidx.core.content.ContextCompat;
 import com.fsm.navigator.auth.PmrManager;
 import com.fsm.navigator.auth.TtsManager;
 import com.fsm.navigator.location.LocationManager;
-import com.fsm.navigator.location.WeightedKNN;
+import com.fsm.navigator.controller.WeightedKNN;
 import com.fsm.navigator.view.FsmMapView;
 
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class MapActivity extends BaseDrawerActivity {
     private TextView    tvBlocNom, tvBlocDesc;
     private android.view.View btnVoirPlan, btnNavigerBloc, btnLocate;
     private ImageButton btnHamburger;
-    private ImageButton btnZoomIn, btnZoomOut;
+    private android.view.View btnZoomIn, btnZoomOut;
     private ProgressBar progressLocate;
 
     private LocationManager   locationManager;

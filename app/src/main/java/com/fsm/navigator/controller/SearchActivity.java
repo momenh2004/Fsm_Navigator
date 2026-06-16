@@ -25,6 +25,7 @@ import com.fsm.navigator.auth.PmrDialogHelper;
 import com.fsm.navigator.auth.PmrManager;
 import com.fsm.navigator.auth.TtsManager;
 import com.fsm.navigator.model.PointInteret;
+import com.fsm.navigator.service.HistoryService;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -356,6 +357,7 @@ public class SearchActivity extends BaseDrawerActivity
         TtsManager.speak("Navigation vers " + poi.getNom()
                 + ", " + poi.getBatiment() + ", " + poi.getEtage() + ".");
         ProfileActivity.addToHistory(this, poi.getNom());
+        HistoryService.logNavigation(this, poi.getId());
         String nodeId = buildNodeId(poi);
         String blocId = poi.getBlocId() != null ? poi.getBlocId() : "B3";
         if (nodeId.startsWith("A16_"))   blocId = "A1-6";

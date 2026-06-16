@@ -6,547 +6,181 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- ===== CONTENU PRINCIPAL ===== -->
-    <LinearLayout
+    <!-- Main content -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@drawable/bg_gradient">
+        android:background="@drawable/bg_screen_gradient">
 
-        <!-- AppBar -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="72dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:paddingTop="24dp">
-
-            <!-- Hamburger -->
-            <ImageButton
-                android:id="@+id/btnHamburger"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:src="@android:drawable/ic_menu_sort_by_size"
-                android:tint="#00D4FF"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Menu"/>
-
-            <!-- Titre -->
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="14dp"
-                android:text="FSM Navigator"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:fontFamily="sans-serif-medium"/>
-
-            <!-- Avatar -->
-            <FrameLayout
-                android:layout_width="36dp"
-                android:layout_height="36dp">
-                <View
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:background="@drawable/bg_avatar"/>
-                <TextView
-                    android:id="@+id/tvAvatarInitial"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="H"
-                    android:textColor="#1A1A2E"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:gravity="center"/>
-            </FrameLayout>
-        </LinearLayout>
-
-        <!-- Contenu scrollable -->
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="match_parent"
             android:scrollbars="none"
-            android:overScrollMode="never">
+            android:fillViewport="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingBottom="32dp">
+                android:paddingStart="@dimen/screen_h"
+                android:paddingEnd="@dimen/screen_h"
+                android:paddingTop="40dp"
+                android:paddingBottom="130dp">
 
-                <!-- Hero section -->
+                <!-- Salutation + avatar -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingStart="24dp"
-                    android:paddingEnd="24dp"
-                    android:paddingTop="16dp"
-                    android:paddingBottom="20dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bonjour 👋"
-                        android:textColor="#607080"
-                        android:textSize="14sp"
-                        android:layout_marginBottom="4dp"/>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/tvWelcome"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Étudiant"
-                            android:textColor="#FFFFFF"
-                            android:textSize="24sp"
-                            android:textStyle="bold"
-                            android:fontFamily="sans-serif-medium"/>
-
-                        <TextView
-                            android:id="@+id/tvPmrBadge"
+                            style="@style/Text.Sub"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/bg_pmr_badge"
-                            android:paddingStart="10dp"
-                            android:paddingEnd="10dp"
-                            android:paddingTop="4dp"
-                            android:paddingBottom="4dp"
-                            android:text="♿ PMR"
-                            android:textColor="#00D4FF"
-                            android:textSize="11sp"
-                            android:visibility="gone"/>
+                            android:textSize="15sp"
+                            android:text="Bonjour," />
+
+                        <TextView
+                            android:id="@+id/greetingName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/space_grotesk"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary"
+                            android:textSize="@dimen/text_name"
+                            android:letterSpacing="-0.025"
+                            android:text="Étudiant" />
                     </LinearLayout>
+
+                    <FrameLayout
+                        android:id="@+id/avatarBtn"
+                        android:layout_width="46dp"
+                        android:layout_height="46dp"
+                        android:background="@drawable/bg_avatar"
+                        android:clickable="true"
+                        android:focusable="true">
+                        <TextView
+                            android:id="@+id/avatarInitial"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:fontFamily="@font/space_grotesk"
+                            android:textFontWeight="600"
+                            android:textColor="@color/on_accent"
+                            android:textSize="20sp"
+                            android:text="É" />
+                    </FrameLayout>
                 </LinearLayout>
 
-                <!-- Barre de recherche -->
+                <!-- BARRE HÉRO -->
                 <LinearLayout
+                    android:id="@+id/searchHero"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:background="@drawable/bg_search_bar"
+                    android:layout_height="@dimen/search_hero_h"
+                    android:layout_marginTop="34dp"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:paddingStart="18dp"
-                    android:paddingEnd="18dp"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginEnd="24dp"
-                    android:layout_marginBottom="28dp"
+                    android:background="@drawable/bg_search_hero"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
                     android:clickable="true"
                     android:focusable="true">
-
                     <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:src="@android:drawable/ic_menu_search"
-                        android:tint="#607080"
-                        android:contentDescription="Rechercher"/>
-
-                    <EditText
-                        android:id="@+id/etSearch"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_search"
+                        app:tint="@color/accent"
+                        android:contentDescription="Rechercher" />
+                    <TextView
                         android:layout_width="0dp"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="12dp"
-                        android:background="@null"
-                        android:hint="Rechercher une salle, bloc..."
-                        android:textColorHint="#607080"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        android:focusable="false"
-                        android:singleLine="true"/>
+                        android:layout_marginStart="15dp"
+                        android:fontFamily="@font/plex_sans"
+                        android:textColor="@color/text_muted"
+                        android:textSize="17sp"
+                        android:text="Où allez-vous ?" />
                 </LinearLayout>
 
-                <!-- Section : Accès rapide -->
+                <!-- Grille 2×2 raccourcis (2 rangées LinearLayout) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:orientation="horizontal">
+                    <include layout="@layout/item_shortcut" android:id="@+id/shortcut1" />
+                    <include layout="@layout/item_shortcut" android:id="@+id/shortcut2" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <include layout="@layout/item_shortcut" android:id="@+id/shortcut3" />
+                    <include layout="@layout/item_shortcut" android:id="@+id/shortcut4" />
+                </LinearLayout>
+
+                <!-- Section récents -->
                 <TextView
+                    style="@style/Text.Section"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginBottom="14dp"
-                    android:text="ACCÈS RAPIDE"
-                    android:textColor="#404A58"
-                    android:textSize="11sp"
-                    android:letterSpacing="0.1"
-                    android:textStyle="bold"/>
+                    android:layout_marginTop="38dp"
+                    android:layout_marginBottom="6dp"
+                    android:text="Récemment consultés" />
 
-                <GridLayout
+                <LinearLayout
+                    android:id="@+id/recentList"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:columnCount="2"
-                    android:paddingStart="20dp"
-                    android:paddingEnd="20dp"
-                    android:layout_marginBottom="28dp">
+                    android:orientation="vertical" />
 
-                    <!-- Amphithéâtres -->
-                    <LinearLayout
-                        android:id="@+id/catAmphitheatre"
-                        android:layout_width="0dp"
-                        android:layout_height="90dp"
-                        android:layout_columnWeight="1"
-                        android:layout_margin="6dp"
-                        android:background="@drawable/bg_glass_card"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:clickable="true"
-                        android:focusable="true">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="🎭" android:textSize="28sp" android:layout_marginBottom="6dp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="Amphithéâtres" android:textColor="#B0BEC5" android:textSize="11sp"
-                            android:gravity="center"/>
-                    </LinearLayout>
-
-                    <!-- Administration -->
-                    <LinearLayout
-                        android:id="@+id/catAdmin"
-                        android:layout_width="0dp"
-                        android:layout_height="90dp"
-                        android:layout_columnWeight="1"
-                        android:layout_margin="6dp"
-                        android:background="@drawable/bg_glass_card"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:clickable="true"
-                        android:focusable="true">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="🏢" android:textSize="28sp" android:layout_marginBottom="6dp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="Administration" android:textColor="#B0BEC5" android:textSize="11sp"
-                            android:gravity="center"/>
-                    </LinearLayout>
-
-                    <!-- Bibliothèque -->
-                    <LinearLayout
-                        android:id="@+id/catBiblio"
-                        android:layout_width="0dp"
-                        android:layout_height="90dp"
-                        android:layout_columnWeight="1"
-                        android:layout_margin="6dp"
-                        android:background="@drawable/bg_glass_card"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:clickable="true"
-                        android:focusable="true">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="📚" android:textSize="28sp" android:layout_marginBottom="6dp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="Bibliothèque" android:textColor="#B0BEC5" android:textSize="11sp"
-                            android:gravity="center"/>
-                    </LinearLayout>
-
-                    <!-- Départements -->
-                    <LinearLayout
-                        android:id="@+id/catDept"
-                        android:layout_width="0dp"
-                        android:layout_height="90dp"
-                        android:layout_columnWeight="1"
-                        android:layout_margin="6dp"
-                        android:background="@drawable/bg_glass_card"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:clickable="true"
-                        android:focusable="true">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="🔬" android:textSize="28sp" android:layout_marginBottom="6dp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="Départements" android:textColor="#B0BEC5" android:textSize="11sp"
-                            android:gravity="center"/>
-                    </LinearLayout>
-                </GridLayout>
-
-                <!-- Section : Destinations populaires -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginBottom="14dp"
-                    android:text="DESTINATIONS POPULAIRES"
-                    android:textColor="#404A58"
-                    android:textSize="11sp"
-                    android:letterSpacing="0.1"
-                    android:textStyle="bold"/>
-
-                <!-- Destination 1 -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cardDest1"
+                <!-- Accès carte campus -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAccederCarte"
+                    style="@style/Widget.FSM.Button.Outline"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    android:layout_marginBottom="10dp"
-                    app:cardBackgroundColor="#12FFFFFF"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="0dp"
-                    android:clickable="true"
-                    android:focusable="true">
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:orientation="horizontal" android:gravity="center_vertical" android:padding="16dp">
-                        <FrameLayout android:layout_width="48dp" android:layout_height="48dp"
-                            android:layout_marginEnd="14dp">
-                            <View android:layout_width="48dp" android:layout_height="48dp"
-                                android:background="@drawable/bg_glass_card_cyan"/>
-                            <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                                android:text="🎭" android:textSize="22sp" android:gravity="center"/>
-                        </FrameLayout>
-                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                            android:layout_weight="1" android:orientation="vertical">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="Amphithéâtre A" android:textColor="#FFFFFF"
-                                android:textSize="14sp" android:textStyle="bold"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="Bloc 1 Palestine • RDC"
-                                android:textColor="#607080" android:textSize="12sp"/>
-                        </LinearLayout>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="›" android:textColor="#00D4FF" android:textSize="22sp"/>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-                <!-- Destination 2 -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cardDest2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    android:layout_marginBottom="10dp"
-                    app:cardBackgroundColor="#12FFFFFF"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="0dp"
-                    android:clickable="true"
-                    android:focusable="true">
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:orientation="horizontal" android:gravity="center_vertical" android:padding="16dp">
-                        <FrameLayout android:layout_width="48dp" android:layout_height="48dp"
-                            android:layout_marginEnd="14dp">
-                            <View android:layout_width="48dp" android:layout_height="48dp"
-                                android:background="@drawable/bg_glass_card"/>
-                            <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                                android:text="💻" android:textSize="22sp" android:gravity="center"/>
-                        </FrameLayout>
-                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                            android:layout_weight="1" android:orientation="vertical">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="Salle 301" android:textColor="#FFFFFF"
-                                android:textSize="14sp" android:textStyle="bold"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="Bloc 3 Informatique • RDC"
-                                android:textColor="#607080" android:textSize="12sp"/>
-                        </LinearLayout>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="›" android:textColor="#00D4FF" android:textSize="22sp"/>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-                <!-- Destination 3 -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cardDest3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    android:layout_marginBottom="10dp"
-                    app:cardBackgroundColor="#12FFFFFF"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="0dp"
-                    android:clickable="true"
-                    android:focusable="true">
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:orientation="horizontal" android:gravity="center_vertical" android:padding="16dp">
-                        <FrameLayout android:layout_width="48dp" android:layout_height="48dp"
-                            android:layout_marginEnd="14dp">
-                            <View android:layout_width="48dp" android:layout_height="48dp"
-                                android:background="@drawable/bg_glass_card"/>
-                            <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                                android:text="📚" android:textSize="22sp" android:gravity="center"/>
-                        </FrameLayout>
-                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                            android:layout_weight="1" android:orientation="vertical">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="Bibliothèque Centrale"
-                                android:textColor="#FFFFFF" android:textSize="14sp" android:textStyle="bold"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="Bâtiment central"
-                                android:textColor="#607080" android:textSize="12sp"/>
-                        </LinearLayout>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="›" android:textColor="#00D4FF" android:textSize="22sp"/>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                    android:layout_height="@dimen/btn_outline_h"
+                    android:layout_marginTop="28dp"
+                    android:text="Accéder à la carte du campus"
+                    app:icon="@drawable/ic_navigate"
+                    app:iconGravity="textStart"
+                    app:iconTint="@color/accent" />
 
             </LinearLayout>
         </ScrollView>
 
-    </LinearLayout>
+        <!-- FAB étendu Naviguer -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/fabNaviguer"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/fab_ext_h"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="22dp"
+            android:layout_marginBottom="26dp"
+            android:text="Naviguer"
+            android:textColor="@color/on_accent"
+            android:textAllCaps="false"
+            android:fontFamily="@font/plex_sans"
+            android:textFontWeight="600"
+            android:textSize="16sp"
+            app:backgroundTint="@color/accent"
+            app:cornerRadius="@dimen/radius_pill"
+            app:icon="@drawable/ic_navigate"
+            app:iconTint="@color/on_accent"
+            app:iconGravity="textStart" />
 
-    <!-- ===== NAVIGATION DRAWER ===== -->
-    <LinearLayout
-        android:id="@+id/navDrawer"
-        android:layout_width="300dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:background="#F01A1A2E"
-        android:orientation="vertical">
+    </FrameLayout>
 
-        <!-- En-tête drawer -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="24dp"
-            android:paddingTop="52dp"
-            android:background="#1A1A2E">
-
-            <!-- Avatar -->
-            <FrameLayout
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_marginBottom="12dp">
-                <View android:layout_width="60dp" android:layout_height="60dp"
-                    android:background="@drawable/bg_avatar"/>
-                <TextView
-                    android:id="@+id/drawerAvatarInitial"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="H"
-                    android:textColor="#1A1A2E"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:gravity="center"/>
-            </FrameLayout>
-
-            <TextView
-                android:id="@+id/drawerName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Étudiant"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:id="@+id/drawerEmail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="email@fsm.rnu.tn"
-                android:textColor="#607080"
-                android:textSize="12sp"/>
-        </LinearLayout>
-
-        <!-- Séparateur -->
-        <View android:layout_width="match_parent" android:layout_height="1dp"
-            android:background="#0FFFFFFF"/>
-
-        <!-- Items navigation -->
-        <ScrollView android:layout_width="match_parent" android:layout_height="0dp"
-            android:layout_weight="1" android:scrollbars="none">
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:orientation="vertical" android:padding="12dp">
-
-                <!-- Accueil -->
-                <LinearLayout android:id="@+id/drawerHome"
-                    android:layout_width="match_parent" android:layout_height="52dp"
-                    android:background="@drawable/bg_drawer_item_active"
-                    android:orientation="horizontal" android:gravity="center_vertical"
-                    android:paddingStart="16dp" android:paddingEnd="16dp"
-                    android:layout_marginBottom="4dp" android:clickable="true" android:focusable="true">
-                    <TextView android:layout_width="24dp" android:layout_height="24dp"
-                        android:text="⌂" android:textSize="16sp" android:textColor="#00D4FF"
-                        android:gravity="center" android:layout_marginEnd="14dp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="Accueil" android:textColor="#00D4FF"
-                        android:textSize="14sp" android:textStyle="bold"/>
-                </LinearLayout>
-
-                <!-- Carte -->
-                <LinearLayout android:id="@+id/drawerMap"
-                    android:layout_width="match_parent" android:layout_height="52dp"
-                    android:orientation="horizontal" android:gravity="center_vertical"
-                    android:paddingStart="16dp" android:paddingEnd="16dp"
-                    android:layout_marginBottom="4dp" android:clickable="true" android:focusable="true">
-                    <TextView android:layout_width="24dp" android:layout_height="24dp"
-                        android:text="⊙" android:textSize="16sp" android:textColor="#607080"
-                        android:gravity="center" android:layout_marginEnd="14dp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="Carte du campus" android:textColor="#B0BEC5" android:textSize="14sp"/>
-                </LinearLayout>
-
-                <!-- Recherche -->
-                <LinearLayout android:id="@+id/drawerSearch"
-                    android:layout_width="match_parent" android:layout_height="52dp"
-                    android:orientation="horizontal" android:gravity="center_vertical"
-                    android:paddingStart="16dp" android:paddingEnd="16dp"
-                    android:layout_marginBottom="4dp" android:clickable="true" android:focusable="true">
-                    <TextView android:layout_width="24dp" android:layout_height="24dp"
-                        android:text="⌕" android:textSize="16sp" android:textColor="#607080"
-                        android:gravity="center" android:layout_marginEnd="14dp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="Recherche" android:textColor="#B0BEC5" android:textSize="14sp"/>
-                </LinearLayout>
-
-                <!-- Navigation -->
-                <LinearLayout android:id="@+id/drawerNav"
-                    android:layout_width="match_parent" android:layout_height="52dp"
-                    android:orientation="horizontal" android:gravity="center_vertical"
-                    android:paddingStart="16dp" android:paddingEnd="16dp"
-                    android:layout_marginBottom="4dp" android:clickable="true" android:focusable="true">
-                    <TextView android:layout_width="24dp" android:layout_height="24dp"
-                        android:text="◎" android:textSize="16sp" android:textColor="#607080"
-                        android:gravity="center" android:layout_marginEnd="14dp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="Navigation" android:textColor="#B0BEC5" android:textSize="14sp"/>
-                </LinearLayout>
-
-                <!-- Divider -->
-                <View android:layout_width="match_parent" android:layout_height="1dp"
-                    android:background="#0FFFFFFF" android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"/>
-
-                <!-- Profil -->
-                <LinearLayout android:id="@+id/drawerProfile"
-                    android:layout_width="match_parent" android:layout_height="52dp"
-                    android:orientation="horizontal" android:gravity="center_vertical"
-                    android:paddingStart="16dp" android:paddingEnd="16dp"
-                    android:layout_marginBottom="4dp" android:clickable="true" android:focusable="true">
-                    <TextView android:layout_width="24dp" android:layout_height="24dp"
-                        android:text="👤" android:textSize="14sp" android:textColor="#607080"
-                        android:gravity="center" android:layout_marginEnd="14dp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="Profil" android:textColor="#B0BEC5" android:textSize="14sp"/>
-                </LinearLayout>
-
-<!-- Divider -->
-                <View android:layout_width="match_parent" android:layout_height="1dp"
-                    android:background="#0FFFFFFF" android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"/>
-
-                <!-- Déconnexion -->
-                <LinearLayout android:id="@+id/drawerLogout"
-                    android:layout_width="match_parent" android:layout_height="52dp"
-                    android:orientation="horizontal" android:gravity="center_vertical"
-                    android:paddingStart="16dp" android:paddingEnd="16dp"
-                    android:clickable="true" android:focusable="true">
-                    <TextView android:layout_width="24dp" android:layout_height="24dp"
-                        android:text="↩" android:textSize="16sp" android:textColor="#FF4B6E"
-                        android:gravity="center" android:layout_marginEnd="14dp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="Déconnexion" android:textColor="#FF4B6E" android:textSize="14sp"/>
-                </LinearLayout>
-
-            </LinearLayout>
-        </ScrollView>
-
-    </LinearLayout>
+    <!-- Navigation Drawer (swipe depuis le bord) -->
+    <include layout="@layout/nav_drawer" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

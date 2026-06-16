@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bottom sheet : surface sombre, coins hauts arrondis -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/sheet" />
+    <corners android:topLeftRadius="@dimen/radius_sheet" android:topRightRadius="@dimen/radius_sheet" />
+</shape>

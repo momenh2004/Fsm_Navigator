@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_gradient"
+    android:background="@drawable/bg_screen_gradient"
     android:fillViewport="true"
     android:scrollbars="none">
 
@@ -12,333 +11,186 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="28dp"
-        android:gravity="center_horizontal">
+        android:paddingStart="30dp"
+        android:paddingEnd="30dp"
+        android:paddingTop="64dp"
+        android:paddingBottom="40dp">
 
-        <!-- Header -->
+        <!-- Titre -->
+        <TextView
+            style="@style/Text.TitleXL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Créer un compte." />
+
+        <TextView
+            style="@style/Text.Sub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:maxWidth="260dp"
+            android:lineSpacingMultiplier="1.45"
+            android:text="Rejoignez FSM Navigator et accédez à toutes les fonctionnalités." />
+
+        <!-- Champ E-mail -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.FSM.Input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:hint="Adresse e-mail">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:inputType="textEmailAddress"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_input"
+                android:fontFamily="@font/plex_sans" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <View android:layout_width="match_parent" android:layout_height="1.5dp"
+            android:background="@color/divider_white" android:layout_marginBottom="24dp" />
+
+        <!-- Champ Mot de passe -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.FSM.Input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mot de passe"
+            app:endIconMode="password_toggle"
+            app:endIconTint="@color/text_muted">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:inputType="textPassword"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_input"
+                android:fontFamily="@font/plex_sans" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <View android:layout_width="match_parent" android:layout_height="1.5dp"
+            android:background="@color/divider_white" android:layout_marginBottom="24dp" />
+
+        <!-- Champ Confirmer mot de passe -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.FSM.Input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Confirmer le mot de passe"
+            app:endIconMode="password_toggle"
+            app:endIconTint="@color/text_muted">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etConfirmPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:inputType="textPassword"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_input"
+                android:fontFamily="@font/plex_sans" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <View android:layout_width="match_parent" android:layout_height="1.5dp"
+            android:background="@color/divider_white" android:layout_marginBottom="36dp" />
+
+        <!-- Bloc CAPTCHA : bordure gauche cyan 2dp, pas de carte -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="48dp"
             android:layout_marginBottom="32dp">
 
-            <ImageButton
-                android:id="@+id/btnBack"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@android:drawable/ic_media_previous"
-                android:tint="#00D4FF"
-                android:background="@drawable/bg_glass_card"
-                android:contentDescription="Retour"/>
+            <View
+                android:layout_width="2dp"
+                android:layout_height="match_parent"
+                android:background="@color/accent"
+                android:layout_marginEnd="16dp" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_marginStart="16dp">
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Créer un compte"
-                    android:textColor="#FFFFFF"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:fontFamily="sans-serif-medium"/>
+                    android:text="Vérification anti-robot"
+                    android:fontFamily="@font/plex_sans"
+                    android:textFontWeight="600"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
+                    android:layout_marginBottom="6dp" />
 
                 <TextView
+                    android:id="@+id/tvCaptchaQuestion"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="Rejoignez FSM Navigator"
-                    android:textColor="#607080"
-                    android:textSize="13sp"/>
+                    android:fontFamily="@font/plex_mono"
+                    android:textColor="@color/accent"
+                    android:textSize="16sp"
+                    android:layout_marginBottom="12dp"
+                    android:text="Combien font 3 + 5 ?" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.FSM.Input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Votre réponse">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etCaptcha"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:inputType="number"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_input"
+                        android:fontFamily="@font/plex_mono" />
+                </com.google.android.material.textfield.TextInputLayout>
+                <View android:layout_width="match_parent" android:layout_height="1.5dp"
+                    android:background="@color/divider_white" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Carte Glass -->
-        <androidx.cardview.widget.CardView
+        <!-- Erreur -->
+        <TextView
+            android:id="@+id/tvError"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="#12FFFFFF"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="0dp">
+            android:text=""
+            android:textColor="@color/danger"
+            android:textSize="12sp"
+            android:visibility="gone"
+            android:layout_marginBottom="8dp" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="24dp">
+        <!-- Bouton créer un compte -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRegister"
+            style="@style/Widget.FSM.Button.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/btn_primary_h"
+            android:text="Créer un compte" />
 
-                <!-- Email -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Email universitaire"
-                    android:textColor="#B0BEC5"
-                    android:textSize="13sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:layout_marginBottom="8dp"/>
+        <!-- Progression -->
+        <ProgressBar
+            android:id="@+id/progressRegister"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity="center_horizontal"
+            android:indeterminateTint="@color/accent"
+            android:visibility="gone"
+            android:layout_marginTop="8dp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:background="@drawable/bg_glass_input"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:layout_marginBottom="16dp">
-
-                    <TextView android:layout_width="20dp" android:layout_height="20dp"
-                        android:text="✉" android:textColor="#607080" android:textSize="14sp"
-                        android:gravity="center"/>
-
-                    <EditText
-                        android:id="@+id/etEmail"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:layout_marginStart="12dp"
-                        android:background="@null"
-                        android:hint="votre@fsm.rnu.tn"
-                        android:textColorHint="#607080"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        android:inputType="textEmailAddress"
-                        android:singleLine="true"/>
-                </LinearLayout>
-
-                <!-- Mot de passe -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Mot de passe"
-                    android:textColor="#B0BEC5"
-                    android:textSize="13sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:layout_marginBottom="8dp"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:background="@drawable/bg_glass_input"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:layout_marginBottom="16dp">
-
-                    <TextView android:layout_width="20dp" android:layout_height="20dp"
-                        android:text="🔒" android:textColor="#607080" android:textSize="13sp"
-                        android:gravity="center"/>
-
-                    <EditText
-                        android:id="@+id/etPassword"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:layout_marginStart="12dp"
-                        android:background="@null"
-                        android:hint="Minimum 6 caractères"
-                        android:textColorHint="#607080"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        android:inputType="textPassword"
-                        android:singleLine="true"/>
-                </LinearLayout>
-
-                <!-- Confirmer mot de passe -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Confirmer le mot de passe"
-                    android:textColor="#B0BEC5"
-                    android:textSize="13sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:layout_marginBottom="8dp"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:background="@drawable/bg_glass_input"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:layout_marginBottom="20dp">
-
-                    <TextView android:layout_width="20dp" android:layout_height="20dp"
-                        android:text="🔒" android:textColor="#607080" android:textSize="13sp"
-                        android:gravity="center"/>
-
-                    <EditText
-                        android:id="@+id/etConfirmPassword"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:layout_marginStart="12dp"
-                        android:background="@null"
-                        android:hint="Répétez le mot de passe"
-                        android:textColorHint="#607080"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        android:inputType="textPassword"
-                        android:singleLine="true"/>
-                </LinearLayout>
-
-                <!-- ══════════════════════════════════════ -->
-                <!-- CAPTCHA MATHÉMATIQUE                   -->
-                <!-- ══════════════════════════════════════ -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_glass_card"
-                    android:padding="16dp"
-                    android:layout_marginBottom="16dp">
-
-                    <!-- Titre captcha -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="12dp">
-
-                        <TextView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:text="🤖"
-                            android:textSize="16sp"
-                            android:gravity="center"
-                            android:layout_marginEnd="8dp"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Vérification anti-robot"
-                            android:textColor="#00D4FF"
-                            android:textSize="13sp"
-                            android:textStyle="bold"
-                            android:fontFamily="sans-serif-medium"/>
-                    </LinearLayout>
-
-                    <!-- Question captcha -->
-                    <TextView
-                        android:id="@+id/tvCaptchaQuestion"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Combien font  3 + 7 ?"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:gravity="center"
-                        android:padding="12dp"
-                        android:background="@drawable/bg_glass_input"
-                        android:layout_marginBottom="12dp"/>
-
-                    <!-- Réponse captcha -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="52dp"
-                        android:background="@drawable/bg_glass_input"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingStart="16dp"
-                        android:paddingEnd="16dp">
-
-                        <TextView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:text="✏️"
-                            android:textColor="#607080"
-                            android:textSize="13sp"
-                            android:gravity="center"/>
-
-                        <EditText
-                            android:id="@+id/etCaptcha"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:layout_marginStart="12dp"
-                            android:background="@null"
-                            android:hint="Votre réponse..."
-                            android:textColorHint="#607080"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:inputType="number"
-                            android:singleLine="true"/>
-                    </LinearLayout>
-                </LinearLayout>
-                <!-- ══════════════════════════════════════ -->
-
-                <!-- Erreur -->
-                <TextView
-                    android:id="@+id/tvError"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text=""
-                    android:textColor="#FF4B6E"
-                    android:textSize="12sp"
-                    android:visibility="gone"
-                    android:layout_marginBottom="8dp"/>
-
-                <!-- Bouton S'inscrire -->
-                <Button
-                    android:id="@+id/btnRegister"
-                    android:layout_width="match_parent"
-                    android:layout_height="54dp"
-                    android:background="@drawable/bg_button_cyan"
-                    android:text="Créer mon compte"
-                    android:textColor="#1A1A2E"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    android:fontFamily="sans-serif-medium"
-                    android:stateListAnimator="@null"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="16dp"/>
-
-                <ProgressBar
-                    android:id="@+id/progressRegister"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_gravity="center_horizontal"
-                    android:indeterminateTint="@color/accent_cyan"
-                    android:visibility="gone"
-                    android:layout_marginBottom="8dp"/>
-
-                <!-- Déjà un compte -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_gravity="center_horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Déjà un compte ? "
-                        android:textColor="#607080"
-                        android:textSize="13sp"/>
-
-                    <TextView
-                        android:id="@+id/tvLogin"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Se connecter"
-                        android:textColor="#00D4FF"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:clickable="true"
-                        android:focusable="true"/>
-                </LinearLayout>
-
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        <!-- Lien retour -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tvLogin"
+            style="@style/Widget.FSM.Button.Text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:text="Déjà un compte ? Se connecter" />
 
     </LinearLayout>
 </ScrollView>

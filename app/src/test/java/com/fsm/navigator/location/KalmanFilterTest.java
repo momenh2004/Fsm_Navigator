@@ -9,6 +9,8 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
+import com.fsm.navigator.controller.KalmanFilter;
+
 public class KalmanFilterTest {
 
     private static final double Q = 0.008;

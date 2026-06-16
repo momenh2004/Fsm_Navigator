@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Padding latéral d'écran : généreux, « respirant » -->
+    <dimen name="screen_h">28dp</dimen>
+    <dimen name="screen_h_lg">30dp</dimen>
+
+    <!-- Rayons -->
+    <dimen name="radius_button">16dp</dimen>
+    <dimen name="radius_card">18dp</dimen>
+    <dimen name="radius_sheet">24dp</dimen>
+    <dimen name="radius_pill">999dp</dimen>
+    <dimen name="radius_room">8dp</dimen>
+
+    <!-- Hauteurs composants -->
+    <dimen name="btn_primary_h">56dp</dimen>
+    <dimen name="btn_outline_h">52dp</dimen>
+    <dimen name="search_hero_h">64dp</dimen>
+    <dimen name="fab_ext_h">58dp</dimen>
+    <dimen name="pill_h">56dp</dimen>
+    <dimen name="touch_min">44dp</dimen>
+
+    <!-- Tailles de texte -->
+    <dimen name="text_title_xl">40sp</dimen>
+    <dimen name="text_title_lg">38sp</dimen>
+    <dimen name="text_sheet">26sp</dimen>
+    <dimen name="text_name">32sp</dimen>
+    <dimen name="text_section">19sp</dimen>
+    <dimen name="text_body">16sp</dimen>
+    <dimen name="text_input">18sp</dimen>
+    <dimen name="text_label">13sp</dimen>
+    <dimen name="text_sub">14sp</dimen>
+    <dimen name="text_mono">12sp</dimen>
+</resources>

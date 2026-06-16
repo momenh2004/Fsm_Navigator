@@ -9,6 +9,8 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
+import com.fsm.navigator.controller.WeightedKNN;
+
 public class WeightedKNNTest {
 
     private static final double DELTA = 1e-6;

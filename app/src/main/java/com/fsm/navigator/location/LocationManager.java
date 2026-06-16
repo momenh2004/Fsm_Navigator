@@ -1,6 +1,8 @@
 package com.fsm.navigator.location;
 
 import com.fsm.navigator.AppConfig;
+import com.fsm.navigator.controller.KalmanFilter;
+import com.fsm.navigator.controller.WeightedKNN;
 
 import android.content.Context;
 import android.net.wifi.ScanResult;

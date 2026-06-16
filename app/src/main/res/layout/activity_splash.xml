@@ -1,158 +1,68 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-    =====================================================
-    activity_splash.xml  –  Splash Screen FSM Navigator
-    =====================================================
-    Structure :
-      - Fond dégradé vert FSM
-      - Icône de navigation (boussole) centrée
-      - Nom de l'application
-      - Nom de la faculté
-      - Barre de progression en bas
-      - Numéro de version
--->
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/splash_background">
+    android:background="@color/bg_deep">
 
-    <!-- ===== CERCLE LUMINEUX DÉCORATIF (haut gauche) ===== -->
-    <View
-        android:id="@+id/decorCircleTopLeft"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:background="@drawable/bg_icon_circle"
-        android:alpha="0.08"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="-60dp"
-        android:layout_marginStart="-60dp" />
-
-    <!-- ===== CERCLE LUMINEUX DÉCORATIF (bas droite) ===== -->
-    <View
-        android:id="@+id/decorCircleBottomRight"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:background="@drawable/bg_icon_circle"
-        android:alpha="0.06"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="-80dp"
-        android:layout_marginEnd="-80dp" />
-
-    <!-- ===== CONTENEUR CENTRAL ===== -->
     <LinearLayout
-        android:id="@+id/centerContainer"
+        android:id="@+id/splashContent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:orientation="vertical"
-        android:gravity="center"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:gravity="center_horizontal">
 
-        <!-- Icône principale (cercle blanc + icône navigation) -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="110dp"
-            android:layout_height="110dp"
-            android:layout_gravity="center"
-            app:cardCornerRadius="55dp"
-            app:cardElevation="16dp"
-            app:cardBackgroundColor="#FFFFFF">
-
-            <ImageView
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_gravity="center"
-                android:src="@android:drawable/ic_menu_compass"
-                android:tint="@color/fsm_green"
-                android:contentDescription="Logo FSM Navigator" />
-        </androidx.cardview.widget.CardView>
-
-        <!-- Nom de l'application -->
         <TextView
-            android:id="@+id/tvAppName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:text="FSM Navigator"
-            android:textColor="#FFFFFF"
-            android:textSize="34sp"
+            android:text="FSM"
+            android:fontFamily="@font/space_grotesk"
             android:textStyle="bold"
-            android:letterSpacing="0.04"
-            android:fontFamily="sans-serif-medium" />
+            android:textColor="@color/text_primary"
+            android:textSize="46sp"
+            android:letterSpacing="-0.03"
+            android:includeFontPadding="false" />
 
-        <!-- Séparateur décoratif -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Navigator"
+            android:fontFamily="@font/space_grotesk"
+            android:textFontWeight="500"
+            android:textColor="@color/text_primary"
+            android:textSize="30sp"
+            android:letterSpacing="-0.015"
+            android:includeFontPadding="false" />
+
         <View
-            android:layout_width="48dp"
-            android:layout_height="3dp"
-            android:layout_marginTop="12dp"
-            android:layout_gravity="center"
-            android:background="#80FFFFFF"
-            android:layout_marginBottom="12dp" />
+            android:layout_width="64dp"
+            android:layout_height="2dp"
+            android:layout_marginTop="22dp"
+            android:layout_marginBottom="22dp"
+            android:background="@color/accent" />
 
-        <!-- Slogan -->
         <TextView
-            android:id="@+id/tvTagline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/splash_tagline"
-            android:textColor="#CCffffff"
-            android:textSize="15sp"
-            android:letterSpacing="0.02"
-            android:fontFamily="sans-serif-light" />
-
+            android:text="Faculté des Sciences\nde Monastir"
+            android:gravity="center"
+            android:fontFamily="@font/plex_sans"
+            android:textColor="@color/text_muted"
+            android:textSize="13.5sp"
+            android:lineSpacingMultiplier="1.5" />
     </LinearLayout>
 
-    <!-- ===== BAS DE PAGE : Faculté + Version ===== -->
-    <LinearLayout
-        android:id="@+id/bottomContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:paddingBottom="40dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <!-- Barre de progression -->
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:layout_width="120dp"
-            android:layout_height="4dp"
-            android:layout_gravity="center"
-            android:indeterminate="true"
-            android:progressTint="#FFFFFF"
-            android:indeterminateTint="#FFFFFF"
-            android:layout_marginBottom="24dp" />
-
-        <!-- Nom de la faculté -->
-        <TextView
-            android:id="@+id/tvUniversity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/splash_university"
-            android:textColor="#AAFFFFFF"
-            android:textSize="13sp"
-            android:fontFamily="sans-serif-light"
-            android:letterSpacing="0.03" />
-
-        <!-- Version -->
-        <TextView
-            android:id="@+id/tvVersion"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="v1.0.0"
-            android:textColor="#66FFFFFF"
-            android:textSize="11sp" />
-
-    </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- barre de progression en bas -->
+    <FrameLayout
+        android:layout_width="120dp"
+        android:layout_height="2.5dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="40dp"
+        android:background="#14FFFFFF">
+        <View
+            android:id="@+id/splashProgress"
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            android:background="@color/accent" />
+    </FrameLayout>
+</FrameLayout>

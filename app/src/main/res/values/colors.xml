@@ -47,8 +47,25 @@
     <color name="fsm_white">#FFFFFF</color>
     <color name="fsm_white_soft">#1A1A2E</color>
 
+    <!-- ===== BOTTOM SHEET ===== -->
+    <color name="sheet_bg">#14182B</color>
+
     <!-- ===== NAVIGATION DRAWER ===== -->
     <color name="drawer_bg">#1A1A2E</color>
     <color name="drawer_item_active">#1200D4FF</color>
     <color name="drawer_divider">#0FFFFFFF</color>
+
+    <!-- ===== DESIGN SYSTEM TOKENS (Claude Design) ===== -->
+    <color name="accent">#00D4FF</color>
+    <color name="accent_dim">#2400D4FF</color>
+    <color name="accent_line">#7300D4FF</color>
+    <color name="on_accent">#08121A</color>
+    <color name="text_muted">#607080</color>
+    <color name="sheet">#14182B</color>
+    <color name="glass_white">#1EFFFFFF</color>
+    <color name="divider_white">#0FFFFFFF</color>
+    <color name="stroke_white">#1AFFFFFF</color>
+    <color name="scrim">#73050608</color>
+    <color name="success">#00D464</color>
+    <color name="danger">#FF4B6E</color>
 </resources>

@@ -31,6 +31,7 @@ import com.fsm.navigator.model.NavigationGraph;
 import com.fsm.navigator.model.NavigationNode;
 import com.fsm.navigator.model.PointInteret;
 import com.fsm.navigator.navigation.NavigationManager;
+import com.fsm.navigator.service.HistoryService;
 import com.fsm.navigator.view.NavigationView;
 
 import org.json.JSONArray;
@@ -86,6 +87,9 @@ public class NavigationActivity extends AppCompatActivity {
     private LinearLayout                layoutOutdoorSteps;
     private com.google.android.material.button.MaterialButton btnArrive;
     private View                        btnStopOutdoor;
+    private View                        layoutOutdoorContent;
+    private android.widget.Button       btnToggleOutdoor;
+    private View                        headerOutdoorSheet;
 
     // ── Mode recherche ───────────────────────────────────────
     private LinearLayout      layoutSearch, layoutNavigation;
@@ -157,12 +161,15 @@ public class NavigationActivity extends AppCompatActivity {
         progressNav     = findViewById(R.id.progressNav);
 
         // Extérieur
-        layoutOutdoor       = findViewById(R.id.layoutOutdoor);
-        mapViewOutdoor      = findViewById(R.id.mapViewOutdoor);
-        tvOutdoorDestination= findViewById(R.id.tvOutdoorDestination);
-        layoutOutdoorSteps  = findViewById(R.id.layoutOutdoorSteps);
-        btnArrive           = findViewById(R.id.btnArrive);
-        btnStopOutdoor      = findViewById(R.id.btnStopOutdoor);
+        layoutOutdoor        = findViewById(R.id.layoutOutdoor);
+        mapViewOutdoor       = findViewById(R.id.mapViewOutdoor);
+        tvOutdoorDestination = findViewById(R.id.tvOutdoorDestination);
+        layoutOutdoorSteps   = findViewById(R.id.layoutOutdoorSteps);
+        btnArrive            = findViewById(R.id.btnArrive);
+        btnStopOutdoor       = findViewById(R.id.btnStopOutdoor);
+        layoutOutdoorContent = findViewById(R.id.layoutOutdoorContent);
+        btnToggleOutdoor     = findViewById(R.id.btnToggleOutdoor);
+        headerOutdoorSheet   = findViewById(R.id.headerOutdoorSheet);
 
         // Recherche
         layoutSearch    = findViewById(R.id.layoutSearch);
@@ -176,11 +183,32 @@ public class NavigationActivity extends AppCompatActivity {
             recyclerDest.setLayoutManager(new LinearLayoutManager(this));
     }
 
+    private void toggleOutdoorSheet() {
+        if (layoutOutdoorContent == null || btnToggleOutdoor == null) return;
+        boolean expanded = layoutOutdoorContent.getVisibility() == View.VISIBLE;
+        if (expanded) {
+            layoutOutdoorContent.animate().alpha(0f).setDuration(150).withEndAction(() -> {
+                layoutOutdoorContent.setVisibility(View.GONE);
+                layoutOutdoorContent.setAlpha(1f);
+            }).start();
+            btnToggleOutdoor.setText("▼");
+            btnToggleOutdoor.setContentDescription("Développer");
+        } else {
+            layoutOutdoorContent.setAlpha(0f);
+            layoutOutdoorContent.setVisibility(View.VISIBLE);
+            layoutOutdoorContent.animate().alpha(1f).setDuration(150).start();
+            btnToggleOutdoor.setText("▲");
+            btnToggleOutdoor.setContentDescription("Réduire");
+        }
+    }
+
     private void setupListeners() {
         setupSheetSwipe(cardInstruction);
-        if (btnBack        != null) btnBack.setOnClickListener(v -> finish());
-        if (btnStopOutdoor != null) btnStopOutdoor.setOnClickListener(v -> finish());
-        if (btnArrive      != null) btnArrive.setOnClickListener(v -> startIndoorOfflineNavigation());
+        if (btnBack           != null) btnBack.setOnClickListener(v -> finish());
+        if (btnStopOutdoor    != null) btnStopOutdoor.setOnClickListener(v -> finish());
+        if (btnToggleOutdoor  != null) btnToggleOutdoor.setOnClickListener(v -> toggleOutdoorSheet());
+        if (headerOutdoorSheet != null) headerOutdoorSheet.setOnClickListener(v -> toggleOutdoorSheet());
+        if (btnArrive         != null) btnArrive.setOnClickListener(v -> startIndoorOfflineNavigation());
         if (btnStop != null) btnStop.setOnClickListener(v -> {
             if (navManager != null) navManager.stopNavigation();
             // Retour à la recherche
@@ -387,6 +415,7 @@ public class NavigationActivity extends AppCompatActivity {
 
     private void doNavigateTo(PointInteret poi) {
         ProfileActivity.addToHistory(this, poi.getNom());
+        HistoryService.logNavigation(this, poi.getId());
 
         String blocCode = poi.getBlocId() != null ? poi.getBlocId() : "B3";
         String batiment = poi.getBatiment(); // ex: "Palestine", "Bloc 3", etc.

@@ -1,4 +1,4 @@
-package com.fsm.navigator.location;
+package com.fsm.navigator.controller;
 
 import java.util.HashMap;
 import java.util.Map;

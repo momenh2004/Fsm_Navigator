@@ -18,6 +18,7 @@ import com.fsm.navigator.auth.AuthService;
 import com.fsm.navigator.auth.PmrManager;
 import com.fsm.navigator.auth.TokenManager;
 import com.fsm.navigator.service.FavoriService;
+import com.fsm.navigator.service.HistoryService;
 
 import java.util.List;
 
@@ -41,6 +42,8 @@ public class ProfileActivity extends BaseDrawerActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
         if (!TokenManager.isLoggedIn(this)) {
             Toast.makeText(getApplicationContext(),
                     "Connectez-vous pour accéder à votre profil",
@@ -49,7 +52,6 @@ public class ProfileActivity extends BaseDrawerActivity {
             return;
         }
 
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
         initViews();
@@ -209,6 +211,7 @@ public class ProfileActivity extends BaseDrawerActivity {
             intent.putExtra("TARGET_NODE_ID", nodeId);
             intent.putExtra("TARGET_NOM",     item.nom);
             intent.putExtra("TARGET_BLOC_ID", item.blocCode);
+            HistoryService.logNavigation(this, item.salleId);
             startActivity(intent);
         } else {
             Intent intent = new Intent(this, BlockDetailActivity.class);
@@ -220,6 +223,56 @@ public class ProfileActivity extends BaseDrawerActivity {
 
     // ── HISTORIQUE ────────────────────────────────────────────
     private void loadHistory() {
+        if (layoutHistoryItems == null) return;
+        HistoryService.getHistory(this, new HistoryService.ListCallback() {
+            @Override
+            public void onSuccess(List<HistoryService.HistoryItem> items) {
+                layoutHistoryItems.removeAllViews();
+                if (items.isEmpty()) {
+                    if (tvHistoryEmpty != null) tvHistoryEmpty.setVisibility(View.VISIBLE);
+                    return;
+                }
+                if (tvHistoryEmpty != null) tvHistoryEmpty.setVisibility(View.GONE);
+                for (HistoryService.HistoryItem it : items) addServerHistoryRow(it);
+            }
+            @Override
+            public void onError(String message) {
+                loadLocalHistory();   // repli si serveur indisponible
+            }
+        });
+    }
+
+    private void addServerHistoryRow(HistoryService.HistoryItem it) {
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setPadding(0, 16, 0, 16);
+        row.setClickable(true); row.setFocusable(true);
+
+        TextView tv = new TextView(this);
+        String sub = (it.blocNom != null && !it.blocNom.isEmpty()) ? "  —  " + it.blocNom : "";
+        tv.setText("🕐  " + it.salleNom + sub);
+        tv.setTextColor(getResources().getColor(R.color.text_primary, null));
+        tv.setTextSize(14);
+        tv.setLayoutParams(new LinearLayout.LayoutParams(
+                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+
+        final String query = it.salleNom;
+        row.setOnClickListener(v -> {
+            Intent intent = new Intent(this, SearchActivity.class);
+            intent.putExtra("QUERY", query);
+            startActivity(intent);
+        });
+        row.addView(tv);
+        layoutHistoryItems.addView(row);
+
+        View divider = new View(this);
+        divider.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 1));
+        divider.setBackgroundColor(getResources().getColor(R.color.glass_border, null));
+        layoutHistoryItems.addView(divider);
+    }
+
+    private void loadLocalHistory() {
         String[] items = getHistory(this);
         layoutHistoryItems.removeAllViews();
         if (items == null || items.length == 0) {
@@ -274,12 +327,18 @@ public class ProfileActivity extends BaseDrawerActivity {
             });
         }
 
-        if (tvClearHistory != null) tvClearHistory.setOnClickListener(v -> {
-            clearHistory(this);
-            layoutHistoryItems.removeAllViews();
-            if (tvHistoryEmpty != null) tvHistoryEmpty.setVisibility(View.VISIBLE);
-            Toast.makeText(this, "Historique effacé", Toast.LENGTH_SHORT).show();
-        });
+        if (tvClearHistory != null) tvClearHistory.setOnClickListener(v ->
+                HistoryService.clearHistory(this, new HistoryService.SimpleCallback() {
+                    @Override public void onSuccess(String message) {
+                        clearHistory(ProfileActivity.this);   // efface aussi le cache local
+                        layoutHistoryItems.removeAllViews();
+                        if (tvHistoryEmpty != null) tvHistoryEmpty.setVisibility(View.VISIBLE);
+                        Toast.makeText(ProfileActivity.this, "Historique effacé", Toast.LENGTH_SHORT).show();
+                    }
+                    @Override public void onError(String message) {
+                        Toast.makeText(ProfileActivity.this, "Erreur : " + message, Toast.LENGTH_SHORT).show();
+                    }
+                }));
 
         if (btnChangePassword != null) btnChangePassword.setOnClickListener(v ->
                 startActivity(new Intent(this, ChangePasswordActivity.class)));

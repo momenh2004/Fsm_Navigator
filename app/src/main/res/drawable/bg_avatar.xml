@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Avatar : cercle dégradé cyan -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
-    <gradient android:type="linear" android:angle="135"
-        android:startColor="#00D4FF" android:endColor="#7B2FBE"/>
+    <gradient
+        android:startColor="#00D4FF"
+        android:endColor="#0077A8"
+        android:angle="135" />
 </shape>

@@ -11,8 +11,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.fsm.navigator.location.KalmanFilter;
-import com.fsm.navigator.location.WeightedKNN;
+import com.fsm.navigator.controller.KalmanFilter;
+import com.fsm.navigator.controller.WeightedKNN;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
