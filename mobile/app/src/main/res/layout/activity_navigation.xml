@@ -1,0 +1,396 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_deep">
+
+    <!-- ══ MODE RECHERCHE ══════════════════════════════════════ -->
+    <LinearLayout
+        android:id="@+id/layoutSearch"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/bg_screen_gradient"
+        android:visibility="gone">
+
+        <!-- Barre haut -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="8dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="40dp"
+            android:paddingBottom="16dp">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:src="@drawable/ic_arrow_left"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/text_secondary"
+                android:contentDescription="Retour" />
+
+            <TextView
+                style="@style/Text.Section"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="Choisir une destination" />
+        </LinearLayout>
+
+        <!-- Champ de recherche souligné -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/screen_h"
+            android:paddingEnd="@dimen/screen_h"
+            android:paddingBottom="8dp">
+
+            <EditText
+                android:id="@+id/etSearchDest"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_underline_input"
+                android:hint="Salle, bloc, service..."
+                android:textColorHint="@color/text_muted"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_input"
+                android:fontFamily="@font/plex_sans"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:inputType="text"
+                android:singleLine="true"
+                android:imeOptions="actionSearch" />
+        </LinearLayout>
+
+        <View android:layout_width="match_parent" android:layout_height="1dp"
+            android:background="@color/divider_white" />
+
+        <!-- Progression -->
+        <ProgressBar
+            android:id="@+id/progressSearch"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity="center_horizontal"
+            android:indeterminateTint="@color/accent"
+            android:visibility="gone"
+            android:layout_marginTop="24dp" />
+
+        <!-- Message vide -->
+        <TextView
+            android:id="@+id/tvSearchEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:gravity="center"
+            android:fontFamily="@font/plex_sans"
+            android:textColor="@color/text_muted"
+            android:textSize="15sp"
+            android:text="Aucun résultat"
+            android:visibility="gone" />
+
+        <!-- Liste résultats -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerDest"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:paddingStart="@dimen/screen_h"
+            android:paddingEnd="@dimen/screen_h"
+            android:clipToPadding="false" />
+
+    </LinearLayout>
+
+    <!-- ══ MODE NAVIGATION ══════════════════════════════════════ -->
+    <LinearLayout
+        android:id="@+id/layoutNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/bg_deep"
+        android:visibility="gone">
+
+        <!-- Barre haut : destination + ✕ -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="@dimen/screen_h"
+            android:paddingEnd="8dp"
+            android:paddingTop="40dp"
+            android:paddingBottom="12dp"
+            android:background="@color/bg_deep">
+
+            <TextView
+                android:id="@+id/tvNavDestination"
+                style="@style/Text.Section"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Destination" />
+
+            <ImageButton
+                android:id="@+id/btnStopNav"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/danger"
+                android:contentDescription="Arrêter" />
+        </LinearLayout>
+
+        <View android:layout_width="match_parent" android:layout_height="1dp"
+            android:background="@color/divider_white" />
+
+        <!-- Statut -->
+        <TextView
+            android:id="@+id/tvNavStatus"
+            style="@style/Text.Sub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/screen_h"
+            android:paddingEnd="@dimen/screen_h"
+            android:paddingTop="12dp"
+            android:paddingBottom="8dp"
+            android:text=""
+            android:gravity="center" />
+
+        <!-- Vue de navigation (plein écran) -->
+        <com.fsm.navigator.view.NavigationView
+            android:id="@+id/navigationView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Progression -->
+        <ProgressBar
+            android:id="@+id/progressNav"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity="center_horizontal"
+            android:indeterminateTint="@color/accent"
+            android:visibility="gone" />
+
+        <!-- Bande d'instruction bas -->
+        <LinearLayout
+            android:id="@+id/cardNavInstruction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_sheet"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Zone de balayage -->
+            <LinearLayout
+                android:id="@+id/handleDismiss"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true">
+                <View
+                    android:layout_width="40dp"
+                    android:layout_height="4dp"
+                    android:background="@color/stroke_white" />
+            </LinearLayout>
+
+            <!-- Contenu instruction -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:paddingBottom="24dp">
+
+                <FrameLayout
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:background="@drawable/bg_accent_circle"
+                    android:layout_marginEnd="16dp">
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_navigate"
+                        app:tint="@color/accent" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvNavInstruction"
+                        style="@style/Text.Body"
+                        android:textFontWeight="600"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingMultiplier="1.3"
+                        android:text="Instruction" />
+
+                    <TextView
+                        android:id="@+id/tvNavDistance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="@font/plex_mono"
+                        android:textColor="@color/accent"
+                        android:textSize="@dimen/text_mono"
+                        android:text="" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- ══ MODE EXTÉRIEUR ══════════════════════════════════════ -->
+    <FrameLayout
+        android:id="@+id/layoutOutdoor"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/bg_deep"
+        android:visibility="gone">
+
+        <com.fsm.navigator.view.FsmMapView
+            android:id="@+id/mapViewOutdoor"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- Pill haut -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/pill_h"
+            android:layout_gravity="top"
+            android:layout_margin="16dp"
+            android:background="@drawable/bg_pill_floating"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="8dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    style="@style/Text.Mono"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Phase 1 — Trajet extérieur" />
+                <TextView
+                    android:id="@+id/tvOutdoorDestination"
+                    style="@style/Text.Body"
+                    android:textFontWeight="600"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="Bloc" />
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/btnStopOutdoor"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/danger"
+                android:contentDescription="Annuler" />
+        </LinearLayout>
+
+        <!-- Card bas : étapes + bouton -->
+        <LinearLayout
+            android:id="@+id/cardOutdoorSheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@drawable/bg_sheet"
+            android:orientation="vertical"
+            android:paddingTop="20dp">
+
+            <View
+                android:layout_width="40dp"
+                android:layout_height="4dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="16dp"
+                android:background="@color/stroke_white" />
+
+            <!-- Header : titre + bouton toggle -->
+            <LinearLayout
+                android:id="@+id/headerOutdoorSheet"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="24dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="12dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    style="@style/Text.Section"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Itinéraire extérieur" />
+
+                <Button
+                    android:id="@+id/btnToggleOutdoor"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:text="▲"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_secondary"
+                    android:padding="0dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Réduire" />
+            </LinearLayout>
+
+            <!-- Contenu pliable -->
+            <LinearLayout
+                android:id="@+id/layoutOutdoorContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:paddingBottom="24dp">
+
+                <LinearLayout
+                    android:id="@+id/layoutOutdoorSteps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="20dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnArrive"
+                    style="@style/Widget.FSM.Button.Primary"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/btn_primary_h"
+                    android:text="Je suis arrivé au bloc" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</FrameLayout>

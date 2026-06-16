@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="300dp"
+    android:layout_height="match_parent"
+    android:layout_gravity="start"
+    android:background="@color/bg_deep"
+    android:orientation="vertical">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:paddingTop="52dp"
+        android:background="@color/bg_deep">
+
+        <FrameLayout
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/bg_avatar">
+            <TextView
+                android:id="@+id/drawerAvatarInitial"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="H"
+                android:textColor="@color/on_accent"
+                android:textSize="20sp"
+                android:fontFamily="@font/space_grotesk"
+                android:textFontWeight="600"
+                android:gravity="center" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/drawerName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Étudiant"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:fontFamily="@font/space_grotesk"
+            android:textFontWeight="600" />
+
+        <TextView
+            android:id="@+id/drawerEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="email@fsm.rnu.tn"
+            android:textColor="@color/text_muted"
+            android:textSize="12sp"
+            android:fontFamily="@font/plex_sans" />
+    </LinearLayout>
+
+    <View android:layout_width="match_parent" android:layout_height="1dp"
+        android:background="@color/divider_white" />
+
+    <!-- Items -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <LinearLayout
+                android:id="@+id/drawerHome"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_drawer_item_active"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="4dp"
+                android:clickable="true"
+                android:focusable="true">
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@android:drawable/ic_menu_today"
+                    app:tint="@color/accent"
+                    android:contentDescription="Accueil"
+                    android:layout_marginEnd="14dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Accueil"
+                    android:textColor="@color/accent"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/plex_sans"
+                    android:textFontWeight="600" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/drawerMap"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="4dp"
+                android:clickable="true"
+                android:focusable="true">
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@android:drawable/ic_menu_mapmode"
+                    app:tint="@color/text_muted"
+                    android:contentDescription="Carte"
+                    android:layout_marginEnd="14dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Carte du campus"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/plex_sans" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/drawerSearch"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="4dp"
+                android:clickable="true"
+                android:focusable="true">
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_search"
+                    app:tint="@color/text_muted"
+                    android:contentDescription="Recherche"
+                    android:layout_marginEnd="14dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Recherche"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/plex_sans" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/drawerNav"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="4dp"
+                android:clickable="true"
+                android:focusable="true">
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_navigate"
+                    app:tint="@color/text_muted"
+                    android:contentDescription="Navigation"
+                    android:layout_marginEnd="14dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Navigation"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/plex_sans" />
+            </LinearLayout>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp"
+                android:background="@color/divider_white"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:id="@+id/drawerProfile"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="4dp"
+                android:clickable="true"
+                android:focusable="true">
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@android:drawable/ic_menu_my_calendar"
+                    app:tint="@color/text_muted"
+                    android:contentDescription="Profil"
+                    android:layout_marginEnd="14dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Profil"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/plex_sans" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/drawerPmr"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="4dp"
+                android:clickable="true"
+                android:focusable="true">
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_accessible"
+                    app:tint="@color/text_muted"
+                    android:contentDescription="PMR"
+                    android:layout_marginEnd="14dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Accessibilité OFF"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/plex_sans" />
+            </LinearLayout>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp"
+                android:background="@color/divider_white"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:id="@+id/drawerLogout"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:clickable="true"
+                android:focusable="true">
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@android:drawable/ic_menu_close_clear_cancel"
+                    app:tint="@color/danger"
+                    android:contentDescription="Déconnexion"
+                    android:layout_marginEnd="14dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Déconnexion"
+                    android:textColor="@color/danger"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/plex_sans" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

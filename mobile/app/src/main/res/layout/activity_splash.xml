@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_deep">
+
+    <LinearLayout
+        android:id="@+id/splashContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="FSM"
+            android:fontFamily="@font/space_grotesk"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:textSize="46sp"
+            android:letterSpacing="-0.03"
+            android:includeFontPadding="false" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Navigator"
+            android:fontFamily="@font/space_grotesk"
+            android:textFontWeight="500"
+            android:textColor="@color/text_primary"
+            android:textSize="30sp"
+            android:letterSpacing="-0.015"
+            android:includeFontPadding="false" />
+
+        <View
+            android:layout_width="64dp"
+            android:layout_height="2dp"
+            android:layout_marginTop="22dp"
+            android:layout_marginBottom="22dp"
+            android:background="@color/accent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Faculté des Sciences\nde Monastir"
+            android:gravity="center"
+            android:fontFamily="@font/plex_sans"
+            android:textColor="@color/text_muted"
+            android:textSize="13.5sp"
+            android:lineSpacingMultiplier="1.5" />
+    </LinearLayout>
+
+    <!-- barre de progression en bas -->
+    <FrameLayout
+        android:layout_width="120dp"
+        android:layout_height="2.5dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="40dp"
+        android:background="#14FFFFFF">
+        <View
+            android:id="@+id/splashProgress"
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            android:background="@color/accent" />
+    </FrameLayout>
+</FrameLayout>

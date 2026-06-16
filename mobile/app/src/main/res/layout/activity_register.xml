@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_screen_gradient"
+    android:fillViewport="true"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="30dp"
+        android:paddingEnd="30dp"
+        android:paddingTop="64dp"
+        android:paddingBottom="40dp">
+
+        <!-- Titre -->
+        <TextView
+            style="@style/Text.TitleXL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Créer un compte." />
+
+        <TextView
+            style="@style/Text.Sub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:maxWidth="260dp"
+            android:lineSpacingMultiplier="1.45"
+            android:text="Rejoignez FSM Navigator et accédez à toutes les fonctionnalités." />
+
+        <!-- Champ E-mail -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.FSM.Input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:hint="Adresse e-mail">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:inputType="textEmailAddress"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_input"
+                android:fontFamily="@font/plex_sans" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <View android:layout_width="match_parent" android:layout_height="1.5dp"
+            android:background="@color/divider_white" android:layout_marginBottom="24dp" />
+
+        <!-- Champ Mot de passe -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.FSM.Input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mot de passe"
+            app:endIconMode="password_toggle"
+            app:endIconTint="@color/text_muted">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:inputType="textPassword"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_input"
+                android:fontFamily="@font/plex_sans" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <View android:layout_width="match_parent" android:layout_height="1.5dp"
+            android:background="@color/divider_white" android:layout_marginBottom="24dp" />
+
+        <!-- Champ Confirmer mot de passe -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.FSM.Input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Confirmer le mot de passe"
+            app:endIconMode="password_toggle"
+            app:endIconTint="@color/text_muted">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etConfirmPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:inputType="textPassword"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_input"
+                android:fontFamily="@font/plex_sans" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <View android:layout_width="match_parent" android:layout_height="1.5dp"
+            android:background="@color/divider_white" android:layout_marginBottom="36dp" />
+
+        <!-- Bloc CAPTCHA : bordure gauche cyan 2dp, pas de carte -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="32dp">
+
+            <View
+                android:layout_width="2dp"
+                android:layout_height="match_parent"
+                android:background="@color/accent"
+                android:layout_marginEnd="16dp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Vérification anti-robot"
+                    android:fontFamily="@font/plex_sans"
+                    android:textFontWeight="600"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:id="@+id/tvCaptchaQuestion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/plex_mono"
+                    android:textColor="@color/accent"
+                    android:textSize="16sp"
+                    android:layout_marginBottom="12dp"
+                    android:text="Combien font 3 + 5 ?" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.FSM.Input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Votre réponse">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etCaptcha"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:inputType="number"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_input"
+                        android:fontFamily="@font/plex_mono" />
+                </com.google.android.material.textfield.TextInputLayout>
+                <View android:layout_width="match_parent" android:layout_height="1.5dp"
+                    android:background="@color/divider_white" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Erreur -->
+        <TextView
+            android:id="@+id/tvError"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@color/danger"
+            android:textSize="12sp"
+            android:visibility="gone"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Bouton créer un compte -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRegister"
+            style="@style/Widget.FSM.Button.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/btn_primary_h"
+            android:text="Créer un compte" />
+
+        <!-- Progression -->
+        <ProgressBar
+            android:id="@+id/progressRegister"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity="center_horizontal"
+            android:indeterminateTint="@color/accent"
+            android:visibility="gone"
+            android:layout_marginTop="8dp" />
+
+        <!-- Lien retour -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tvLogin"
+            style="@style/Widget.FSM.Button.Text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:text="Déjà un compte ? Se connecter" />
+
+    </LinearLayout>
+</ScrollView>

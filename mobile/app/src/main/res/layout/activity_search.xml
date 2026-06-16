@@ -1,0 +1,310 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Main content -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/bg_screen_gradient">
+
+        <!-- Barre haut : retour + champ souligné -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="8dp"
+            android:paddingEnd="@dimen/screen_h"
+            android:paddingTop="40dp"
+            android:paddingBottom="8dp">
+
+            <ImageButton
+                android:id="@+id/btnHamburger"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:src="@drawable/ic_menu"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/text_secondary"
+                android:contentDescription="Menu" />
+
+            <EditText
+                android:id="@+id/etSearch"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_underline_input"
+                android:hint="Rechercher une salle, un service..."
+                android:textColorHint="@color/text_muted"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:fontFamily="@font/plex_sans"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:inputType="text"
+                android:singleLine="true"
+                android:imeOptions="actionSearch" />
+
+            <ImageButton
+                android:id="@+id/btnClear"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/text_muted"
+                android:visibility="gone"
+                android:contentDescription="Effacer" />
+        </LinearLayout>
+
+        <!-- Filtres catégorie (scroll horizontal) -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:paddingStart="@dimen/screen_h"
+            android:paddingEnd="@dimen/screen_h"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView android:id="@+id/filterAll"
+                    android:layout_width="wrap_content" android:layout_height="36dp"
+                    android:background="@drawable/bg_chip_active"
+                    android:gravity="center" android:paddingStart="14dp" android:paddingEnd="14dp"
+                    android:text="Tous" android:textColor="@color/on_accent" android:textSize="13sp"
+                    android:fontFamily="@font/plex_sans" android:textFontWeight="600"
+                    android:layout_marginEnd="8dp" android:clickable="true" android:focusable="true" />
+
+                <TextView android:id="@+id/filterAmphi"
+                    android:layout_width="wrap_content" android:layout_height="36dp"
+                    android:background="@drawable/bg_chip_inactive"
+                    android:gravity="center" android:paddingStart="14dp" android:paddingEnd="14dp"
+                    android:text="Amphis" android:textColor="@color/text_secondary" android:textSize="13sp"
+                    android:fontFamily="@font/plex_sans"
+                    android:layout_marginEnd="8dp" android:clickable="true" android:focusable="true" />
+
+                <TextView android:id="@+id/filterAdmin"
+                    android:layout_width="wrap_content" android:layout_height="36dp"
+                    android:background="@drawable/bg_chip_inactive"
+                    android:gravity="center" android:paddingStart="14dp" android:paddingEnd="14dp"
+                    android:text="Administration" android:textColor="@color/text_secondary" android:textSize="13sp"
+                    android:fontFamily="@font/plex_sans"
+                    android:layout_marginEnd="8dp" android:clickable="true" android:focusable="true" />
+
+                <TextView android:id="@+id/filterLabo"
+                    android:layout_width="wrap_content" android:layout_height="36dp"
+                    android:background="@drawable/bg_chip_inactive"
+                    android:gravity="center" android:paddingStart="14dp" android:paddingEnd="14dp"
+                    android:text="Labos" android:textColor="@color/text_secondary" android:textSize="13sp"
+                    android:fontFamily="@font/plex_sans"
+                    android:layout_marginEnd="8dp" android:clickable="true" android:focusable="true" />
+
+                <TextView android:id="@+id/filterBiblio"
+                    android:layout_width="wrap_content" android:layout_height="36dp"
+                    android:background="@drawable/bg_chip_inactive"
+                    android:gravity="center" android:paddingStart="14dp" android:paddingEnd="14dp"
+                    android:text="Bibliothèque" android:textColor="@color/text_secondary" android:textSize="13sp"
+                    android:fontFamily="@font/plex_sans"
+                    android:layout_marginEnd="8dp" android:clickable="true" android:focusable="true" />
+
+                <TextView android:id="@+id/filterDept"
+                    android:layout_width="wrap_content" android:layout_height="36dp"
+                    android:background="@drawable/bg_chip_inactive"
+                    android:gravity="center" android:paddingStart="14dp" android:paddingEnd="14dp"
+                    android:text="Départements" android:textColor="@color/text_secondary" android:textSize="13sp"
+                    android:fontFamily="@font/plex_sans"
+                    android:layout_marginEnd="8dp" android:clickable="true" android:focusable="true" />
+
+                <TextView android:id="@+id/filterSalle"
+                    android:layout_width="wrap_content" android:layout_height="36dp"
+                    android:background="@drawable/bg_chip_inactive"
+                    android:gravity="center" android:paddingStart="14dp" android:paddingEnd="14dp"
+                    android:text="Salles" android:textColor="@color/text_secondary" android:textSize="13sp"
+                    android:fontFamily="@font/plex_sans"
+                    android:clickable="true" android:focusable="true" />
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <View android:layout_width="match_parent" android:layout_height="1dp"
+            android:background="@color/divider_white" />
+
+        <!-- Compteur résultats -->
+        <TextView
+            android:id="@+id/tvResultCount"
+            style="@style/Text.Mono"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/screen_h"
+            android:paddingEnd="@dimen/screen_h"
+            android:paddingTop="10dp"
+            android:paddingBottom="6dp"
+            android:text=""
+            android:visibility="gone" />
+
+        <!-- Progression -->
+        <ProgressBar
+            android:id="@+id/progressSearch"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity="center_horizontal"
+            android:indeterminateTint="@color/accent"
+            android:visibility="gone"
+            android:layout_marginTop="16dp" />
+
+        <!-- Section historique -->
+        <LinearLayout
+            android:id="@+id/layoutHistory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="@dimen/screen_h"
+                android:paddingEnd="@dimen/screen_h"
+                android:paddingTop="12dp"
+                android:paddingBottom="8dp">
+                <TextView
+                    style="@style/Text.Section"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Recherches récentes" />
+                <TextView
+                    android:id="@+id/tvClearHistory"
+                    style="@style/Text.Sub"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/accent"
+                    android:text="Effacer"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/historyItem1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="@dimen/screen_h"
+                android:paddingEnd="@dimen/screen_h"
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp"
+                android:clickable="true" android:focusable="true">
+                <ImageView android:layout_width="20dp" android:layout_height="20dp"
+                    android:src="@android:drawable/ic_menu_recent_history"
+                    app:tint="@color/text_muted"
+                    android:layout_marginEnd="14dp" />
+                <TextView android:id="@+id/tvHistory1"
+                    style="@style/Text.Body"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="" />
+            </LinearLayout>
+            <View android:layout_width="match_parent" android:layout_height="1dp"
+                android:background="@color/divider_white"
+                android:layout_marginStart="@dimen/screen_h" />
+
+            <LinearLayout
+                android:id="@+id/historyItem2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="@dimen/screen_h"
+                android:paddingEnd="@dimen/screen_h"
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp"
+                android:clickable="true" android:focusable="true">
+                <ImageView android:layout_width="20dp" android:layout_height="20dp"
+                    android:src="@android:drawable/ic_menu_recent_history"
+                    app:tint="@color/text_muted"
+                    android:layout_marginEnd="14dp" />
+                <TextView android:id="@+id/tvHistory2"
+                    style="@style/Text.Body"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="" />
+            </LinearLayout>
+            <View android:layout_width="match_parent" android:layout_height="1dp"
+                android:background="@color/divider_white"
+                android:layout_marginStart="@dimen/screen_h" />
+
+            <LinearLayout
+                android:id="@+id/historyItem3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="@dimen/screen_h"
+                android:paddingEnd="@dimen/screen_h"
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp"
+                android:clickable="true" android:focusable="true">
+                <ImageView android:layout_width="20dp" android:layout_height="20dp"
+                    android:src="@android:drawable/ic_menu_recent_history"
+                    app:tint="@color/text_muted"
+                    android:layout_marginEnd="14dp" />
+                <TextView android:id="@+id/tvHistory3"
+                    style="@style/Text.Body"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Section résultats -->
+        <LinearLayout
+            android:id="@+id/layoutResults"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerResults"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingStart="@dimen/screen_h"
+                android:paddingEnd="@dimen/screen_h" />
+        </LinearLayout>
+
+        <!-- Section vide -->
+        <LinearLayout
+            android:id="@+id/layoutEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <TextView
+                style="@style/Text.Sub"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:lineSpacingMultiplier="1.5"
+                android:text="Aucun résultat trouvé.\nEssayez un autre terme." />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Navigation Drawer -->
+    <include layout="@layout/nav_drawer" />
+
+</androidx.drawerlayout.widget.DrawerLayout>

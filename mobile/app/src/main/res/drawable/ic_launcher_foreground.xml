@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Navigation arrow left half (bright cyan) -->
+    <path
+        android:fillColor="#00D4FF"
+        android:pathData="M54,16 L30,82 L54,64 Z" />
+
+    <!-- Navigation arrow right half (slightly darker for depth) -->
+    <path
+        android:fillColor="#00A8CC"
+        android:pathData="M54,16 L78,82 L54,64 Z" />
+
+</vector>

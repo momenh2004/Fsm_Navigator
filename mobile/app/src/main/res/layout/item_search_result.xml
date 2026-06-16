@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp">
+
+        <ImageView
+            android:id="@+id/ivPoiIcon"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_navigate"
+            app:tint="@color/text_secondary"
+            android:contentDescription="Icône"
+            android:layout_marginEnd="16dp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvPoiName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Salle 301"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp"
+                android:fontFamily="@font/plex_sans"
+                android:textFontWeight="600"
+                android:layout_marginBottom="2dp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvPoiDetails"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bloc 3 · RDC"
+                    android:textColor="@color/text_muted"
+                    android:textSize="13sp"
+                    android:fontFamily="@font/plex_sans" />
+
+                <TextView
+                    android:id="@+id/tvPoiCategory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@color/text_muted"
+                    android:textSize="13sp"
+                    android:fontFamily="@font/plex_sans"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/btnNavigate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="6dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Y aller"
+                android:textColor="@color/accent"
+                android:textSize="14sp"
+                android:fontFamily="@font/plex_sans"
+                android:textFontWeight="600" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_chevron_right"
+                app:tint="@color/accent"
+                android:layout_marginStart="4dp"
+                android:contentDescription="→" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/btnFavori"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="4dp"
+            android:src="@android:drawable/btn_star_big_off"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="4dp"
+            android:visibility="gone"
+            android:contentDescription="Favori" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_white" />
+
+</LinearLayout>

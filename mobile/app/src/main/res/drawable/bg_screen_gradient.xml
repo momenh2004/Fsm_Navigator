@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dégradé vertical des écrans de contenu : #1A1A2E -> #181F38 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <gradient
+        android:startColor="#1A1A2E"
+        android:endColor="#181F38"
+        android:angle="270" />
+</shape>

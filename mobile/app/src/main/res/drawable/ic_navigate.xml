@@ -1,0 +1,7 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <!-- Flèche pleine (navigate / FAB) -->
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M21,4L3,11l7,3 3,7 8,-17z" />
+</vector>

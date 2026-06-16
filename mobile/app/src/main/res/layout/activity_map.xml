@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/bg_deep">
+
+        <com.fsm.navigator.view.FsmMapView
+            android:id="@+id/mapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- Pill flottante haut -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/pill_h"
+            android:layout_gravity="top"
+            android:layout_margin="16dp"
+            android:background="@drawable/bg_pill_floating"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="16dp">
+
+            <ImageButton
+                android:id="@+id/btnHamburger"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_menu"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/text_secondary"
+                android:contentDescription="Menu" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/plex_sans"
+                android:textFontWeight="500"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp"
+                android:text="Carte du campus" />
+
+            <ImageButton
+                android:id="@+id/btnLocate"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@android:drawable/ic_menu_mylocation"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/accent"
+                android:contentDescription="Me localiser" />
+        </LinearLayout>
+
+        <!-- Zoom +/- -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="12dp"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btnZoomIn"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginBottom="8dp"
+                android:text="+"
+                android:textSize="22sp"
+                android:textColor="@color/text_primary"
+                android:padding="0dp"
+                android:background="@drawable/bg_pill_floating"
+                android:contentDescription="Zoom +" />
+
+            <Button
+                android:id="@+id/btnZoomOut"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:text="−"
+                android:textSize="22sp"
+                android:textColor="@color/text_primary"
+                android:padding="0dp"
+                android:background="@drawable/bg_pill_floating"
+                android:contentDescription="Zoom -" />
+        </LinearLayout>
+
+        <!-- Card infos bloc (bottom sheet, GONE par défaut) -->
+        <LinearLayout
+            android:id="@+id/cardBlocInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@drawable/bg_sheet"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:paddingTop="20dp"
+            android:visibility="gone">
+
+            <!-- Zone de balayage (handle élargi pour faciliter le geste) -->
+            <LinearLayout
+                android:id="@+id/handleDismiss"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:paddingTop="4dp"
+                android:paddingBottom="20dp"
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true">
+                <View
+                    android:layout_width="40dp"
+                    android:layout_height="4dp"
+                    android:background="@color/stroke_white" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvBlocNom"
+                style="@style/Text.Sheet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nom du bloc" />
+
+            <TextView
+                android:id="@+id/tvBlocDesc"
+                style="@style/Text.Sub"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:lineSpacingMultiplier="1.4"
+                android:text="" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="20dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnVoirPlan"
+                    style="@style/Widget.FSM.Button.Outline"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/btn_outline_h"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="12dp"
+                    android:text="Plan"
+                    android:visibility="gone" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnNavigerBloc"
+                    style="@style/Widget.FSM.Button.Primary"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/btn_primary_h"
+                    android:layout_weight="1"
+                    android:text="Y aller" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <include layout="@layout/nav_drawer" />
+
+</androidx.drawerlayout.widget.DrawerLayout>

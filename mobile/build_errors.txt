@@ -1,0 +1,893 @@
+﻿
+> Configure project :app
+WARNING: The option setting 'android.usesSdkInManifest.disallowed=false' is deprecated.
+The current default is 'true'.
+It will be removed in version 10.0 of the Android Gradle plugin.
+WARNING: The option setting 'android.sdk.defaultTargetSdkToCompileSdkIfUnset=false' is deprecated.
+The current default is 'true'.
+It will be removed in version 10.0 of the Android Gradle plugin.
+WARNING: The option setting 'android.enableAppCompileTimeRClass=false' is deprecated.
+The current default is 'true'.
+It will be removed in version 10.0 of the Android Gradle plugin.
+WARNING: The option setting 'android.builtInKotlin=false' is deprecated.
+The current default is 'true'.
+It will be removed in version 10.0 of the Android Gradle plugin.
+WARNING: The option setting 'android.newDsl=false' is deprecated.
+The current default is 'true'.
+It will be removed in version 10.0 of the Android Gradle plugin.
+WARNING: The option setting 'android.r8.optimizedResourceShrinking=false' is deprecated.
+The current default is 'true'.
+It will be removed in version 10.0 of the Android Gradle plugin.
+WARNING: The option setting 'android.defaults.buildfeatures.resvalues=true' is deprecated.
+The current default is 'false'.
+It will be removed in version 10.0 of the Android Gradle plugin.
+WARNING: The property android.dependency.excludeLibraryComponentsFromConstraints improves project import performance for very large projects. It should be enabled to improve performance.
+To suppress this warning, add android.generateSyncIssueWhenLibraryConstraintsAreEnabled=false to gradle.properties
+WARNING: The property android.dependency.excludeLibraryComponentsFromConstraints improves project import performance for very large projects. It should be enabled to improve performance.
+To suppress this warning, add android.generateSyncIssueWhenLibraryConstraintsAreEnabled=false to gradle.properties
+WARNING: The property android.dependency.excludeLibraryComponentsFromConstraints improves project import performance for very large projects. It should be enabled to improve performance.
+To suppress this warning, add android.generateSyncIssueWhenLibraryConstraintsAreEnabled=false to gradle.properties
+WARNING: The property android.dependency.excludeLibraryComponentsFromConstraints improves project import performance for very large projects. It should be enabled to improve performance.
+To suppress this warning, add android.generateSyncIssueWhenLibraryConstraintsAreEnabled=false to gradle.properties
+
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest
+> Task :app:processDebugManifest
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:generateDebugGlobalSynthetics UP-TO-DATE
+> Task :app:processDebugJavaRes NO-SOURCE
+> Task :app:mergeDebugJavaResource UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :app:mergeDebugNativeLibs NO-SOURCE
+> Task :app:stripDebugDebugSymbols NO-SOURCE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:processDebugManifestForPackage
+> Task :app:processDebugResources
+
+> Task :app:compileDebugJavaWithJavac
+.\gradlew.bat : C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:1: error: 
+illegal character: '\ufeff'
+At line:2 char:1
++ .\gradlew.bat assembleDebug 2>&1 | Out-File "C:\Fsm_Navigation\build_ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:\Fsm_Navigati...acter: '\ufeff':String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+﻿package com.fsm.navigator.controller;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:1: error: class, interface, 
+or enum expected
+﻿package com.fsm.navigator.controller;
+         ^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:3: error: class, interface, 
+or enum expected
+import android.app.AlertDialog;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:4: error: class, interface, 
+or enum expected
+import android.content.Intent;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:5: error: class, interface, 
+or enum expected
+import android.os.Bundle;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:6: error: class, interface, 
+or enum expected
+import android.view.Gravity;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:7: error: class, interface, 
+or enum expected
+import android.view.View;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:8: error: class, interface, 
+or enum expected
+import android.widget.ImageButton;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:9: error: class, interface, 
+or enum expected
+import android.widget.LinearLayout;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:10: error: class, interface, 
+or enum expected
+import android.widget.TextView;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:12: error: class, interface, 
+or enum expected
+import androidx.appcompat.app.AppCompatActivity;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:13: error: class, interface, 
+or enum expected
+import androidx.drawerlayout.widget.DrawerLayout;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:15: error: class, interface, 
+or enum expected
+import com.fsm.navigator.auth.TokenManager;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BlockDetailActivity.java:1: error: illegal character: 
+'\ufeff'
+﻿package com.fsm.navigator.controller;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BlockDetailActivity.java:1: error: class, interface, 
+or enum expected
+﻿package com.fsm.navigator.controller;
+         ^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BlockDetailActivity.java:3: error: class, interface, 
+or enum expected
+import android.content.Intent;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BlockDetailActivity.java:4: error: class, interface, 
+or enum expected
+import android.os.Bundle;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BlockDetailActivity.java:5: error: class, interface, 
+or enum expected
+import android.view.View;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BlockDetailActivity.java:6: error: class, interface, 
+or enum expected
+import android.widget.ImageButton;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BlockDetailActivity.java:7: error: class, interface, 
+or enum expected
+import android.widget.LinearLayout;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BlockDetailActivity.java:8: error: class, interface, 
+or enum expected
+import android.widget.TextView;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BlockDetailActivity.java:9: error: class, interface, 
+or enum expected
+import androidx.cardview.widget.CardView;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BlockDetailActivity.java:11: error: class, interface, 
+or enum expected
+import com.fsm.navigator.model.NavigationGraph;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BlockDetailActivity.java:12: error: class, interface, 
+or enum expected
+import com.fsm.navigator.view.BlocDetailView;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:1: error: illegal 
+character: '\ufeff'
+﻿package com.fsm.navigator.controller;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:1: error: class, 
+interface, or enum expected
+﻿package com.fsm.navigator.controller;
+         ^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:3: error: class, 
+interface, or enum expected
+import android.os.Bundle;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:4: error: class, 
+interface, or enum expected
+import android.text.method.PasswordTransformationMethod;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:5: error: class, 
+interface, or enum expected
+import android.view.View;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:6: error: class, 
+interface, or enum expected
+import android.widget.Button;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:7: error: class, 
+interface, or enum expected
+import android.widget.EditText;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:8: error: class, 
+interface, or enum expected
+import android.widget.ImageButton;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:9: error: class, 
+interface, or enum expected
+import android.widget.ProgressBar;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:10: error: class, 
+interface, or enum expected
+import android.widget.TextView;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:11: error: class, 
+interface, or enum expected
+import android.widget.Toast;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:13: error: class, 
+interface, or enum expected
+import androidx.appcompat.app.AppCompatActivity;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:15: error: class, 
+interface, or enum expected
+import com.fsm.navigator.auth.AuthService;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:16: error: class, 
+interface, or enum expected
+import com.fsm.navigator.auth.TokenManager;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:1: error: illegal character: 
+'\ufeff'
+﻿package com.fsm.navigator.controller;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:1: error: class, interface, or 
+enum expected
+﻿package com.fsm.navigator.controller;
+         ^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:3: error: class, interface, or 
+enum expected
+import android.content.Intent;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:4: error: class, interface, or 
+enum expected
+import android.os.Bundle;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:5: error: class, interface, or 
+enum expected
+import android.text.method.PasswordTransformationMethod;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:6: error: class, interface, or 
+enum expected
+import android.view.View;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:7: error: class, interface, or 
+enum expected
+import android.widget.Button;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:8: error: class, interface, or 
+enum expected
+import android.widget.EditText;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:9: error: class, interface, or 
+enum expected
+import android.widget.ImageButton;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:10: error: class, interface, or 
+enum expected
+import android.widget.ProgressBar;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:11: error: class, interface, or 
+enum expected
+import android.util.Patterns;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:12: error: class, interface, or 
+enum expected
+import android.widget.TextView;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:13: error: class, interface, or 
+enum expected
+import android.text.method.HideReturnsTransformationMethod;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:15: error: class, interface, or 
+enum expected
+import androidx.appcompat.app.AppCompatActivity;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:17: error: class, interface, or 
+enum expected
+import com.fsm.navigator.auth.AuthService;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:18: error: class, interface, or 
+enum expected
+import com.fsm.navigator.auth.TokenManager;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:19: error: class, interface, or 
+enum expected
+import androidx.appcompat.widget.SwitchCompat;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:20: error: class, interface, or 
+enum expected
+import com.fsm.navigator.auth.PmrManager;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MainActivity.java:1: error: illegal character: 
+'\ufeff'
+﻿package com.fsm.navigator.controller;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MainActivity.java:1: error: class, interface, or enum 
+expected
+﻿package com.fsm.navigator.controller;
+         ^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MainActivity.java:3: error: class, interface, or enum 
+expected
+import android.content.Intent;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MainActivity.java:4: error: class, interface, or enum 
+expected
+import android.os.Bundle;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MainActivity.java:5: error: class, interface, or enum 
+expected
+import android.view.View;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MainActivity.java:6: error: class, interface, or enum 
+expected
+import android.widget.TextView;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MainActivity.java:8: error: class, interface, or enum 
+expected
+import androidx.cardview.widget.CardView;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MainActivity.java:10: error: class, interface, or 
+enum expected
+import com.fsm.navigator.auth.PmrManager;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MainActivity.java:11: error: class, interface, or 
+enum expected
+import com.fsm.navigator.auth.TokenManager;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:1: error: illegal character: '\ufeff'
+﻿package com.fsm.navigator.controller;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:1: error: class, interface, or enum 
+expected
+﻿package com.fsm.navigator.controller;
+         ^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:3: error: class, interface, or enum 
+expected
+import android.Manifest;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:4: error: class, interface, or enum 
+expected
+import android.content.Intent;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:5: error: class, interface, or enum 
+expected
+import android.content.pm.PackageManager;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:6: error: class, interface, or enum 
+expected
+import android.os.Bundle;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:7: error: class, interface, or enum 
+expected
+import android.os.Handler;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:8: error: class, interface, or enum 
+expected
+import android.view.View;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:9: error: class, interface, or enum 
+expected
+import android.widget.ImageButton;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:10: error: class, interface, or enum 
+expected
+import android.widget.LinearLayout;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:11: error: class, interface, or enum 
+expected
+import android.widget.ProgressBar;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:12: error: class, interface, or enum 
+expected
+import android.widget.TextView;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:13: error: class, interface, or enum 
+expected
+import android.widget.Toast;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:15: error: class, interface, or enum 
+expected
+import androidx.cardview.widget.CardView;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:16: error: class, interface, or enum 
+expected
+import androidx.core.app.ActivityCompat;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:17: error: class, interface, or enum 
+expected
+import androidx.core.content.ContextCompat;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:19: error: class, interface, or enum 
+expected
+import com.fsm.navigator.location.LocationManager;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:20: error: class, interface, or enum 
+expected
+import com.fsm.navigator.location.WeightedKNN;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:21: error: class, interface, or enum 
+expected
+import com.fsm.navigator.view.FsmMapView;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:23: error: class, interface, or enum 
+expected
+import java.util.ArrayList;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:24: error: class, interface, or enum 
+expected
+import java.util.Arrays;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:25: error: class, interface, or enum 
+expected
+import java.util.Collections;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:26: error: class, interface, or enum 
+expected
+import java.util.HashMap;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:27: error: class, interface, or enum 
+expected
+import java.util.LinkedList;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:28: error: class, interface, or enum 
+expected
+import java.util.List;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:29: error: class, interface, or enum 
+expected
+import java.util.Map;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:30: error: class, interface, or enum 
+expected
+import java.util.Queue;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\NavigationActivity.java:1: error: illegal character: 
+'\ufeff'
+﻿package com.fsm.navigator.controller;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\NavigationActivity.java:1: error: class, interface, 
+or enum expected
+﻿package com.fsm.navigator.controller;
+         ^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\NavigationActivity.java:3: error: class, interface, 
+or enum expected
+import android.content.Intent;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\NavigationActivity.java:4: error: class, interface, 
+or enum expected
+import android.os.Bundle;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\NavigationActivity.java:5: error: class, interface, 
+or enum expected
+import android.text.Editable;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\NavigationActivity.java:6: error: class, interface, 
+or enum expected
+import android.text.TextWatcher;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\NavigationActivity.java:7: error: class, interface, 
+or enum expected
+import android.util.Log;
+^
+C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\NavigationActivity.java:8: error: class, interface, 
+or enum expected
+import android.view.View;
+^
+100 errors
+
+> Task :app:compileDebugJavaWithJavac FAILED
+
+[Incubating] Problems report is available at: file:///C:/Fsm_Navigation/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileDebugJavaWithJavac'.
+> Compilation failed; see the compiler output below.
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:1: error: class, interface, 
+or enum expected
+  ﻿package com.fsm.navigator.controller;
+           ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:3: error: class, interface, 
+or enum expected
+  import android.app.AlertDialog;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:4: error: class, interface, 
+or enum expected
+  import android.content.Intent;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:5: error: class, interface, 
+or enum expected
+  import android.os.Bundle;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:6: error: class, interface, 
+or enum expected
+  import android.view.Gravity;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:7: error: class, interface, 
+or enum expected
+  import android.view.View;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:8: error: class, interface, 
+or enum expected
+  import android.widget.ImageButton;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:9: error: class, interface, 
+or enum expected
+  import android.widget.LinearLayout;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:10: error: class, 
+interface, or enum expected
+  import android.widget.TextView;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:12: error: class, 
+interface, or enum expected
+  import androidx.appcompat.app.AppCompatActivity;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:13: error: class, 
+interface, or enum expected
+  import androidx.drawerlayout.widget.DrawerLayout;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:15: error: class, 
+interface, or enum expected
+  import com.fsm.navigator.auth.TokenManager;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BlockDetailActivity.java:1: error: class, 
+interface, or enum expected
+  ﻿package com.fsm.navigator.controller;
+           ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BlockDetailActivity.java:3: error: class, 
+interface, or enum expected
+  import android.content.Intent;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BlockDetailActivity.java:4: error: class, 
+interface, or enum expected
+  import android.os.Bundle;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BlockDetailActivity.java:5: error: class, 
+interface, or enum expected
+  import android.view.View;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BlockDetailActivity.java:6: error: class, 
+interface, or enum expected
+  import android.widget.ImageButton;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BlockDetailActivity.java:7: error: class, 
+interface, or enum expected
+  import android.widget.LinearLayout;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BlockDetailActivity.java:8: error: class, 
+interface, or enum expected
+  import android.widget.TextView;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BlockDetailActivity.java:9: error: class, 
+interface, or enum expected
+  import androidx.cardview.widget.CardView;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BlockDetailActivity.java:11: error: class, 
+interface, or enum expected
+  import com.fsm.navigator.model.NavigationGraph;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BlockDetailActivity.java:12: error: class, 
+interface, or enum expected
+  import com.fsm.navigator.view.BlocDetailView;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:1: error: class, 
+interface, or enum expected
+  ﻿package com.fsm.navigator.controller;
+           ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:3: error: class, 
+interface, or enum expected
+  import android.os.Bundle;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:4: error: class, 
+interface, or enum expected
+  import android.text.method.PasswordTransformationMethod;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:5: error: class, 
+interface, or enum expected
+  import android.view.View;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:6: error: class, 
+interface, or enum expected
+  import android.widget.Button;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:7: error: class, 
+interface, or enum expected
+  import android.widget.EditText;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:8: error: class, 
+interface, or enum expected
+  import android.widget.ImageButton;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:9: error: class, 
+interface, or enum expected
+  import android.widget.ProgressBar;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:10: error: class, 
+interface, or enum expected
+  import android.widget.TextView;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:11: error: class, 
+interface, or enum expected
+  import android.widget.Toast;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:13: error: class, 
+interface, or enum expected
+  import androidx.appcompat.app.AppCompatActivity;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:15: error: class, 
+interface, or enum expected
+  import com.fsm.navigator.auth.AuthService;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:16: error: class, 
+interface, or enum expected
+  import com.fsm.navigator.auth.TokenManager;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:1: error: class, interface, or 
+enum expected
+  ﻿package com.fsm.navigator.controller;
+           ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:3: error: class, interface, or 
+enum expected
+  import android.content.Intent;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:4: error: class, interface, or 
+enum expected
+  import android.os.Bundle;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:5: error: class, interface, or 
+enum expected
+  import android.text.method.PasswordTransformationMethod;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:6: error: class, interface, or 
+enum expected
+  import android.view.View;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:7: error: class, interface, or 
+enum expected
+  import android.widget.Button;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:8: error: class, interface, or 
+enum expected
+  import android.widget.EditText;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:9: error: class, interface, or 
+enum expected
+  import android.widget.ImageButton;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:10: error: class, interface, or 
+enum expected
+  import android.widget.ProgressBar;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:11: error: class, interface, or 
+enum expected
+  import android.util.Patterns;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:12: error: class, interface, or 
+enum expected
+  import android.widget.TextView;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:13: error: class, interface, or 
+enum expected
+  import android.text.method.HideReturnsTransformationMethod;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:15: error: class, interface, or 
+enum expected
+  import androidx.appcompat.app.AppCompatActivity;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:17: error: class, interface, or 
+enum expected
+  import com.fsm.navigator.auth.AuthService;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:18: error: class, interface, or 
+enum expected
+  import com.fsm.navigator.auth.TokenManager;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:19: error: class, interface, or 
+enum expected
+  import androidx.appcompat.widget.SwitchCompat;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:20: error: class, interface, or 
+enum expected
+  import com.fsm.navigator.auth.PmrManager;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MainActivity.java:1: error: class, interface, or 
+enum expected
+  ﻿package com.fsm.navigator.controller;
+           ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MainActivity.java:3: error: class, interface, or 
+enum expected
+  import android.content.Intent;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MainActivity.java:4: error: class, interface, or 
+enum expected
+  import android.os.Bundle;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MainActivity.java:5: error: class, interface, or 
+enum expected
+  import android.view.View;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MainActivity.java:6: error: class, interface, or 
+enum expected
+  import android.widget.TextView;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MainActivity.java:8: error: class, interface, or 
+enum expected
+  import androidx.cardview.widget.CardView;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MainActivity.java:10: error: class, interface, or 
+enum expected
+  import com.fsm.navigator.auth.PmrManager;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MainActivity.java:11: error: class, interface, or 
+enum expected
+  import com.fsm.navigator.auth.TokenManager;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:1: error: class, interface, or 
+enum expected
+  ﻿package com.fsm.navigator.controller;
+           ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:3: error: class, interface, or 
+enum expected
+  import android.Manifest;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:4: error: class, interface, or 
+enum expected
+  import android.content.Intent;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:5: error: class, interface, or 
+enum expected
+  import android.content.pm.PackageManager;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:6: error: class, interface, or 
+enum expected
+  import android.os.Bundle;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:7: error: class, interface, or 
+enum expected
+  import android.os.Handler;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:8: error: class, interface, or 
+enum expected
+  import android.view.View;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:9: error: class, interface, or 
+enum expected
+  import android.widget.ImageButton;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:10: error: class, interface, or 
+enum expected
+  import android.widget.LinearLayout;
+  ^
+29 actionable tasks: 5 executed, 24 up-to-date
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:11: error: class, interface, or 
+enum expected
+  import android.widget.ProgressBar;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:12: error: class, interface, or 
+enum expected
+  import android.widget.TextView;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:13: error: class, interface, or 
+enum expected
+  import android.widget.Toast;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:15: error: class, interface, or 
+enum expected
+  import androidx.cardview.widget.CardView;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:16: error: class, interface, or 
+enum expected
+  import androidx.core.app.ActivityCompat;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:17: error: class, interface, or 
+enum expected
+  import androidx.core.content.ContextCompat;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:19: error: class, interface, or 
+enum expected
+  import com.fsm.navigator.location.LocationManager;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:20: error: class, interface, or 
+enum expected
+  import com.fsm.navigator.location.WeightedKNN;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:21: error: class, interface, or 
+enum expected
+  import com.fsm.navigator.view.FsmMapView;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:23: error: class, interface, or 
+enum expected
+  import java.util.ArrayList;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:24: error: class, interface, or 
+enum expected
+  import java.util.Arrays;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:25: error: class, interface, or 
+enum expected
+  import java.util.Collections;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:26: error: class, interface, or 
+enum expected
+  import java.util.HashMap;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:27: error: class, interface, or 
+enum expected
+  import java.util.LinkedList;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:28: error: class, interface, or 
+enum expected
+  import java.util.List;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:29: error: class, interface, or 
+enum expected
+  import java.util.Map;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:30: error: class, interface, or 
+enum expected
+  import java.util.Queue;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\NavigationActivity.java:1: error: class, interface, 
+or enum expected
+  ﻿package com.fsm.navigator.controller;
+           ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\NavigationActivity.java:3: error: class, interface, 
+or enum expected
+  import android.content.Intent;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\NavigationActivity.java:4: error: class, interface, 
+or enum expected
+  import android.os.Bundle;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\NavigationActivity.java:5: error: class, interface, 
+or enum expected
+  import android.text.Editable;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\NavigationActivity.java:6: error: class, interface, 
+or enum expected
+  import android.text.TextWatcher;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\NavigationActivity.java:7: error: class, interface, 
+or enum expected
+  import android.util.Log;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\NavigationActivity.java:8: error: class, interface, 
+or enum expected
+  import android.view.View;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BaseDrawerActivity.java:1: error: illegal 
+character: '\ufeff'
+  ﻿package com.fsm.navigator.controller;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\BlockDetailActivity.java:1: error: illegal 
+character: '\ufeff'
+  ﻿package com.fsm.navigator.controller;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\ChangePasswordActivity.java:1: error: illegal 
+character: '\ufeff'
+  ﻿package com.fsm.navigator.controller;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\LoginActivity.java:1: error: illegal character: 
+'\ufeff'
+  ﻿package com.fsm.navigator.controller;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MainActivity.java:1: error: illegal character: 
+'\ufeff'
+  ﻿package com.fsm.navigator.controller;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\MapActivity.java:1: error: illegal character: 
+'\ufeff'
+  ﻿package com.fsm.navigator.controller;
+  ^
+  C:\Fsm_Navigation\app\src\main\java\com\fsm\navigator\controller\NavigationActivity.java:1: error: illegal 
+character: '\ufeff'
+  ﻿package com.fsm.navigator.controller;
+  ^
+  100 errors
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 14s
