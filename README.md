@@ -31,9 +31,6 @@ Faculté des Sciences de Monastir — Université de Monastir — Année 2025/20
 
 | Rôle | Nom |
 |------|-----|
-| Encadrante | Mme Mouna Karaja |
-| Jury Président | M. Nizar Kerkeni |
-| Rapporteur | M. Adnen Mahmoud |
 | Auteur | Hellara Mohamed Momen |
 
 ---
